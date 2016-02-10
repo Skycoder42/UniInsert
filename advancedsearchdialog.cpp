@@ -41,28 +41,16 @@ AdvancedSearchDialog::~AdvancedSearchDialog()
 void AdvancedSearchDialog::on_nameFilterLineEdit_textChanged(const QString &text)
 {
 	QString pattern = QRegularExpression::escape(text);
-	switch (this->mode) {
-	case Contains:
-		break;
-	case StartsWith:
+	if(!this->mode.testFlag(DatabaseLoader::StartsWith))
 		pattern.prepend(QLatin1Char('^'));
-		break;
-	case EndsWith:
+	if(!this->mode.testFlag(DatabaseLoader::EndsWith))
 		pattern.append(QLatin1Char('$'));
-		break;
-	case Wildcard:
-		this->proxyModel->setFilterWildcard(text);
-		return;
-	default:
-		Q_UNREACHABLE();
-		return;
-	}
 	this->proxyModel->setFilterRegExp(pattern);
 }
 
 void AdvancedSearchDialog::on_filterModeComboBox_currentIndexChanged(int index)
 {
-	this->mode = (SearchMode)index;
+	this->mode = (DatabaseLoader::SearchFlag)index;
 	this->on_nameFilterLineEdit_textChanged(this->ui->nameFilterLineEdit->text());
 }
 

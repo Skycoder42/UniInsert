@@ -65,6 +65,11 @@ void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
 	Unicoder::copySymbol(this->ui->previewLineEdit->text());
 }
 
+void SymbolSelectDialog::on_searchButton_clicked()
+{
+
+}
+
 QString SymbolSelectDialog::calcUnicode(const QString &code)
 {
 	QRegularExpressionMatch match = SymbolSelectDialog::unicodeRegex.match(code);

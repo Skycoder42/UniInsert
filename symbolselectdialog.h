@@ -29,6 +29,7 @@ private slots:
 	void on_unicodeLineEdit_textChanged(const QString &text);
 	void on_insertButton_clicked();
 	void on_actionCopy_Symbol_triggered();
+	void on_searchButton_clicked();
 
 private:/*functions*/
 	QString calcUnicode(const QString &code);

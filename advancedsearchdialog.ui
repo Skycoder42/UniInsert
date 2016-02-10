@@ -25,7 +25,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Name Filter:</string>
+        <string>Search Term:</string>
        </property>
       </widget>
      </item>
@@ -61,7 +61,7 @@
        </item>
        <item>
         <property name="text">
-         <string>Wildcard</string>
+         <string>Exact Match</string>
         </property>
        </item>
       </widget>

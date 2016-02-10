@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
+#include "databaseloader.h"
 
 namespace Ui {
 	class AdvancedSearchDialog;
@@ -21,16 +22,9 @@ private slots:
 	void on_treeView_activated(const QModelIndex &index);
 
 private:
-	enum SearchMode {
-		Contains = 0,
-		StartsWith,
-		EndsWith,
-		Wildcard
-	};
-
 	Ui::AdvancedSearchDialog *ui;
 	QSortFilterProxyModel *proxyModel;
-	SearchMode mode;
+	DatabaseLoader::SearchFlags mode;
 
 	QModelIndex selectedIndex;
 
