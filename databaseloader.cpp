@@ -22,8 +22,6 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
 	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
-	//DEBUG
-	Q_ASSERT(QFile::remove(file));
 	if(!QFile::exists(file)) {
 		QFile::copy(QStringLiteral(":/data/mainDB.sqlite"), file);
 		QFile::setPermissions(file, QFileDevice::ReadUser | QFileDevice::WriteUser);
