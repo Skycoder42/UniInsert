@@ -1,18 +1,18 @@
 #include "advancedsearchdialog.h"
 #include "ui_advancedsearchdialog.h"
 #include "unicoder.h"
-#include "codeblockreader.h"
+#include "databaseloader.h"
 
-QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent)
+QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemModel *model)
 {
-	AdvancedSearchDialog dialog(parent);
+	AdvancedSearchDialog dialog(model, parent);
 	if(dialog.exec() == QDialog::Accepted)
 		return dialog.selectedIndex;
 	else
 		return QModelIndex();
 }
 
-AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
+AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::AdvancedSearchDialog),
 	proxyModel(new QSortFilterProxyModel(this)),
@@ -20,7 +20,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	this->proxyModel->setSourceModel(Unicoder::getCodeBlockReader()->blockModel());
+	this->proxyModel->setSourceModel(model);
 	this->proxyModel->setSortLocaleAware(true);
 	this->proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	this->proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);

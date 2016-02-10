@@ -2,7 +2,6 @@
 #define GETCODEDIALOG_H
 
 #include "popupdialog.h"
-#include "codeblockreader.h"
 
 namespace Ui {
 	class GetCodeDialog;

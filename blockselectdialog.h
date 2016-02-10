@@ -25,6 +25,7 @@ private slots:
 
 private:
 	Ui::BlockSelectDialog *ui;
+	QAbstractItemModel *blockModel;
 	DragStringListModel *displayModel;
 };
 

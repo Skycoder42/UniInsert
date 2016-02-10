@@ -13,7 +13,7 @@ class AdvancedSearchDialog : public QDialog
 	Q_OBJECT
 
 public:
-	static QModelIndex searchBlock(QWidget *parent);
+	static QModelIndex searchBlock(QWidget *parent, QAbstractItemModel *model);
 
 private slots:
 	void on_nameFilterLineEdit_textChanged(const QString &text);
@@ -34,7 +34,7 @@ private:
 
 	QModelIndex selectedIndex;
 
-	explicit AdvancedSearchDialog(QWidget *parent = 0);
+	explicit AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent = nullptr);
 	~AdvancedSearchDialog();
 };
 

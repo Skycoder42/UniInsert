@@ -4,12 +4,12 @@
 #include <QClipboard>
 #include <QAbstractItemModel>
 #include <QMimeData>
-#include "codeblockreader.h"
+#include "databaseloader.h"
 #include "symbolinserter.h"
 
 //all static "helper classes"
 Q_GLOBAL_STATIC(SymbolInserter, symbolInserter)
-Q_GLOBAL_STATIC(CodeBlockReader, codeBlockReader)
+Q_GLOBAL_STATIC(DatabaseLoader, databaseLoader)
 
 QString Unicoder::code32ToSymbol(uint code)
 {
@@ -80,34 +80,19 @@ Unicoder::SurrogatePair Unicoder::code32ToCode16(uint code)
 
 void Unicoder::sendSymbolInput(const QString &symbol)
 {
-	codeBlockReader->updateRecent(symbol);
+	::databaseLoader->updateRecent(symbol);
 	symbolInserter->insertSymbol(symbol);
 }
 
 void Unicoder::copySymbol(const QString &symbol)
 {
-	codeBlockReader->updateRecent(symbol);
+	::databaseLoader->updateRecent(symbol);
 	QApplication::clipboard()->setText(symbol);
 }
 
-CodeBlockReader *Unicoder::getCodeBlockReader()
+DatabaseLoader *Unicoder::databaseLoader()
 {
-	return codeBlockReader;
-}
-
-QString Unicoder::findSymbolBlock(const QString &symbol)
-{
-	return codeBlockReader->blockModel()->data(codeBlockReader->findBlock(symbol)).toString();
-}
-
-QString Unicoder::findSymbolBlock(Unicoder::SurrogatePair code)
-{
-	return codeBlockReader->blockModel()->data(codeBlockReader->findBlock(code)).toString();
-}
-
-QString Unicoder::findSymbolBlock(uint code)
-{
-	return codeBlockReader->blockModel()->data(codeBlockReader->findBlock(code)).toString();
+	return ::databaseLoader;
 }
 
 
@@ -152,7 +137,7 @@ QMimeData *DragStringListModel::mimeData(const QModelIndexList &indexes) const
 	QMimeData *data = this->QStringListModel::mimeData(indexes);
 	if(data && indexes.size() == 1) {
 		QString symbol = this->data(indexes.first(), Qt::DisplayRole).toString();
-		Unicoder::getCodeBlockReader()->updateRecent(symbol);
+		Unicoder::databaseLoader()->updateRecent(symbol);
 		data->setText(symbol);
 	}
 	return data;

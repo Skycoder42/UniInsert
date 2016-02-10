@@ -19,7 +19,6 @@ include(C:/C++Libraries/Qt/QHotkey/qhotkey.pri)
 SOURCES += main.cpp\
         symbolselectdialog.cpp \
     getcodedialog.cpp \
-    codeblockreader.cpp \
     unicoder.cpp \
     blockselectdialog.cpp \
     popupdialog.cpp \
@@ -31,7 +30,6 @@ SOURCES += main.cpp\
 
 HEADERS  += symbolselectdialog.h \
     getcodedialog.h \
-    codeblockreader.h \
     unicoder.h \
     blockselectdialog.h \
     popupdialog.h \

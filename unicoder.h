@@ -6,7 +6,7 @@
 #include <QStringListModel>
 #include <QAction>
 #include <QAbstractItemView>
-class CodeBlockReader;
+class DatabaseLoader;
 
 class Unicoder
 {
@@ -33,10 +33,7 @@ public:
 	static void sendSymbolInput(const QString &symbol);
 	static void copySymbol(const QString &symbol);
 
-	static CodeBlockReader *getCodeBlockReader();
-	static QString findSymbolBlock(const QString &symbol);
-	static QString findSymbolBlock(Unicoder::SurrogatePair code);
-	static QString findSymbolBlock(uint code);
+	static DatabaseLoader *databaseLoader();
 
 private:
 	Unicoder() = delete;
@@ -46,7 +43,7 @@ private:
 class DragStringListModel : public QStringListModel
 {
 public:
-	DragStringListModel(QObject *parent = NULL);
+	DragStringListModel(QObject *parent = nullptr);
 
 	QAction *createCopyAction(QAbstractItemView *view) const;
 

@@ -4,12 +4,13 @@
 #include <QTreeView>
 #include <QShowEvent>
 #include "unicoder.h"
-#include "codeblockreader.h"
 #include "advancedsearchdialog.h"
+#include "databaseloader.h"
 
 BlockSelectDialog::BlockSelectDialog() :
 	PopupDialog(false),
 	ui(new Ui::BlockSelectDialog),
+	blockModel(Unicoder::databaseLoader()->createBlockModel(this)),
 	displayModel(new DragStringListModel(this))
 {
 	ui->setupUi(this);
@@ -21,7 +22,7 @@ BlockSelectDialog::BlockSelectDialog() :
 	connect(this->ui->listView, &QListView::activated,
 			this->displayModel, &DragStringListModel::activateItem);
 
-	this->ui->comboBox->setModel(Unicoder::getCodeBlockReader()->blockModel());
+	this->ui->comboBox->setModel(this->blockModel);
 	this->ui->listView->setModel(this->displayModel);
 }
 
@@ -39,13 +40,17 @@ void BlockSelectDialog::showEvent(QShowEvent *event)
 
 void BlockSelectDialog::on_comboBox_currentIndexChanged(int index)
 {
-	this->displayModel->setStringList(Unicoder::getCodeBlockReader()->createBlock(index));
+	QModelIndex modelIndex = this->blockModel->index(index, 0);
+	if(modelIndex.isValid()) {
+		int blockID = this->blockModel->data(modelIndex, DatabaseLoader::BlockModelDataRole).toInt();
+		this->displayModel->setStringList(Unicoder::databaseLoader()->createBlock(blockID));
+	}
 }
 
 void BlockSelectDialog::on_toolButton_clicked()
 {
 	this->setAutoHide(false);
-	QModelIndex index = AdvancedSearchDialog::searchBlock(this);
+	QModelIndex index = AdvancedSearchDialog::searchBlock(this, this->blockModel);
 	if(index.isValid())
 		this->ui->comboBox->setCurrentIndex(index.row());
 	this->setAutoHide(true);

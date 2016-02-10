@@ -1,7 +1,8 @@
 #include "getcodedialog.h"
 #include "ui_getcodedialog.h"
-#include "unicoder.h"
 #include <QShowEvent>
+#include "unicoder.h"
+#include "databaseloader.h"
 
 GetCodeDialog::GetCodeDialog() :
 	PopupDialog(true),
@@ -44,7 +45,7 @@ void GetCodeDialog::on_symbolLineEdit_textChanged(const QString &text)
 			this->ui->uTF16CodeHighLineEdit->clear();
 			this->ui->uTF16CodeLowLineEdit->setText(uniBase.arg(shortCode.lowCode, 4, 16, QLatin1Char('0')).toUpper());
 		}
-		this->ui->symbolGroupLineEdit->setText(Unicoder::findSymbolBlock(text));
+		this->ui->symbolGroupLineEdit->setText(Unicoder::databaseLoader()->findBlockName(text));
 	} else {
 		this->ui->uTF16CodeHighLineEdit->setEnabled(true);
 		this->ui->uTF16CodeHighLineEdit->clear();

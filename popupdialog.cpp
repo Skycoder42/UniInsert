@@ -4,7 +4,7 @@
 #include <QSettings>
 
 PopupDialog::PopupDialog(bool isFixedSize) :
-	QDialog(new QWidget(NULL), Qt::Dialog |
+	QDialog(new QWidget(nullptr), Qt::Dialog |
 			Qt::CustomizeWindowHint |
 			Qt::WindowTitleHint |
 			Qt::WindowCloseButtonHint |
