@@ -4,9 +4,9 @@
 #include <qt_windows.h>
 #include <QVector>
 #include <QDebug>
-#include <QSettings>
 #include <QMimeData>
 #include <QTimer>
+#include "settingsdialog.h"
 
 SymbolInserter::SymbolInserter(QObject *parent) :
 	QObject(parent)
@@ -15,7 +15,7 @@ SymbolInserter::SymbolInserter(QObject *parent) :
 void SymbolInserter::insertSymbol(const QString &symbol)
 {
 	const char *method = nullptr;
-	if(QSettings().value("allClip", false).toBool())
+	if(SETTINGS_VALUE(SettingsDialog::allClip).toBool())
 		method = "sendClipInput";
 	else
 		method = "sendInput";
@@ -44,7 +44,7 @@ void SymbolInserter::sendInput(const QString &symbol)
 	uint res = ::SendInput(len, inputs.data(), sizeof(INPUT));
 	if(res != len) {
 		qDebug() << "send data failed with error" << ::GetLastError();
-		if(QSettings().value("useClip", true).toBool())
+		if(SETTINGS_VALUE(SettingsDialog::useClip).toBool())
 			this->sendClipInput(symbol);
 	}
 }

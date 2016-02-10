@@ -56,6 +56,8 @@ public:
 	void updateRecent(uint code) const;
 
 	//emojis
+	QMap<int, QString> listEmojiGroups() const;
+	QStringList createEmojiGroup(int groupID) const;
 
 private:/*functions*/
 	static QString prepareSearch(QString term, SearchFlags flags);

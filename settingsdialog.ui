@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
-    <height>113</height>
+    <width>436</width>
+    <height>139</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,6 +77,38 @@
       <widget class="QCheckBox" name="autoHideWindowsCheckBox">
        <property name="checked">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="maximumRecentlyUsedItemsLabel">
+       <property name="text">
+        <string>Maximum &amp;Recently Used Items:</string>
+       </property>
+       <property name="buddy">
+        <cstring>maximumRecentlyUsedItemsSpinBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="maximumRecentlyUsedItemsSpinBox">
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::PlusMinus</enum>
+       </property>
+       <property name="specialValueText">
+        <string>Deactivated</string>
+       </property>
+       <property name="accelerated">
+        <bool>true</bool>
+       </property>
+       <property name="correctionMode">
+        <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="value">
+        <number>42</number>
        </property>
       </widget>
      </item>

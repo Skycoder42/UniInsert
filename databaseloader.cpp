@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QStandardItemModel>
+#include "settingsdialog.h"
 
 const QString DatabaseLoader::DBName = QStringLiteral("UnicodeDB");
 const DatabaseLoader::Range DatabaseLoader::InvalidRange(UINT_MAX, 0);
@@ -73,7 +74,7 @@ QStringList DatabaseLoader::createBlock(int blockID) const
 	if(blockID == 0) {
 		QSqlQuery query(this->mainDB);
 		query.prepare(QStringLiteral("SELECT Code FROM Recent ORDER BY Count DESC LIMIT 0, :limit"));
-		query.bindValue(QStringLiteral(":limit"), 42);//TODO settings
+		query.bindValue(QStringLiteral(":limit"), SETTINGS_VALUE(SettingsDialog::maxRecent).toInt());
 		if(query.exec()) {
 			QStringList list;
 			while(query.next())
@@ -199,6 +200,33 @@ void DatabaseLoader::updateRecent(uint code) const
 			qDebug() << "Failed to update recent entry";
 	} else
 		qDebug() << "Failed to insert/ignore recent entry";
+}
+
+QMap<int, QString> DatabaseLoader::listEmojiGroups() const
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("SELECT ID, Name FROM EmojiGroups"));
+	if(query.exec()) {
+		QMap<int, QString> map;
+		while(query.next())
+			map.insert(query.value(0).toInt(), query.value(1).toString());
+		return map;
+	} else
+		return QMap<int, QString>();
+}
+
+QStringList DatabaseLoader::createEmojiGroup(int groupID) const
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID FROM EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID WHERE EmojiGroups.ID = :groupID"));
+	query.bindValue(QStringLiteral(":groupID"), groupID);
+	if(query.exec()) {
+		QStringList emojiList;
+		while(query.next())
+			emojiList += Unicoder::code32ToSymbol(query.value(0).toUInt());
+		return emojiList;
+	} else
+		return QStringList();
 }
 
 QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)

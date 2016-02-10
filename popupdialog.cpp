@@ -1,7 +1,7 @@
 #include "popupdialog.h"
 #include <QEvent>
 #include <QCloseEvent>
-#include <QSettings>
+#include "settingsdialog.h"
 
 PopupDialog::PopupDialog(bool isFixedSize) :
 	QDialog(new QWidget(nullptr), Qt::Dialog |
@@ -36,7 +36,7 @@ void PopupDialog::popup()
 bool PopupDialog::event(QEvent *event)
 {
 	if(this->autoHide && event->type() == QEvent::WindowDeactivate) {
-		if(QSettings().value("autoHide", true).toBool())
+		if(SETTINGS_VALUE(SettingsDialog::autoHide).toBool())
 			this->close();
 	}
 	return this->QDialog::event(event);
