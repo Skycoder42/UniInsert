@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     symbolinserter.cpp \
     advancedsearchdialog.cpp \
     emojidialog.cpp \
-    databaseloader.cpp
+    databaseloader.cpp \
+    unicodermodels.cpp
 
 HEADERS  += symbolselectdialog.h \
     getcodedialog.h \
@@ -37,7 +38,8 @@ HEADERS  += symbolselectdialog.h \
     symbolinserter.h \
     advancedsearchdialog.h \
     emojidialog.h \
-    databaseloader.h
+    databaseloader.h \
+    unicodermodels.h
 
 FORMS    += symbolselectdialog.ui \
     getcodedialog.ui \

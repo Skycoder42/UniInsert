@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QMap>
+#include <QAbstractItemModel>
 #include "unicoder.h"
 
 class DatabaseLoader : public QObject
@@ -11,6 +12,8 @@ class DatabaseLoader : public QObject
 	Q_OBJECT
 public:
 	typedef QPair<uint, uint> Range;
+	typedef QPair<uint, QString> SymbolInfo;
+	typedef QList<SymbolInfo> SymbolInfoList;
 
 	enum {BlockModelDataRole = Qt::UserRole + 1};
 
@@ -36,12 +39,12 @@ public:
 	inline QString nameForSymbol(const QString &symbol) const;
 	inline QString nameForSymbol(Unicoder::SurrogatePair code) const;
 	QString nameForSymbol(uint code) const;
-	QMap<uint, QString> searchName(const QString &nameTerm, SearchFlags mode = Contains) const;
+	SymbolInfoList searchName(const QString &nameTerm, SearchFlags mode = Contains) const;
 	QSqlQuery searchNameQuery(const QString &nameTerm, SearchFlags mode = Contains) const;
 	QSqlQuery emptySearchQuery() const;
 
 	//per block
-	QStringList createBlock(int blockID) const;
+	SymbolInfoList createBlock(int blockID) const;
 	inline int findBlock(const QString &symbol) const;
 	inline int findBlock(Unicoder::SurrogatePair code) const;
 	int findBlock(uint code) const;
@@ -59,7 +62,7 @@ public:
 
 	//emojis
 	QMap<int, QString> listEmojiGroups() const;
-	QStringList createEmojiGroup(int groupID) const;
+	SymbolInfoList createEmojiGroup(int groupID) const;
 
 private:/*functions*/
 	static QString prepareSearch(QString term, SearchFlags flags);

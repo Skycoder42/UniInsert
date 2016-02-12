@@ -3,6 +3,7 @@
 
 #include "popupdialog.h"
 #include "unicoder.h"
+#include "unicodermodels.h"
 
 namespace Ui {
 	class BlockSelectDialog;
@@ -26,7 +27,7 @@ private slots:
 private:
 	Ui::BlockSelectDialog *ui;
 	QAbstractItemModel *blockModel;
-	DragStringListModel *displayModel;
+	SymbolListModel *displayModel;
 };
 
 #endif // BLOCKSELECT࣫DIALOG_H

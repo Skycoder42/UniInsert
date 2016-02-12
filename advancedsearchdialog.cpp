@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include "unicoder.h"
 #include "databaseloader.h"
+#include "unicodermodels.h"
 
 QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemModel *model)
 {
@@ -73,8 +74,31 @@ AdvancedSearchDialog::~AdvancedSearchDialog()
 
 void AdvancedSearchDialog::on_nameFilterLineEdit_textChanged(const QString &text)
 {
+	this->updateSearch(text, false);
+}
+
+void AdvancedSearchDialog::on_nameFilterLineEdit_returnPressed()
+{
+	this->updateSearch(this->ui->nameFilterLineEdit->text(), true);
+}
+
+void AdvancedSearchDialog::on_filterModeComboBox_currentIndexChanged(int index)
+{
+	this->mode = (DatabaseLoader::SearchFlag)index;
+	this->on_nameFilterLineEdit_textChanged(this->ui->nameFilterLineEdit->text());
+}
+
+void AdvancedSearchDialog::on_treeView_activated(const QModelIndex &index)
+{
+	this->selectedIndex = this->proxyModel->mapToSource(index);
+	this->selectedIndex = this->selectedIndex.sibling(this->selectedIndex.row(), 0);
+	this->accept();
+}
+
+void AdvancedSearchDialog::updateSearch(const QString &text, bool force)
+{
 	if(this->symbolModel) {
-		if(text.size() < 3)
+		if(!force && text.size() < 3)
 			this->symbolModel->setQuery(Unicoder::databaseLoader()->emptySearchQuery());
 		else {
 			QString pattern = text;
@@ -92,17 +116,4 @@ void AdvancedSearchDialog::on_nameFilterLineEdit_textChanged(const QString &text
 			pattern.append(QLatin1Char('$'));
 		this->proxyModel->setFilterRegExp(pattern);
 	}
-}
-
-void AdvancedSearchDialog::on_filterModeComboBox_currentIndexChanged(int index)
-{
-	this->mode = (DatabaseLoader::SearchFlag)index;
-	this->on_nameFilterLineEdit_textChanged(this->ui->nameFilterLineEdit->text());
-}
-
-void AdvancedSearchDialog::on_treeView_activated(const QModelIndex &index)
-{
-	this->selectedIndex = this->proxyModel->mapToSource(index);
-	this->selectedIndex = this->selectedIndex.sibling(this->selectedIndex.row(), 0);
-	this->accept();
 }

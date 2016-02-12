@@ -3,10 +3,6 @@
 
 #include <QString>
 #include <QPair>
-#include <QStringListModel>
-#include <QAction>
-#include <QAbstractItemView>
-#include <QStyledItemDelegate>
 class DatabaseLoader;
 
 class Unicoder
@@ -42,32 +38,5 @@ private:
 	Unicoder() = delete;
 	Unicoder(const Unicoder& other) = delete;
 };
-class DragStringListModel : public QStringListModel
-{
-public:
-	DragStringListModel(QObject *parent = nullptr);
-
-	QAction *createCopyAction(QAbstractItemView *view) const;
-
-	// QAbstractItemModel interface
-	QStringList mimeTypes() const Q_DECL_OVERRIDE;
-	QMimeData *mimeData(const QModelIndexList &indexes) const Q_DECL_OVERRIDE;
-
-public slots:
-	void activateItem(const QModelIndex &index) const;
-	void copyItem(const QModelIndex &index) const;
-};
-
-class UnicodeDelegate : public QStyledItemDelegate
-{
-public:
-	static QString displayCode(uint code);
-
-	UnicodeDelegate(QObject *parent = nullptr);
-	QString displayText(const QVariant &value, const QLocale &locale) const Q_DECL_OVERRIDE;
-};
-
-
-
 
 #endif // UNICODER_H

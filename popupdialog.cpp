@@ -1,6 +1,8 @@
 #include "popupdialog.h"
 #include <QEvent>
 #include <QCloseEvent>
+#include <QApplication>
+#include <QDesktopWidget>
 #include "settingsdialog.h"
 
 PopupDialog::PopupDialog(bool isFixedSize) :
@@ -28,6 +30,9 @@ void PopupDialog::setAutoHide(bool autoHide)
 
 void PopupDialog::popup()
 {
+	QRect geom = this->geometry();
+	geom.moveCenter(QApplication::desktop()->screenGeometry(QCursor::pos()).center());
+	this->move(geom.topLeft());
 	this->show();
 	this->raise();
 	this->activateWindow();

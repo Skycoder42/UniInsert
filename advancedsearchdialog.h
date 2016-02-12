@@ -20,8 +20,10 @@ public:
 
 private slots:
 	void on_nameFilterLineEdit_textChanged(const QString &text);
+	void on_nameFilterLineEdit_returnPressed();
 	void on_filterModeComboBox_currentIndexChanged(int index);
 	void on_treeView_activated(const QModelIndex &index);
+
 
 private:
 	Ui::AdvancedSearchDialog *ui;
@@ -34,6 +36,8 @@ private:
 	explicit AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent = nullptr);
 	explicit AdvancedSearchDialog(QWidget *parent = nullptr);
 	~AdvancedSearchDialog();
+
+	void updateSearch(const QString &text, bool force);
 };
 
 #endif // ADVANCEDSEARCHDIALOG_H

@@ -3,6 +3,7 @@
 #include <QListView>
 #include "unicoder.h"
 #include "databaseloader.h"
+#include "unicodermodels.h"
 
 EmojiDialog::EmojiDialog(QWidget *parent) :
 	PopupDialog(parent),
@@ -13,8 +14,8 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 	typedef QMap<int, QString>::const_iterator itr;
 	QMap<int, QString> groups = Unicoder::databaseLoader()->listEmojiGroups();
 	for(itr it = groups.begin(), end = groups.end(); it != end; ++it) {
-		DragStringListModel *model = new DragStringListModel(this);
-		model->setStringList(Unicoder::databaseLoader()->createEmojiGroup(it.key()));
+		SymbolListModel *model = new SymbolListModel(this);
+		model->resetData(Unicoder::databaseLoader()->createEmojiGroup(it.key()));
 
 		QListView *view = new QListView(this->ui->tabWidget);
 		QFont font = view->font();
@@ -35,7 +36,7 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 
 		model->createCopyAction(view);
 		connect(view, &QListView::activated, this, &EmojiDialog::accept);
-		connect(view, &QListView::activated, model, &DragStringListModel::activateItem);
+		connect(view, &QListView::activated, model, &SymbolListModel::activateItem);
 		view->setModel(model);
 
 		QString title = it.value();

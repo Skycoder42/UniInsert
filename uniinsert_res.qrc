@@ -5,7 +5,7 @@
         <file alias="zoom.ico">icons/Fatcow-Farm-Fresh-Zoom-in.ico</file>
         <file alias="main.ico">icons/UNI.Logo.ico</file>
         <file alias="detailedSearch.ico">icons/Fatcow-Farm-Fresh-Advanced-data-grid.ico</file>
-        <file alias="search.ico">icons/Fatcow-Farm-Fresh-Magnifier.ico</file>
+        <file alias="search.ico">icons/Fatcow-Farm-Fresh-Search-field.ico</file>
     </qresource>
     <qresource prefix="/data">
         <file alias="mainDB.sqlite">tables/uniDatabase.sqlite</file>

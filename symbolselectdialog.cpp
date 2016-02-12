@@ -21,6 +21,10 @@ SymbolSelectDialog::SymbolSelectDialog() :
 	this->ui->actionCopy_Symbol->setShortcut(QKeySequence::Copy);
 	this->ui->copyButton->setDefaultAction(this->ui->actionCopy_Symbol);
 	this->ui->previewLineEdit->addAction(this->ui->actionCopy_Symbol);
+
+	this->ui->actionSearch_symbol_name->setShortcut(QKeySequence::Find);
+	this->ui->searchButton->setDefaultAction(this->ui->actionSearch_symbol_name);
+	this->ui->unicodeLineEdit->addAction(this->ui->actionSearch_symbol_name);
 }
 
 SymbolSelectDialog::~SymbolSelectDialog()
@@ -66,7 +70,7 @@ void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
 	Unicoder::copySymbol(this->ui->previewLineEdit->text());
 }
 
-void SymbolSelectDialog::on_searchButton_clicked()
+void SymbolSelectDialog::on_actionSearch_symbol_name_triggered()
 {
 	this->setAutoHide(false);
 	QString code = AdvancedSearchDialog::searchSymbol(this);

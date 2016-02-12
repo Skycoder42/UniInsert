@@ -84,15 +84,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="searchButton">
-       <property name="toolTip">
-        <string>Search the symbol by it's name</string>
-       </property>
-       <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
-         <normaloff>:/icons/search.ico</normaloff>:/icons/search.ico</iconset>
-       </property>
-      </widget>
+      <widget class="QToolButton" name="searchButton"/>
      </item>
     </layout>
    </item>
@@ -143,6 +135,21 @@
    </property>
    <property name="toolTip">
     <string>Copy the symbol to the clipboard</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionSearch_symbol_name">
+   <property name="icon">
+    <iconset resource="uniinsert_res.qrc">
+     <normaloff>:/icons/search.ico</normaloff>:/icons/search.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Search symbol name</string>
+   </property>
+   <property name="toolTip">
+    <string>Searches for a specific symbol by it's name</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::WidgetWithChildrenShortcut</enum>

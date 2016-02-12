@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>267</width>
-    <height>148</height>
+    <width>357</width>
+    <height>174</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -151,13 +151,33 @@
     </widget>
    </item>
    <item row="4" column="0">
+    <widget class="QLabel" name="symbolNameLabel">
+     <property name="text">
+      <string>Symbol Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="symbolNameLineEdit">
+     <property name="dragEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>The symbols name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QLabel" name="symbolGroupLabel">
      <property name="text">
       <string>Symbol Group:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QLineEdit" name="symbolGroupLineEdit">
      <property name="dragEnabled">
       <bool>true</bool>

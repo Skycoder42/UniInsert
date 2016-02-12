@@ -52,16 +52,16 @@ QString DatabaseLoader::nameForSymbol(uint code) const
 		return QString();
 }
 
-QMap<uint, QString> DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode) const
+DatabaseLoader::SymbolInfoList DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode) const
 {
 	QSqlQuery query = this->searchNameQuery(nameTerm, mode);
 	if(query.isActive()) {
-		QMap<uint, QString> result;
+		SymbolInfoList result;
 		while(query.next())
-			result.insert(query.value(0).toUInt(), query.value(1).toString());
+			result += {query.value(0).toUInt(), query.value(1).toString()};
 		return result;
 	} else
-		return QMap<uint, QString>();
+		return SymbolInfoList();
 }
 
 QSqlQuery DatabaseLoader::searchNameQuery(const QString &nameTerm, SearchFlags mode) const
@@ -86,29 +86,36 @@ QSqlQuery DatabaseLoader::emptySearchQuery() const
 		return QSqlQuery();
 }
 
-QStringList DatabaseLoader::createBlock(int blockID) const
+DatabaseLoader::SymbolInfoList DatabaseLoader::createBlock(int blockID) const
 {
 	if(blockID == 0) {
 		QSqlQuery query(this->mainDB);
-		query.prepare(QStringLiteral("SELECT Code FROM Recent ORDER BY Count DESC LIMIT 0, :limit"));
+		query.prepare(QStringLiteral("SELECT Recent.Code, Symbols.Name FROM Recent INNER JOIN Symbols ON Recent.Code = Symbols.Code ORDER BY Count DESC LIMIT 0, :limit"));
 		query.bindValue(QStringLiteral(":limit"), SETTINGS_VALUE(SettingsDialog::maxRecent).toInt());
 		if(query.exec()) {
-			QStringList list;
+			SymbolInfoList symbolList;
 			while(query.next())
-				list += Unicoder::code32ToSymbol(query.value(0).toUInt());
-			return list;
+				symbolList += {query.value(0).toUInt(), query.value(1).toString()};
+			return symbolList;
 		} else
-			return QStringList();
+			return SymbolInfoList();
 	} else {
 		//get the blocks borders
 		Range range = this->blockRange(blockID);
 		if(DatabaseLoader::isRangeValid(range)) {
-			QStringList list;
-			for(uint code = range.first; code <= range.second; ++code)
-				list += Unicoder::code32ToSymbol(code);
-			return list;
-		} else
-			return QStringList();
+			QSqlQuery query(this->mainDB);
+			query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE Code >= :start AND Code <= :end"));
+			query.bindValue(QStringLiteral(":start"), range.first);
+			query.bindValue(QStringLiteral(":end"), range.second);
+			if(query.exec()) {
+				SymbolInfoList symbolList;
+				while(query.next())
+					symbolList += {query.value(0).toUInt(), query.value(1).toString()};
+				return symbolList;
+			}
+		}
+
+		return SymbolInfoList();
 	}
 }
 
@@ -125,17 +132,13 @@ int DatabaseLoader::findBlock(uint code) const
 
 QString DatabaseLoader::blockName(int blockID) const
 {
-	if(blockID == 0)
-		return tr("Recently Used");
-	else {
-		QSqlQuery query(this->mainDB);
-		query.prepare(QStringLiteral("SELECT Name FROM Blocks WHERE ID = :id"));
-		query.bindValue(QStringLiteral(":id"), blockID);
-		if(query.exec() && query.first())
-			return query.value(0).toString();
-		else
-			return QString();
-	}
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("SELECT Name FROM Blocks WHERE ID = :id"));
+	query.bindValue(QStringLiteral(":id"), blockID);
+	if(query.exec() && query.first())
+		return query.value(0).toString();
+	else
+		return QString();
 }
 
 DatabaseLoader::Range DatabaseLoader::blockRange(int blockID) const
@@ -143,9 +146,14 @@ DatabaseLoader::Range DatabaseLoader::blockRange(int blockID) const
 	QSqlQuery query(this->mainDB);
 	query.prepare(QStringLiteral("SELECT Start, End FROM Blocks WHERE ID = :id"));
 	query.bindValue(QStringLiteral(":id"), blockID);
-	if(query.exec() && query.first())
-		return {query.value(0).toUInt(), query.value(1).toUInt()};
-	else
+	if(query.exec() && query.first()) {
+		bool ok1 = false, ok2 = false;
+		Range range = {query.value(0).toUInt(&ok1), query.value(1).toUInt(&ok2)};
+		if(ok1 && ok2)
+			return range;
+		else
+			return DatabaseLoader::InvalidRange;
+	} else
 		return DatabaseLoader::InvalidRange;
 }
 
@@ -232,18 +240,18 @@ QMap<int, QString> DatabaseLoader::listEmojiGroups() const
 		return QMap<int, QString>();
 }
 
-QStringList DatabaseLoader::createEmojiGroup(int groupID) const
+DatabaseLoader::SymbolInfoList DatabaseLoader::createEmojiGroup(int groupID) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID FROM EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID WHERE EmojiGroups.ID = :groupID"));
+	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID AS ID, Symbols.Name AS Name FROM (EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID) AS TTbl INNER JOIN Symbols ON TTbl.EmojiID = Symbols.Code WHERE EmojiGroups.ID = :groupID"));
 	query.bindValue(QStringLiteral(":groupID"), groupID);
 	if(query.exec()) {
-		QStringList emojiList;
+		SymbolInfoList emojiList;
 		while(query.next())
-			emojiList += Unicoder::code32ToSymbol(query.value(0).toUInt());
+			emojiList += {query.value(0).toUInt(), query.value(1).toString()};
 		return emojiList;
 	} else
-		return QStringList();
+		return SymbolInfoList();
 }
 
 QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)

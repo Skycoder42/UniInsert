@@ -6,12 +6,13 @@
 #include "unicoder.h"
 #include "advancedsearchdialog.h"
 #include "databaseloader.h"
+#include "unicodermodels.h"
 
 BlockSelectDialog::BlockSelectDialog() :
 	PopupDialog(false),
 	ui(new Ui::BlockSelectDialog),
 	blockModel(Unicoder::databaseLoader()->createBlockModel(this)),
-	displayModel(new DragStringListModel(this))
+	displayModel(new SymbolListModel(this))
 {
 	ui->setupUi(this);
 
@@ -20,7 +21,7 @@ BlockSelectDialog::BlockSelectDialog() :
 	connect(this->ui->listView, &QListView::activated,
 			this, &BlockSelectDialog::accept);
 	connect(this->ui->listView, &QListView::activated,
-			this->displayModel, &DragStringListModel::activateItem);
+			this->displayModel, &SymbolListModel::activateItem);
 
 	this->ui->comboBox->setModel(this->blockModel);
 	this->ui->listView->setModel(this->displayModel);
@@ -43,7 +44,7 @@ void BlockSelectDialog::on_comboBox_currentIndexChanged(int index)
 	QModelIndex modelIndex = this->blockModel->index(index, 0);
 	if(modelIndex.isValid()) {
 		int blockID = this->blockModel->data(modelIndex, DatabaseLoader::BlockModelDataRole).toInt();
-		this->displayModel->setStringList(Unicoder::databaseLoader()->createBlock(blockID));
+		this->displayModel->resetData(Unicoder::databaseLoader()->createBlock(blockID));
 	}
 }
 

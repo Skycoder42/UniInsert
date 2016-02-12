@@ -45,6 +45,7 @@ void GetCodeDialog::on_symbolLineEdit_textChanged(const QString &text)
 			this->ui->uTF16CodeHighLineEdit->clear();
 			this->ui->uTF16CodeLowLineEdit->setText(uniBase.arg(shortCode.lowCode, 4, 16, QLatin1Char('0')).toUpper());
 		}
+		this->ui->symbolNameLineEdit->setText(Unicoder::databaseLoader()->nameForSymbol(text));
 		this->ui->symbolGroupLineEdit->setText(Unicoder::databaseLoader()->findBlockName(text));
 	} else {
 		this->ui->uTF16CodeHighLineEdit->setEnabled(true);
@@ -52,6 +53,7 @@ void GetCodeDialog::on_symbolLineEdit_textChanged(const QString &text)
 		this->ui->uTF16CodeLowLineEdit->clear();
 		this->ui->uTF32CodeLineEdit->clear();
 		this->ui->hTMLCodeLineEdit->clear();
+		this->ui->symbolNameLineEdit->clear();
 		this->ui->symbolGroupLineEdit->clear();
 	}
 }
