@@ -1,5 +1,6 @@
 #include "advancedsearchdialog.h"
 #include "ui_advancedsearchdialog.h"
+#include <QSqlQuery>
 #include "unicoder.h"
 #include "databaseloader.h"
 
@@ -12,16 +13,21 @@ QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemMode
 		return QModelIndex();
 }
 
-uint AdvancedSearchDialog::searchSymbol(QWidget *parent)
+QString AdvancedSearchDialog::searchSymbol(QWidget *parent)
 {
-
+	AdvancedSearchDialog dialog(parent);
+	if(dialog.exec() == QDialog::Accepted)
+		return UnicodeDelegate::displayCode(dialog.selectedIndex.data().toUInt());
+	else
+		return QString();
 }
 
 AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::AdvancedSearchDialog),
 	proxyModel(new QSortFilterProxyModel(this)),
-	mode(Contains)
+	symbolModel(nullptr),
+	mode(DatabaseLoader::Contains)
 {
 	ui->setupUi(this);
 
@@ -38,6 +44,28 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
 }
 
+AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
+	QDialog(parent, Qt::WindowCloseButtonHint),
+	ui(new Ui::AdvancedSearchDialog),
+	proxyModel(new QSortFilterProxyModel(this)),
+	symbolModel(new QSqlQueryModel(this)),
+	mode(DatabaseLoader::Contains)
+{
+	ui->setupUi(this);
+
+	this->symbolModel->setHeaderData(0, Qt::Horizontal, tr("Code"));
+	this->symbolModel->setHeaderData(1, Qt::Horizontal, tr("Name"));
+	this->symbolModel->setQuery(Unicoder::databaseLoader()->emptySearchQuery());
+
+	this->proxyModel->setSourceModel(this->symbolModel);
+	this->proxyModel->setSortLocaleAware(true);
+	this->proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+	this->ui->treeView->setModel(this->proxyModel);
+
+	this->ui->treeView->setItemDelegateForColumn(0, new UnicodeDelegate(this->ui->treeView));
+	this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
+}
+
 AdvancedSearchDialog::~AdvancedSearchDialog()
 {
 	delete ui;
@@ -45,12 +73,25 @@ AdvancedSearchDialog::~AdvancedSearchDialog()
 
 void AdvancedSearchDialog::on_nameFilterLineEdit_textChanged(const QString &text)
 {
-	QString pattern = QRegularExpression::escape(text);
-	if(this->mode.testFlag(DatabaseLoader::StartsWith))
-		pattern.prepend(QLatin1Char('^'));
-	if(this->mode.testFlag(DatabaseLoader::EndsWith))
-		pattern.append(QLatin1Char('$'));
-	this->proxyModel->setFilterRegExp(pattern);
+	if(this->symbolModel) {
+		if(text.size() < 3)
+			this->symbolModel->setQuery(Unicoder::databaseLoader()->emptySearchQuery());
+		else {
+			QString pattern = text;
+			pattern.replace(QLatin1Char('*'), QLatin1Char('%'));
+			pattern.replace(QLatin1Char('?'), QLatin1Char('_'));
+			this->symbolModel->setQuery(Unicoder::databaseLoader()->searchNameQuery(pattern, this->mode));
+		}
+	} else {
+		QString pattern = QRegExp::escape(text);
+		pattern.replace(QStringLiteral("\\*"), QStringLiteral(".*"));
+		pattern.replace(QStringLiteral("\\?"), QStringLiteral("."));
+		if(this->mode.testFlag(DatabaseLoader::StartsWith))
+			pattern.prepend(QLatin1Char('^'));
+		if(this->mode.testFlag(DatabaseLoader::EndsWith))
+			pattern.append(QLatin1Char('$'));
+		this->proxyModel->setFilterRegExp(pattern);
+	}
 }
 
 void AdvancedSearchDialog::on_filterModeComboBox_currentIndexChanged(int index)

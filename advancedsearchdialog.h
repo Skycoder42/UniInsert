@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
+#include <QSqlQueryModel>
 #include "databaseloader.h"
 
 namespace Ui {
@@ -15,7 +16,7 @@ class AdvancedSearchDialog : public QDialog
 
 public:
 	static QModelIndex searchBlock(QWidget *parent, QAbstractItemModel *model);
-	static uint searchSymbol(QWidget *parent);
+	static QString searchSymbol(QWidget *parent);
 
 private slots:
 	void on_nameFilterLineEdit_textChanged(const QString &text);
@@ -25,11 +26,13 @@ private slots:
 private:
 	Ui::AdvancedSearchDialog *ui;
 	QSortFilterProxyModel *proxyModel;
+	QSqlQueryModel *symbolModel;
 	DatabaseLoader::SearchFlags mode;
 
 	QModelIndex selectedIndex;
 
 	explicit AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent = nullptr);
+	explicit AdvancedSearchDialog(QWidget *parent = nullptr);
 	~AdvancedSearchDialog();
 };
 

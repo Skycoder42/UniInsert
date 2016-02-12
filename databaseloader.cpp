@@ -54,17 +54,36 @@ QString DatabaseLoader::nameForSymbol(uint code) const
 
 QMap<uint, QString> DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode) const
 {
-	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE Name Like :term"));
-	query.bindValue(QStringLiteral(":term"),
-					DatabaseLoader::prepareSearch(nameTerm, mode));
-	if(query.exec()) {
+	QSqlQuery query = this->searchNameQuery(nameTerm, mode);
+	if(query.isActive()) {
 		QMap<uint, QString> result;
 		while(query.next())
 			result.insert(query.value(0).toUInt(), query.value(1).toString());
 		return result;
 	} else
 		return QMap<uint, QString>();
+}
+
+QSqlQuery DatabaseLoader::searchNameQuery(const QString &nameTerm, SearchFlags mode) const
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE Name Like :term"));
+	query.bindValue(QStringLiteral(":term"),
+					DatabaseLoader::prepareSearch(nameTerm, mode));
+	if(query.exec())
+		return query;
+	else
+		return QSqlQuery();
+}
+
+QSqlQuery DatabaseLoader::emptySearchQuery() const
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE 1 = 0"));
+	if(query.exec())
+		return query;
+	else
+		return QSqlQuery();
 }
 
 QStringList DatabaseLoader::createBlock(int blockID) const

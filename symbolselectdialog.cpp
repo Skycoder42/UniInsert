@@ -3,6 +3,7 @@
 #include <QRegularExpressionMatch>
 #include <QShowEvent>
 #include "unicoder.h"
+#include "advancedsearchdialog.h"
 
 const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(?:U\+?|\\u)?((?:10|[\dA-F])?[\dA-F]{4})$)__"),
 														  QRegularExpression::CaseInsensitiveOption);
@@ -67,7 +68,11 @@ void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
 
 void SymbolSelectDialog::on_searchButton_clicked()
 {
-
+	this->setAutoHide(false);
+	QString code = AdvancedSearchDialog::searchSymbol(this);
+	if(!code.isEmpty())
+		this->ui->unicodeLineEdit->setText(code);
+	this->setAutoHide(true);
 }
 
 QString SymbolSelectDialog::calcUnicode(const QString &code)

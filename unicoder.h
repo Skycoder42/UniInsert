@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QAction>
 #include <QAbstractItemView>
+#include <QStyledItemDelegate>
 class DatabaseLoader;
 
 class Unicoder
@@ -21,7 +22,9 @@ public:
 
 	static QString code32ToSymbol(uint code);
 	static QString code16ToSymbol(SurrogatePair code);
-	static inline QString code16ToSymbol(ushort highSurrogate, ushort lowSurrogate);
+	static inline QString code16ToSymbol(ushort highSurrogate, ushort lowSurrogate) {
+		return Unicoder::code16ToSymbol({highSurrogate, lowSurrogate});
+	}
 	static QString code16ToSymbol(ushort code);
 
 	static uint symbolToCode32(const QString &symbol);
@@ -39,7 +42,6 @@ private:
 	Unicoder() = delete;
 	Unicoder(const Unicoder& other) = delete;
 };
-
 class DragStringListModel : public QStringListModel
 {
 public:
@@ -55,5 +57,17 @@ public slots:
 	void activateItem(const QModelIndex &index) const;
 	void copyItem(const QModelIndex &index) const;
 };
+
+class UnicodeDelegate : public QStyledItemDelegate
+{
+public:
+	static QString displayCode(uint code);
+
+	UnicodeDelegate(QObject *parent = nullptr);
+	QString displayText(const QVariant &value, const QLocale &locale) const Q_DECL_OVERRIDE;
+};
+
+
+
 
 #endif // UNICODER_H

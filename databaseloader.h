@@ -37,6 +37,8 @@ public:
 	inline QString nameForSymbol(Unicoder::SurrogatePair code) const;
 	QString nameForSymbol(uint code) const;
 	QMap<uint, QString> searchName(const QString &nameTerm, SearchFlags mode = Contains) const;
+	QSqlQuery searchNameQuery(const QString &nameTerm, SearchFlags mode = Contains) const;
+	QSqlQuery emptySearchQuery() const;
 
 	//per block
 	QStringList createBlock(int blockID) const;

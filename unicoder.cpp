@@ -33,9 +33,7 @@ QString Unicoder::code16ToSymbol(SurrogatePair code)
 	return text;
 }
 
-QString Unicoder::code16ToSymbol(ushort highSurrogate, ushort lowSurrogate) {
-	return code16ToSymbol({highSurrogate, lowSurrogate});
-}
+
 
 QString Unicoder::code16ToSymbol(ushort code)
 {
@@ -153,4 +151,21 @@ void DragStringListModel::copyItem(const QModelIndex &index) const
 {
 	if(index.isValid())
 		Unicoder::copySymbol(this->data(index, Qt::DisplayRole).toString());
+}
+
+
+
+QString UnicodeDelegate::displayCode(uint code)
+{
+	return QStringLiteral("U+%1").arg(code, 4, 16, QLatin1Char('0')).toUpper();
+}
+
+UnicodeDelegate::UnicodeDelegate(QObject *parent) :
+	QStyledItemDelegate(parent)
+{}
+
+QString UnicodeDelegate::displayText(const QVariant &value, const QLocale &locale) const
+{
+	Q_UNUSED(locale)
+	return UnicodeDelegate::displayCode(value.toUInt());
 }
