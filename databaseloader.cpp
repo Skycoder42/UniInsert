@@ -168,47 +168,8 @@ QString DatabaseLoader::findBlockName(uint code) const
 
 QAbstractItemModel *DatabaseLoader::createBlockModel(QObject *modelParent) const
 {
-	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT ID, Name, Start, End FROM Blocks"));
-	if(!query.exec())
-		return nullptr;
-
-	QStandardItemModel *model = new QStandardItemModel(0, 3, modelParent);
-	model->setHorizontalHeaderLabels({
-										 tr("Block Name"),
-										 tr("First Symbol"),
-										 tr("Last Symbol")
-									 });
-
-	//recently used
-	QStandardItem *recentItem = new QStandardItem(tr("Recently Used"));
-	recentItem->setData(0, BlockModelDataRole);
-	model->appendRow({
-						 recentItem,
-						 new QStandardItem(tr("-/-")),
-						 new QStandardItem(tr("-/-"))
-					 });
-
-	while(query.next()) {
-		QStandardItem *displayItem = new QStandardItem(query.value(1).toString());
-		displayItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		displayItem->setData(query.value(0).toInt(), BlockModelDataRole);
-
-		QStandardItem *beginItem = new QStandardItem(QStringLiteral("U+") + query.value(2).toString());
-		beginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		beginItem->setData(query.value(2).toUInt(), BlockModelDataRole);
-
-		QStandardItem *endItem = new QStandardItem(QStringLiteral("U+") + query.value(3).toString());
-		endItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		endItem->setData(query.value(3).toUInt(), BlockModelDataRole);
-
-		model->appendRow({
-							 displayItem,
-							 beginItem,
-							 endItem
-						 });
-	}
-
+	QSqlQueryModel *model = new QSqlQueryModel(modelParent);
+	model->setQuery(QStringLiteral("SELECT Name, Start, End, ID FROM Blocks"), this->mainDB);
 	return model;
 }
 

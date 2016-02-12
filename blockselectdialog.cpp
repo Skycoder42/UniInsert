@@ -41,9 +41,9 @@ void BlockSelectDialog::showEvent(QShowEvent *event)
 
 void BlockSelectDialog::on_comboBox_currentIndexChanged(int index)
 {
-	QModelIndex modelIndex = this->blockModel->index(index, 0);
+	QModelIndex modelIndex = this->blockModel->index(index, 3);
 	if(modelIndex.isValid()) {
-		int blockID = this->blockModel->data(modelIndex, DatabaseLoader::BlockModelDataRole).toInt();
+		int blockID = this->blockModel->data(modelIndex).toInt();
 		this->displayModel->resetData(Unicoder::databaseLoader()->createBlock(blockID));
 	}
 }

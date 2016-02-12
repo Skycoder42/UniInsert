@@ -18,11 +18,12 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	QApplication::setApplicationName(QStringLiteral("UniInsert"));
 	QApplication::setOrganizationName(QStringLiteral("Skycoder Soft"));
-	QApplication::setApplicationDisplayName(Global::tr("Unicode Symbol Selector"));
+	QApplication::setApplicationDisplayName(Global::tr("Unicode Utility"));
 	QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/main.ico")));
 	QApplication::setQuitOnLastWindowClosed(false);
 
 	QSystemTrayIcon trayIco(QApplication::windowIcon());
+	trayIco.setToolTip(QApplication::applicationDisplayName());
 
 	SettingsDialog settingsDiag;
 	SymbolSelectDialog symbDiag;

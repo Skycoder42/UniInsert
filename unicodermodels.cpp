@@ -77,6 +77,11 @@ UnicodeDelegate::UnicodeDelegate(QObject *parent) :
 QString UnicodeDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
 	Q_UNUSED(locale)
-	return UnicodeDelegate::displayCode(value.toUInt());
+	bool ok = false;
+	QString text = UnicodeDelegate::displayCode(value.toUInt(&ok));
+	if(ok)
+		return text;
+	else
+		return tr("-/-");
 }
 
