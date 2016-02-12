@@ -12,6 +12,11 @@ QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemMode
 		return QModelIndex();
 }
 
+uint AdvancedSearchDialog::searchSymbol(QWidget *parent)
+{
+
+}
+
 AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::AdvancedSearchDialog),
@@ -41,9 +46,9 @@ AdvancedSearchDialog::~AdvancedSearchDialog()
 void AdvancedSearchDialog::on_nameFilterLineEdit_textChanged(const QString &text)
 {
 	QString pattern = QRegularExpression::escape(text);
-	if(!this->mode.testFlag(DatabaseLoader::StartsWith))
+	if(this->mode.testFlag(DatabaseLoader::StartsWith))
 		pattern.prepend(QLatin1Char('^'));
-	if(!this->mode.testFlag(DatabaseLoader::EndsWith))
+	if(this->mode.testFlag(DatabaseLoader::EndsWith))
 		pattern.append(QLatin1Char('$'));
 	this->proxyModel->setFilterRegExp(pattern);
 }
