@@ -52,14 +52,10 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::AdvancedSearchDialog),
 	proxyModel(new QSortFilterProxyModel(this)),
-	symbolModel(new QSqlQueryModel(this)),
+	symbolModel(Unicoder::databaseLoader()->createSearchModel(this)),
 	mode(DatabaseLoader::Contains)
 {
 	ui->setupUi(this);
-
-	this->symbolModel->setHeaderData(0, Qt::Horizontal, tr("Code"));
-	this->symbolModel->setHeaderData(1, Qt::Horizontal, tr("Name"));
-	this->symbolModel->setQuery(Unicoder::databaseLoader()->emptySearchQuery());
 
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
@@ -105,12 +101,12 @@ void AdvancedSearchDialog::updateSearch(const QString &text, bool force)
 {
 	if(this->symbolModel) {
 		if(!force && text.size() < 3)
-			this->symbolModel->setQuery(Unicoder::databaseLoader()->emptySearchQuery());
+			Unicoder::databaseLoader()->clearSearchModel(this->symbolModel);
 		else {
 			QString pattern = text;
 			pattern.replace(QLatin1Char('*'), QLatin1Char('%'));
 			pattern.replace(QLatin1Char('?'), QLatin1Char('_'));
-			this->symbolModel->setQuery(Unicoder::databaseLoader()->searchNameQuery(pattern, this->mode));
+			Unicoder::databaseLoader()->searchName(pattern, this->mode, this->symbolModel);
 		}
 	} else {
 		QString pattern = QRegExp::escape(text);

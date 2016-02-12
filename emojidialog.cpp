@@ -14,8 +14,7 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 	typedef QMap<int, QString>::const_iterator itr;
 	QMap<int, QString> groups = Unicoder::databaseLoader()->listEmojiGroups();
 	for(itr it = groups.begin(), end = groups.end(); it != end; ++it) {
-		SymbolListModel *model = new SymbolListModel(this);
-		model->resetData(Unicoder::databaseLoader()->createEmojiGroup(it.key()));
+		SymbolListModel *model = Unicoder::databaseLoader()->createEmojiGroup(it.key(), this);
 
 		QListView *view = new QListView(this->ui->tabWidget);
 		QFont font = view->font();

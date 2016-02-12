@@ -4,16 +4,15 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QMap>
-#include <QAbstractItemModel>
+#include <QSqlQueryModel>
 #include "unicoder.h"
+class SymbolListModel;
 
 class DatabaseLoader : public QObject
 {
 	Q_OBJECT
 public:
 	typedef QPair<uint, uint> Range;
-	typedef QPair<uint, QString> SymbolInfo;
-	typedef QList<SymbolInfo> SymbolInfoList;
 
 	enum {BlockModelDataRole = Qt::UserRole + 1};
 
@@ -39,12 +38,13 @@ public:
 	inline QString nameForSymbol(const QString &symbol) const;
 	inline QString nameForSymbol(Unicoder::SurrogatePair code) const;
 	QString nameForSymbol(uint code) const;
-	SymbolInfoList searchName(const QString &nameTerm, SearchFlags mode = Contains) const;
-	QSqlQuery searchNameQuery(const QString &nameTerm, SearchFlags mode = Contains) const;
-	QSqlQuery emptySearchQuery() const;
+	QSqlQueryModel *createSearchModel(QObject *modelParent) const;
+	bool searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const;
+	void clearSearchModel(QSqlQueryModel *model) const;
 
 	//per block
-	SymbolInfoList createBlock(int blockID) const;
+	SymbolListModel *createBlock(int blockID, QObject *modelParent) const;
+	bool createBlock(int blockID, SymbolListModel *updateModel) const;
 	inline int findBlock(const QString &symbol) const;
 	inline int findBlock(Unicoder::SurrogatePair code) const;
 	int findBlock(uint code) const;
@@ -53,7 +53,7 @@ public:
 	inline QString findBlockName(const QString &symbol) const;
 	inline QString findBlockName(Unicoder::SurrogatePair code) const;
 	QString findBlockName(uint code) const;
-	QAbstractItemModel *createBlockModel(QObject *modelParent) const;
+	QSqlQueryModel *createBlockModel(QObject *modelParent) const;
 
 	//recent
 	inline void updateRecent(const QString &symbol) const;
@@ -62,7 +62,8 @@ public:
 
 	//emojis
 	QMap<int, QString> listEmojiGroups() const;
-	SymbolInfoList createEmojiGroup(int groupID) const;
+	SymbolListModel *createEmojiGroup(int groupID, QObject *modelParent) const;
+	bool createEmojiGroup(int groupID, SymbolListModel *updateModel) const;
 
 private:/*functions*/
 	static QString prepareSearch(QString term, SearchFlags flags);

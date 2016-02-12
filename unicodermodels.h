@@ -1,29 +1,32 @@
 #ifndef UNICODERMODELS_H
 #define UNICODERMODELS_H
 
-#include <QStandardItemModel>
+#include <QSqlQueryModel>
 #include <QAction>
 #include <QAbstractItemView>
 #include <QStyledItemDelegate>
 #include "unicoder.h"
 #include "databaseloader.h"
 
-class SymbolListModel : public QStandardItemModel
+class SymbolListModel : public QSqlQueryModel
 {
 public:
 	SymbolListModel(QObject *parent = nullptr);
 
-	void resetData(DatabaseLoader::SymbolInfoList symbolList);
-
 	QAction *createCopyAction(QAbstractItemView *view) const;
 
 	// QAbstractItemModel interface
+	QVariant data(const QModelIndex &item, int role) const;
 	QStringList mimeTypes() const Q_DECL_OVERRIDE;
 	QMimeData *mimeData(const QModelIndexList &indexes) const Q_DECL_OVERRIDE;
+	Qt::ItemFlags flags(const QModelIndex &index) const;
 
 public slots:
 	void activateItem(const QModelIndex &index) const;
 	void copyItem(const QModelIndex &index) const;
+
+private:
+	QString getSymbol(const QModelIndex &index) const;
 };
 
 class UnicodeDelegate : public QStyledItemDelegate

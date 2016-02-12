@@ -3,18 +3,8 @@
 #include <QMimeData>
 
 SymbolListModel::SymbolListModel(QObject *parent) :
-	QStandardItemModel(0, 1, parent)
+	QSqlQueryModel(parent)
 {}
-
-void SymbolListModel::resetData(DatabaseLoader::SymbolInfoList symbolList)
-{
-	this->clear();
-	for(DatabaseLoader::SymbolInfo info : symbolList) {
-		QStandardItem *item = new QStandardItem(Unicoder::code32ToSymbol(info.first));
-		item->setToolTip(info.second);
-		this->appendRow(item);
-	}
-}
 
 QAction *SymbolListModel::createCopyAction(QAbstractItemView *view) const
 {
@@ -33,34 +23,56 @@ QAction *SymbolListModel::createCopyAction(QAbstractItemView *view) const
 	return action;
 }
 
+QVariant SymbolListModel::data(const QModelIndex &item, int role) const
+{
+	switch(role) {
+	case Qt::DisplayRole:
+		return Unicoder::code32ToSymbol(this->QSqlQueryModel::data(item, role).toUInt());
+	case Qt::ToolTipRole:
+		return this->QSqlQueryModel::data(item.sibling(item.row(), 1), Qt::DisplayRole);
+	default:
+		return this->QSqlQueryModel::data(item, role);
+	}
+}
+
 QStringList SymbolListModel::mimeTypes() const
 {
-	QStringList types = this->QStandardItemModel::mimeTypes();
-	types.append(QStringLiteral("text/plain"));
+	QStringList types = this->QSqlQueryModel::mimeTypes();
+	types.prepend(QStringLiteral("text/plain"));
 	return types;
 }
 
 QMimeData *SymbolListModel::mimeData(const QModelIndexList &indexes) const
 {
-	QMimeData *data = this->QStandardItemModel::mimeData(indexes);
+	QMimeData *data = this->QSqlQueryModel::mimeData(indexes);
 	if(data && indexes.size() == 1) {
-		QString symbol = this->data(indexes.first(), Qt::DisplayRole).toString();
+		QString symbol = this->getSymbol(indexes.first());
 		Unicoder::databaseLoader()->updateRecent(symbol);
 		data->setText(symbol);
 	}
 	return data;
 }
 
+Qt::ItemFlags SymbolListModel::flags(const QModelIndex &index) const
+{
+	return this->QSqlQueryModel::flags(index) | Qt::ItemIsDragEnabled;
+}
+
 void SymbolListModel::activateItem(const QModelIndex &index) const
 {
 	if(index.isValid())
-		Unicoder::sendSymbolInput(this->data(index, Qt::DisplayRole).toString());
+		Unicoder::sendSymbolInput(this->getSymbol(index));
 }
 
 void SymbolListModel::copyItem(const QModelIndex &index) const
 {
 	if(index.isValid())
-		Unicoder::copySymbol(this->data(index, Qt::DisplayRole).toString());
+		Unicoder::copySymbol(this->getSymbol(index));
+}
+
+QString SymbolListModel::getSymbol(const QModelIndex &index) const
+{
+	return this->data(index.sibling(index.row(), 0), Qt::DisplayRole).toString();
 }
 
 

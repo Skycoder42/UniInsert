@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QStandardItemModel>
+#include "unicodermodels.h"
 #include "settingsdialog.h"
 
 const QString DatabaseLoader::DBName = QStringLiteral("UnicodeDB");
@@ -52,53 +53,55 @@ QString DatabaseLoader::nameForSymbol(uint code) const
 		return QString();
 }
 
-DatabaseLoader::SymbolInfoList DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode) const
+QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent) const
 {
-	QSqlQuery query = this->searchNameQuery(nameTerm, mode);
-	if(query.isActive()) {
-		SymbolInfoList result;
-		while(query.next())
-			result += {query.value(0).toUInt(), query.value(1).toString()};
-		return result;
-	} else
-		return SymbolInfoList();
+	QSqlQueryModel *model = new QSqlQueryModel(modelParent);
+	model->setHeaderData(0, Qt::Horizontal, tr("Code"));
+	model->setHeaderData(1, Qt::Horizontal, tr("Name"));
+	this->clearSearchModel(model);
+	return model;
 }
 
-QSqlQuery DatabaseLoader::searchNameQuery(const QString &nameTerm, SearchFlags mode) const
+bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const
 {
 	QSqlQuery query(this->mainDB);
 	query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE Name Like :term"));
 	query.bindValue(QStringLiteral(":term"),
 					DatabaseLoader::prepareSearch(nameTerm, mode));
-	if(query.exec())
-		return query;
-	else
-		return QSqlQuery();
+	if(query.exec()){
+		model->setQuery(query);
+		return true;
+	} else
+		return false;
 }
 
-QSqlQuery DatabaseLoader::emptySearchQuery() const
+void DatabaseLoader::clearSearchModel(QSqlQueryModel *model) const
 {
-	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE 1 = 0"));
-	if(query.exec())
-		return query;
-	else
-		return QSqlQuery();
+	model->setQuery(QStringLiteral("SELECT Code, Name FROM Symbols WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
 }
 
-DatabaseLoader::SymbolInfoList DatabaseLoader::createBlock(int blockID) const
+SymbolListModel *DatabaseLoader::createBlock(int blockID, QObject *modelParent) const
+{
+	SymbolListModel *updateModel = new SymbolListModel(modelParent);
+	if(this->createBlock(blockID, updateModel))
+		return updateModel;
+	else {
+		delete updateModel;
+		return nullptr;
+	}
+}
+
+bool DatabaseLoader::createBlock(int blockID, SymbolListModel *updateModel) const
 {
 	if(blockID == 0) {
 		QSqlQuery query(this->mainDB);
 		query.prepare(QStringLiteral("SELECT Recent.Code, Symbols.Name FROM Recent INNER JOIN Symbols ON Recent.Code = Symbols.Code ORDER BY Count DESC LIMIT 0, :limit"));
 		query.bindValue(QStringLiteral(":limit"), SETTINGS_VALUE(SettingsDialog::maxRecent).toInt());
 		if(query.exec()) {
-			SymbolInfoList symbolList;
-			while(query.next())
-				symbolList += {query.value(0).toUInt(), query.value(1).toString()};
-			return symbolList;
+			updateModel->setQuery(query);
+			return true;
 		} else
-			return SymbolInfoList();
+			return false;
 	} else {
 		//get the blocks borders
 		Range range = this->blockRange(blockID);
@@ -108,14 +111,12 @@ DatabaseLoader::SymbolInfoList DatabaseLoader::createBlock(int blockID) const
 			query.bindValue(QStringLiteral(":start"), range.first);
 			query.bindValue(QStringLiteral(":end"), range.second);
 			if(query.exec()) {
-				SymbolInfoList symbolList;
-				while(query.next())
-					symbolList += {query.value(0).toUInt(), query.value(1).toString()};
-				return symbolList;
+				updateModel->setQuery(query);
+				return true;
 			}
 		}
 
-		return SymbolInfoList();
+		return false;
 	}
 }
 
@@ -166,7 +167,7 @@ QString DatabaseLoader::findBlockName(uint code) const
 		return QString();
 }
 
-QAbstractItemModel *DatabaseLoader::createBlockModel(QObject *modelParent) const
+QSqlQueryModel *DatabaseLoader::createBlockModel(QObject *modelParent) const
 {
 	QSqlQueryModel *model = new QSqlQueryModel(modelParent);
 	model->setQuery(QStringLiteral("SELECT Name, Start, End, ID FROM Blocks"), this->mainDB);
@@ -201,18 +202,27 @@ QMap<int, QString> DatabaseLoader::listEmojiGroups() const
 		return QMap<int, QString>();
 }
 
-DatabaseLoader::SymbolInfoList DatabaseLoader::createEmojiGroup(int groupID) const
+SymbolListModel *DatabaseLoader::createEmojiGroup(int groupID, QObject *modelParent) const
+{
+	SymbolListModel *updateModel = new SymbolListModel(modelParent);
+	if(this->createEmojiGroup(groupID, updateModel))
+		return updateModel;
+	else {
+		delete updateModel;
+		return nullptr;
+	}
+}
+
+bool DatabaseLoader::createEmojiGroup(int groupID, SymbolListModel *updateModel) const
 {
 	QSqlQuery query(this->mainDB);
 	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID AS ID, Symbols.Name AS Name FROM (EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID) AS TTbl INNER JOIN Symbols ON TTbl.EmojiID = Symbols.Code WHERE EmojiGroups.ID = :groupID"));
 	query.bindValue(QStringLiteral(":groupID"), groupID);
 	if(query.exec()) {
-		SymbolInfoList emojiList;
-		while(query.next())
-			emojiList += {query.value(0).toUInt(), query.value(1).toString()};
-		return emojiList;
+		updateModel->setQuery(query);
+		return true;
 	} else
-		return SymbolInfoList();
+		return false;
 }
 
 QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)
