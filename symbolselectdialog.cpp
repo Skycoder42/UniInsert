@@ -42,20 +42,26 @@ void SymbolSelectDialog::showEvent(QShowEvent *event)
 void SymbolSelectDialog::on_unicodeLineEdit_textChanged(const QString &text)
 {
 	bool isInputOk = this->ui->unicodeLineEdit->hasAcceptableInput();
-	QString codeText;
+	uint code;
 	if(isInputOk) {
-		codeText = this->calcUnicode(text);
-		isInputOk = !codeText.isNull();
+		code = this->calcUnicode(text);
+		isInputOk = (code != UINT_MAX);
 	}
 
 	this->ui->insertButton->setEnabled(isInputOk);
 	this->ui->copyButton->setEnabled(isInputOk);
 	if(isInputOk) {
-		this->ui->previewLineEdit->setText(codeText);
-		this->previewAction->setText(codeText);
+		QString symbol = Unicoder::code32ToSymbol(code);
+		QString name = Unicoder::databaseLoader()->nameForSymbol(code);
+		this->ui->previewLineEdit->setText(symbol);
+		this->ui->previewLineEdit->setToolTip(name);
+		this->previewAction->setText(symbol);
+		this->previewAction->setToolTip(name);
 	} else {
 		this->ui->previewLineEdit->clear();
+		this->ui->previewLineEdit->setToolTip(QString());
 		this->previewAction->setText(QString());
+		this->previewAction->setToolTip(QString());
 	}
 }
 
@@ -79,18 +85,17 @@ void SymbolSelectDialog::on_actionSearch_symbol_name_triggered()
 	this->setAutoHide(true);
 }
 
-QString SymbolSelectDialog::calcUnicode(const QString &code)
+uint SymbolSelectDialog::calcUnicode(const QString &code)
 {
 	QRegularExpressionMatch match = SymbolSelectDialog::unicodeRegex.match(code);
 	if(match.hasMatch()) {
 		bool ok = false;
 		uint symbol = match.captured(1).toUInt(&ok, 16);
-		if(!ok)
-			return QString();
+		if(ok)
+			return symbol;
+	}
 
-		return Unicoder::code32ToSymbol(symbol);
-	} else
-		return QString();
+	return UINT_MAX;
 }
 
 

@@ -32,7 +32,7 @@ private slots:
 	void on_actionSearch_symbol_name_triggered();
 
 private:/*functions*/
-	QString calcUnicode(const QString &code);
+	uint calcUnicode(const QString &code);
 
 private:
 	class PreviewAction : public QWidgetAction
