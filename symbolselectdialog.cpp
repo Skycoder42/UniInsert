@@ -55,13 +55,11 @@ void SymbolSelectDialog::on_unicodeLineEdit_textChanged(const QString &text)
 		QString name = Unicoder::databaseLoader()->nameForSymbol(code);
 		this->ui->previewLineEdit->setText(symbol);
 		this->ui->previewLineEdit->setToolTip(name);
-		this->previewAction->setText(symbol);
-		this->previewAction->setToolTip(name);
+		this->previewAction->setText(symbol, name);
 	} else {
 		this->ui->previewLineEdit->clear();
 		this->ui->previewLineEdit->setToolTip(QString());
-		this->previewAction->setText(QString());
-		this->previewAction->setToolTip(QString());
+		this->previewAction->setText(QString(), QString());
 	}
 }
 
@@ -105,13 +103,15 @@ SymbolSelectDialog::PreviewAction::PreviewAction(QObject *parent) :
 	QWidgetAction(parent)
 {}
 
-void SymbolSelectDialog::PreviewAction::setText(const QString &text)
+void SymbolSelectDialog::PreviewAction::setText(const QString &text, const QString &toolTip)
 {
 	this->text = text;
+	this->toolTip = toolTip;
 	for(QWidget *widget : this->createdWidgets()) {
 		Q_ASSERT(dynamic_cast<QLabel*>(widget));
 		QLabel *label = static_cast<QLabel*>(widget);
 		label->setText(text);
+		label->setToolTip(toolTip);
 		label->setFixedWidth(qMax(label->fontMetrics().width(text),
 								  label->height()));
 	}
@@ -126,6 +126,7 @@ QWidget *SymbolSelectDialog::PreviewAction::createWidget(QWidget *parent)
 	previewLabel->setAlignment(Qt::AlignCenter);
 
 	previewLabel->setText(this->text);
+	previewLabel->setToolTip(this->toolTip);
 	previewLabel->setFixedHeight(previewLabel->fontMetrics().height());
 	previewLabel->setFixedWidth(qMax(previewLabel->fontMetrics().width(this->text),
 									 previewLabel->height()));

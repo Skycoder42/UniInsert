@@ -52,4 +52,5 @@ RESOURCES += \
     uniinsert_res.qrc
 
 DISTFILES += \
-    links.txt
+    LICENSE \
+    README.md

@@ -12,7 +12,8 @@ BlockSelectDialog::BlockSelectDialog() :
 	PopupDialog(false),
 	ui(new Ui::BlockSelectDialog),
 	blockModel(Unicoder::databaseLoader()->createBlockModel(this)),
-	displayModel(new SymbolListModel(this))
+	displayModel(new SymbolListModel(this)),
+	indexSet(false)
 {
 	ui->setupUi(this);
 
@@ -32,10 +33,32 @@ BlockSelectDialog::~BlockSelectDialog()
 	delete ui;
 }
 
+void BlockSelectDialog::showBlock(int blockID)
+{
+	//try the easy way...
+	QModelIndex index = this->blockModel->index(blockID, 3);
+	if(index.isValid() && index.data().toInt() == blockID)
+		this->ui->comboBox->setCurrentIndex(blockID);
+	else {//if that fails -> long fallback...
+		qDebug("FALLBACK");
+		for(int i = 0, max = this->blockModel->rowCount(); i < max; ++i) {
+			int id = this->blockModel->data(this->blockModel->index(i, 3)).toInt();
+			if(id == blockID) {
+				this->ui->comboBox->setCurrentIndex(i);
+				break;
+			}
+		}
+	}
+	this->indexSet = true;
+	this->popup();
+}
+
 void BlockSelectDialog::showEvent(QShowEvent *event)
 {
-	this->ui->comboBox->setCurrentIndex(-1);
-	this->ui->comboBox->setCurrentIndex(0);
+	if(this->indexSet)
+		this->indexSet = false;
+	else
+		this->ui->comboBox->setCurrentIndex(0);
 	event->accept();
 }
 

@@ -23,7 +23,6 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 		view->setContextMenuPolicy(Qt::ActionsContextMenu);
 		view->setFrameShape(QFrame::NoFrame);
 		view->setEditTriggers(QAbstractItemView::NoEditTriggers);
-		view->setTabKeyNavigation(true);
 		view->setDropIndicatorShown(false);
 		view->setDragEnabled(true);
 		view->setMovement(QListView::Static);

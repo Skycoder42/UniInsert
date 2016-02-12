@@ -39,13 +39,14 @@ private:
 	{
 	public:
 		PreviewAction(QObject *parent);
-		void setText(const QString &text);
+		void setText(const QString &text, const QString &toolTip);
 
 	protected:
 		QWidget *createWidget(QWidget *parent) Q_DECL_OVERRIDE;
 
 	private:
 		QString text;
+		QString toolTip;
 	};
 
 	Ui::SymbolSelectDialog *ui;

@@ -15,11 +15,15 @@ public:
 	explicit GetCodeDialog();
 	~GetCodeDialog();
 
+signals:
+	void showBlock(int blockID);
+
 protected:
 	void showEvent(QShowEvent *event);
 
 private slots:
 	void on_symbolLineEdit_textChanged(const QString &text);
+	void on_exploreGroupButton_clicked();
 
 private:
 	Ui::GetCodeDialog *ui;

@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
 	EmojiDialog emojiDialog;
 	BlockSelectDialog blockDiag;
 
+	QObject::connect(&codeDiag, &GetCodeDialog::showBlock, &blockDiag, &BlockSelectDialog::showBlock);
+
 	QMenu *trayMenu = new QMenu();
 	trayIco.setContextMenu(trayMenu);
 	QObject::connect(&trayIco, &QSystemTrayIcon::destroyed, trayMenu, [&](){

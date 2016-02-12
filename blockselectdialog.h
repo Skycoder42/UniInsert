@@ -17,6 +17,9 @@ public:
 	explicit BlockSelectDialog();
 	~BlockSelectDialog();
 
+public slots:
+	void showBlock(int blockID);
+
 protected:
 	void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
 
@@ -28,6 +31,7 @@ private:
 	Ui::BlockSelectDialog *ui;
 	QAbstractItemModel *blockModel;
 	SymbolListModel *displayModel;
+	bool indexSet;
 };
 
 #endif // BLOCKSELECT࣫DIALOG_H
