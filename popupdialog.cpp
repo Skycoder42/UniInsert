@@ -3,6 +3,7 @@
 #include <QCloseEvent>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QSettings>
 #include "settingsdialog.h"
 
 PopupDialog::PopupDialog(bool isFixedSize) :

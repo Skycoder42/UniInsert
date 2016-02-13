@@ -13,6 +13,7 @@ class DatabaseLoader : public QObject
 	Q_OBJECT
 public:
 	typedef QPair<uint, uint> Range;
+	typedef QPair<int, QString> EmojiGroupInfo;
 
 	enum {BlockModelDataRole = Qt::UserRole + 1};
 
@@ -61,13 +62,14 @@ public:
 	void updateRecent(uint code);
 
 	//emojis
-	QMap<int, QString> listEmojiGroups() const;
+	QList<EmojiGroupInfo> listEmojiGroups() const;
 	SymbolListModel *createEmojiGroupModel(int groupID, QObject *modelParent) const;
 	bool createEmojiGroupModel(int groupID, SymbolListModel *updateModel) const;
 	bool addEmoji(int groupID, uint code);
 	bool removeEmoji(int groupID, uint code);
 	int createEmojiGroup(const QString &name);
 	bool deleteEmojiGroup(int groupID);
+	void updateEmojiGroupOrder(const QList<int> &idOrder);
 
 private:/*functions*/
 	static QString prepareSearch(QString term, SearchFlags flags);

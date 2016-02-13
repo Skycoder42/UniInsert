@@ -8,6 +8,7 @@
 #include "databaseloader.h"
 #include "unicodermodels.h"
 #include "advancedsearchdialog.h"
+#include "settingsdialog.h"
 
 EmojiDialog::EmojiDialog(QWidget *parent) :
 	PopupDialog(parent),
@@ -18,6 +19,8 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 	tabModels()
 {
 	ui->setupUi(this);
+	SettingsDialog::loadSize(this);
+
 	this->ui->tabWidget->installEventFilter(this);
 	this->ui->tabWidget->addActions({
 										this->ui->actionAdd_Emoji_Group,
@@ -29,14 +32,15 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 	connect(this->deleteMapper, SIGNAL(mapped(QObject*)),
 			this, SLOT(deleteTriggered(QObject*)));
 
-	typedef QMap<int, QString>::const_iterator itr;
-	QMap<int, QString> groups = Unicoder::databaseLoader()->listEmojiGroups();
+	typedef QList<DatabaseLoader::EmojiGroupInfo>::const_iterator itr;
+	QList<DatabaseLoader::EmojiGroupInfo> groups = Unicoder::databaseLoader()->listEmojiGroups();
 	for(itr it = groups.begin(), end = groups.end(); it != end; ++it)
-		this->createTab(it.key(), it.value());
+		this->createTab(it->first, it->second);
 }
 
 EmojiDialog::~EmojiDialog()
 {
+	SettingsDialog::storeSize(this);
 	delete ui;
 }
 
@@ -51,6 +55,19 @@ bool EmojiDialog::eventFilter(QObject *, QEvent *event)
 		}
 	}
 	return false;
+}
+
+void EmojiDialog::closeEvent(QCloseEvent *ev)
+{
+	QList<int> idOrder;
+	for(int i = 0, max = this->ui->tabWidget->count(); i < max; ++i) {
+		QWidget *wdg = this->ui->tabWidget->widget(i);
+		SymbolListModel *model = this->tabModels.value(wdg);
+		if(model)
+			idOrder += model->property("groupID").toInt();
+	}
+	Unicoder::databaseLoader()->updateEmojiGroupOrder(idOrder);
+	this->QDialog::closeEvent(ev);
 }
 
 void EmojiDialog::addTriggered(QObject *model)
@@ -113,7 +130,7 @@ void EmojiDialog::on_actionRemove_Emoji_Group_triggered()
 	this->setAutoHide(false);
 	if(QMessageBox::question(this,
 							 tr("Delete Emoji Group"),
-							 tr("Do you really want to delete the current group?"))
+							 tr("Do you really want to delete the emoji group?"))
 	   == QMessageBox::Yes) {
 		if(Unicoder::databaseLoader()->deleteEmojiGroup(model->property("groupID").toInt())) {
 			this->tabModels.remove(this->tabContextWidget);

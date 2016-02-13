@@ -19,6 +19,9 @@ public:
 
 	bool eventFilter(QObject *, QEvent *event) Q_DECL_OVERRIDE;
 
+protected:
+	void closeEvent(QCloseEvent *ev);
+
 private slots:
 	void addTriggered(QObject *model);
 	void deleteTriggered(QObject *model);

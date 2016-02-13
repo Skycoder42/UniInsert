@@ -23,6 +23,9 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
 	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
+#ifndef QT_NO_DEBUG
+	QFile::remove(file);
+#endif
 	if(!QFile::exists(file)) {
 		QFile::copy(QStringLiteral(":/data/mainDB.sqlite"), file);
 		QFile::setPermissions(file, QFileDevice::ReadUser | QFileDevice::WriteUser);
@@ -193,17 +196,17 @@ void DatabaseLoader::updateRecent(uint code)
 		qDebug() << "Failed to insert/ignore recent entry";
 }
 
-QMap<int, QString> DatabaseLoader::listEmojiGroups() const
+QList<DatabaseLoader::EmojiGroupInfo> DatabaseLoader::listEmojiGroups() const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT ID, Name FROM EmojiGroups"));
+	query.prepare(QStringLiteral("SELECT ID, Name FROM EmojiGroups ORDER BY SortHint ASC"));
 	if(query.exec()) {
-		QMap<int, QString> map;
+		QList<EmojiGroupInfo> list;
 		while(query.next())
-			map.insert(query.value(0).toInt(), query.value(1).toString());
-		return map;
+			list += {query.value(0).toInt(), query.value(1).toString()};
+		return list;
 	} else
-		return QMap<int, QString>();
+		return QList<EmojiGroupInfo>();
 }
 
 SymbolListModel *DatabaseLoader::createEmojiGroupModel(int groupID, QObject *modelParent) const
@@ -277,6 +280,22 @@ bool DatabaseLoader::deleteEmojiGroup(int groupID)
 		return false;
 	} else
 		return this->mainDB.commit();
+}
+
+void DatabaseLoader::updateEmojiGroupOrder(const QList<int> &idOrder)
+{
+	this->mainDB.transaction();
+	for(int i = 0; i < idOrder.size(); i++) {
+		QSqlQuery query(this->mainDB);
+		query.prepare(QStringLiteral("UPDATE EmojiGroups SET SortHint = :index WHERE ID = :id"));
+		query.bindValue(QStringLiteral(":id"), idOrder[i]);
+		query.bindValue(QStringLiteral(":index"), i);
+		if(!query.exec()) {
+			this->mainDB.rollback();
+			return;
+		}
+	}
+	this->mainDB.commit();
 }
 
 QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)

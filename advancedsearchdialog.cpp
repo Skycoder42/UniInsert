@@ -4,6 +4,7 @@
 #include "unicoder.h"
 #include "databaseloader.h"
 #include "unicodermodels.h"
+#include "settingsdialog.h"
 
 QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemModel *model)
 {
@@ -31,6 +32,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	mode(DatabaseLoader::Contains)
 {
 	ui->setupUi(this);
+	SettingsDialog::loadSize(this);
 
 	this->proxyModel->setSourceModel(model);
 	this->proxyModel->setSortLocaleAware(true);
@@ -56,6 +58,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	mode(DatabaseLoader::Contains)
 {
 	ui->setupUi(this);
+	SettingsDialog::loadSize(this);
 
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
@@ -70,6 +73,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 
 AdvancedSearchDialog::~AdvancedSearchDialog()
 {
+	SettingsDialog::storeSize(this);
 	delete ui;
 }
 

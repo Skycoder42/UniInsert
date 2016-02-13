@@ -18,11 +18,30 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 	ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
+	SettingsDialog::loadSize(this);
 }
 
 SettingsDialog::~SettingsDialog()
 {
+	SettingsDialog::storeSize(this);
 	delete ui;
+}
+
+void SettingsDialog::storeSize(QWidget *widget)
+{
+	QSettings settings;
+	settings.beginGroup(QStringLiteral("gui"));
+	settings.setValue(widget->objectName(), widget->size());
+	settings.endGroup();
+}
+
+void SettingsDialog::loadSize(QWidget *widget)
+{
+	QSettings settings;
+	settings.beginGroup(QStringLiteral("gui"));
+	QSize size = settings.value(widget->objectName(), widget->size()).toSize();
+	widget->resize(size);
+	settings.endGroup();
 }
 
 void SettingsDialog::showSettings()

@@ -27,6 +27,9 @@ public:
 	explicit SettingsDialog(QWidget *parent = 0);
 	~SettingsDialog();
 
+	static void storeSize(QWidget *widget);
+	static void loadSize(QWidget *widget);
+
 public slots:
 	void showSettings();
 	void accept() Q_DECL_OVERRIDE;

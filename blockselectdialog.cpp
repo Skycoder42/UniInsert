@@ -7,6 +7,7 @@
 #include "advancedsearchdialog.h"
 #include "databaseloader.h"
 #include "unicodermodels.h"
+#include "settingsdialog.h"
 
 BlockSelectDialog::BlockSelectDialog() :
 	PopupDialog(false),
@@ -16,6 +17,7 @@ BlockSelectDialog::BlockSelectDialog() :
 	indexSet(false)
 {
 	ui->setupUi(this);
+	SettingsDialog::loadSize(this);
 
 	this->displayModel->createCopyAction(this->ui->listView);
 	this->ui->listView->setDragDropMode(QAbstractItemView::DragOnly);
@@ -30,6 +32,7 @@ BlockSelectDialog::BlockSelectDialog() :
 
 BlockSelectDialog::~BlockSelectDialog()
 {
+	SettingsDialog::storeSize(this);
 	delete ui;
 }
 
