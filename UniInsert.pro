@@ -9,8 +9,22 @@ CONFIG += C++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = UniInsert
+TARGET = UnicodeUtil
+VERSION = 1.0.0
 TEMPLATE = app
+
+DEFINES += "TARGET=\\\"$$TARGET\\\""
+DEFINES += "VERSION=\\\"$$VERSION\\\""
+
+win32 {
+	RC_ICONS += ./icons/UNI.Logo.ico
+	QMAKE_TARGET_COMPANY = "Skycoder42"
+	QMAKE_TARGET_PRODUCT = "Unicode Utility"
+	QMAKE_TARGET_DESCRIPTION = $$QMAKE_TARGET_PRODUCT
+
+	DEFINES += "COMPANY=\"\\\"$$QMAKE_TARGET_COMPANY\\\"\""
+	DEFINES += "DISPLAY_NAME=\"\\\"$$QMAKE_TARGET_PRODUCT\\\"\""
+}
 
 LIBS += -lUser32
 

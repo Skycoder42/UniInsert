@@ -57,8 +57,10 @@ void BlockSelectDialog::showEvent(QShowEvent *event)
 {
 	if(this->indexSet)
 		this->indexSet = false;
-	else
+	else {
+		this->ui->comboBox->setCurrentIndex(-1);
 		this->ui->comboBox->setCurrentIndex(0);
+	}
 	event->accept();
 }
 

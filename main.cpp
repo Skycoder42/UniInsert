@@ -16,9 +16,10 @@ class Global {
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	QApplication::setApplicationName(QStringLiteral("UniInsert"));
-	QApplication::setOrganizationName(QStringLiteral("Skycoder Soft"));
-	QApplication::setApplicationDisplayName(Global::tr("Unicode Utility"));
+	QApplication::setApplicationName(TARGET);
+	QApplication::setApplicationVersion(VERSION);
+	QApplication::setOrganizationName(COMPANY);
+	QApplication::setApplicationDisplayName(DISPLAY_NAME);
 	QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/main.ico")));
 	QApplication::setQuitOnLastWindowClosed(false);
 
@@ -57,6 +58,9 @@ int main(int argc, char *argv[])
 
 	trayMenu->addSeparator();
 	trayMenu->addAction(Global::tr("Settings"), &settingsDiag, SLOT(showSettings()));
+	trayMenu->addAction(Global::tr("About"), &settingsDiag, SLOT(showAboutDialog()));
+	trayMenu->addAction(Global::tr("About Qt"), qApp, SLOT(aboutQt()));
+	trayMenu->addSeparator();
 	trayMenu->addAction(Global::tr("Quit"), qApp, SLOT(quit()));
 
 	trayIco.show();

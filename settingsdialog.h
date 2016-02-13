@@ -31,6 +31,8 @@ public slots:
 	void showSettings();
 	void accept() Q_DECL_OVERRIDE;
 
+	static void showAboutDialog();
+
 signals:
 	void settingsChanged();
 

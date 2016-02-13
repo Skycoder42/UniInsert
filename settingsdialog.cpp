@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include <QSettings>
+#include <QMessageBox>
 
 #define SETTINGS_CODE(code, defaultValue) \
 	const QString SettingsDialog::code = QStringLiteral(#code);\
@@ -47,4 +48,23 @@ void SettingsDialog::accept()
 	settings.setValue(SettingsDialog::maxRecent, this->ui->maximumRecentlyUsedItemsSpinBox->value());
 	emit settingsChanged();
 	this->QDialog::accept();
+}
+
+void SettingsDialog::showAboutDialog()
+{
+	QMessageBox box(NULL);
+	box.setModal(true);
+	box.setWindowTitle(tr("About"));
+	QImage img = QApplication::windowIcon().pixmap(64, 64).toImage();
+	img.invertPixels();
+	box.setIconPixmap(QPixmap::fromImage(img));
+	box.setText(tr("<b>About %1 — Version %2</b>")
+				.arg(QApplication::applicationDisplayName())
+				.arg(QApplication::applicationVersion()));
+	box.setInformativeText(tr("<p>An application to easily insert unicode characters EVERYWHERE.</p>"
+							  "<p>Author: Sykcoder Soft (<a href=\"https://github.com/Skycoder42\">Skycoder42</a>)</p>"
+							  "<p>For Updates and further Information, check <a href=\"https://github.com/Skycoder42/UniInsert\">https://github.com/Skycoder42/UniInsert</a></p>"));
+	box.setStandardButtons(QMessageBox::Ok);
+	box.setDefaultButton(QMessageBox::Ok);
+	box.exec();
 }
