@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>139</height>
+    <width>453</width>
+    <height>201</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,6 +112,64 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="editEmojisLabel">
+       <property name="text">
+        <string>Edit &amp;Emojis:</string>
+       </property>
+       <property name="buddy">
+        <cstring>editEmojisButton</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="editEmojisButton">
+         <property name="text">
+          <string>Edit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="changeUnicodeDatabaseLabel">
+       <property name="text">
+        <string>Change &amp;Unicode Database:</string>
+       </property>
+       <property name="buddy">
+        <cstring>changeUnicodeDatabaseSpinBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+       <item>
+        <widget class="QVersionEdit" name="changeUnicodeDatabaseSpinBox"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="changeUnicodeDatabaseButton">
+         <property name="text">
+          <string>Update</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
    </item>
    <item>
@@ -133,6 +191,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QVersionEdit</class>
+   <extends>QSpinBox</extends>
+   <header>qversionedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
