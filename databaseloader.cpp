@@ -178,7 +178,7 @@ QSqlQueryModel *DatabaseLoader::createBlockModel(QObject *modelParent) const
 	return model;
 }
 
-void DatabaseLoader::updateRecent(uint code) const
+void DatabaseLoader::updateRecent(uint code)
 {
 	QSqlQuery insertQuery(this->mainDB);
 	insertQuery.prepare(QStringLiteral("INSERT OR IGNORE INTO Recent (Code) VALUES(:code)"));
@@ -206,10 +206,10 @@ QMap<int, QString> DatabaseLoader::listEmojiGroups() const
 		return QMap<int, QString>();
 }
 
-SymbolListModel *DatabaseLoader::createEmojiGroup(int groupID, QObject *modelParent) const
+SymbolListModel *DatabaseLoader::createEmojiGroupModel(int groupID, QObject *modelParent) const
 {
 	SymbolListModel *updateModel = new SymbolListModel(modelParent);
-	if(this->createEmojiGroup(groupID, updateModel))
+	if(this->createEmojiGroupModel(groupID, updateModel))
 		return updateModel;
 	else {
 		delete updateModel;
@@ -217,7 +217,7 @@ SymbolListModel *DatabaseLoader::createEmojiGroup(int groupID, QObject *modelPar
 	}
 }
 
-bool DatabaseLoader::createEmojiGroup(int groupID, SymbolListModel *updateModel) const
+bool DatabaseLoader::createEmojiGroupModel(int groupID, SymbolListModel *updateModel) const
 {
 	QSqlQuery query(this->mainDB);
 	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID AS ID, Symbols.Name AS Name FROM (EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID) AS TTbl INNER JOIN Symbols ON TTbl.EmojiID = Symbols.Code WHERE EmojiGroups.ID = :groupID"));
@@ -227,6 +227,56 @@ bool DatabaseLoader::createEmojiGroup(int groupID, SymbolListModel *updateModel)
 		return true;
 	} else
 		return false;
+}
+
+bool DatabaseLoader::addEmoji(int groupID, uint code)
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID) VALUES(:group, :emoji)"));
+	query.bindValue(QStringLiteral(":group"), groupID);
+	query.bindValue(QStringLiteral(":emoji"), code);
+	return query.exec();
+}
+
+bool DatabaseLoader::removeEmoji(int groupID, uint code)
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("DELETE FROM EmojiMapping WHERE GroupID = :group AND EmojiID = :emoji"));
+	query.bindValue(QStringLiteral(":group"), groupID);
+	query.bindValue(QStringLiteral(":emoji"), code);
+	return query.exec();
+}
+
+int DatabaseLoader::createEmojiGroup(const QString &name)
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("INSERT INTO EmojiGroups (Name) VALUES(:name)"));
+	query.bindValue(QStringLiteral(":name"), name);
+	if(query.exec())
+		return query.lastInsertId().toInt();
+	else
+		return -1;
+}
+
+bool DatabaseLoader::deleteEmojiGroup(int groupID)
+{
+	this->mainDB.transaction();
+	QSqlQuery removeMappingQuery(this->mainDB);
+	removeMappingQuery.prepare(QStringLiteral("DELETE FROM EmojiMapping WHERE GroupID = :group"));
+	removeMappingQuery.bindValue(QStringLiteral(":group"), groupID);
+	if(!removeMappingQuery.exec()) {
+		this->mainDB.rollback();
+		return false;
+	}
+
+	QSqlQuery removeGroupQuery(this->mainDB);
+	removeGroupQuery.prepare(QStringLiteral("DELETE FROM EmojiGroups WHERE ID = :group"));
+	removeGroupQuery.bindValue(QStringLiteral(":group"), groupID);
+	if(!removeGroupQuery.exec()) {
+		this->mainDB.rollback();
+		return false;
+	} else
+		return this->mainDB.commit();
 }
 
 QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)

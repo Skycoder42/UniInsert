@@ -14,13 +14,13 @@ QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemMode
 		return QModelIndex();
 }
 
-QString AdvancedSearchDialog::searchSymbol(QWidget *parent)
+uint AdvancedSearchDialog::searchSymbol(QWidget *parent)
 {
 	AdvancedSearchDialog dialog(parent);
 	if(dialog.exec() == QDialog::Accepted)
-		return UnicodeDelegate::displayCode(dialog.selectedIndex.data().toUInt());
+		return dialog.selectedIndex.data().toUInt();
 	else
-		return QString();
+		return UINT_MAX;
 }
 
 AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent) :

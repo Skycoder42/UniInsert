@@ -18,10 +18,34 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget"/>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="contextMenuPolicy">
+      <enum>Qt::ActionsContextMenu</enum>
+     </property>
+    </widget>
    </item>
   </layout>
+  <action name="actionAdd_Emoji_Group">
+   <property name="icon">
+    <iconset resource="uniinsert_res.qrc">
+     <normaloff>:/icons/addTab.ico</normaloff>:/icons/addTab.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Add Emoji Group</string>
+   </property>
+  </action>
+  <action name="actionRemove_Emoji_Group">
+   <property name="icon">
+    <iconset resource="uniinsert_res.qrc">
+     <normaloff>:/icons/deleteTab.ico</normaloff>:/icons/deleteTab.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Emoji Group</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="uniinsert_res.qrc"/>
+ </resources>
  <connections/>
 </ui>

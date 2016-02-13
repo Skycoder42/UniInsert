@@ -7,9 +7,13 @@
         <file alias="detailedSearch.ico">icons/Fatcow-Farm-Fresh-Advanced-data-grid.ico</file>
         <file alias="search.ico">icons/Fatcow-Farm-Fresh-Search-field.ico</file>
         <file alias="details.ico">icons/Fatcow-Farm-Fresh-Application-view-detail.ico</file>
+        <file alias="add.ico">icons/Fatcow-Farm-Fresh-Add.ico</file>
+        <file alias="delete.ico">icons/Fatcow-Farm-Fresh-Delete.ico</file>
+        <file alias="addTab.ico">icons/Fatcow-Farm-Fresh-Tab-add.ico</file>
+        <file alias="deleteTab.ico">icons/Fatcow-Farm-Fresh-Tab-delete.ico</file>
     </qresource>
     <qresource prefix="/data">
         <file alias="mainDB.sqlite">tables/uniDatabase.sqlite</file>
     </qresource>
-    <qresource prefix="/data" lang="de"/>
+    <qresource lang="de" prefix="/data"/>
 </RCC>

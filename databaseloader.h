@@ -56,14 +56,18 @@ public:
 	QSqlQueryModel *createBlockModel(QObject *modelParent) const;
 
 	//recent
-	inline void updateRecent(const QString &symbol) const;
-	inline void updateRecent(Unicoder::SurrogatePair code) const;
-	void updateRecent(uint code) const;
+	inline void updateRecent(const QString &symbol);
+	inline void updateRecent(Unicoder::SurrogatePair code);
+	void updateRecent(uint code);
 
 	//emojis
 	QMap<int, QString> listEmojiGroups() const;
-	SymbolListModel *createEmojiGroup(int groupID, QObject *modelParent) const;
-	bool createEmojiGroup(int groupID, SymbolListModel *updateModel) const;
+	SymbolListModel *createEmojiGroupModel(int groupID, QObject *modelParent) const;
+	bool createEmojiGroupModel(int groupID, SymbolListModel *updateModel) const;
+	bool addEmoji(int groupID, uint code);
+	bool removeEmoji(int groupID, uint code);
+	int createEmojiGroup(const QString &name);
+	bool deleteEmojiGroup(int groupID);
 
 private:/*functions*/
 	static QString prepareSearch(QString term, SearchFlags flags);
@@ -102,12 +106,12 @@ QString DatabaseLoader::findBlockName(Unicoder::SurrogatePair code) const
 	return this->findBlockName(Unicoder::code16ToCode32(code));
 }
 
-void DatabaseLoader::updateRecent(const QString &symbol) const
+void DatabaseLoader::updateRecent(const QString &symbol)
 {
 	this->updateRecent(Unicoder::symbolToCode32(symbol));
 }
 
-void DatabaseLoader::updateRecent(Unicoder::SurrogatePair code) const
+void DatabaseLoader::updateRecent(Unicoder::SurrogatePair code)
 {
 	this->updateRecent(Unicoder::code16ToCode32(code));
 }

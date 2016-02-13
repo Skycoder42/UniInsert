@@ -1,6 +1,7 @@
 #include "unicodermodels.h"
 #include <QAbstractItemModel>
 #include <QMimeData>
+#include <QSqlQuery>
 
 SymbolListModel::SymbolListModel(QObject *parent) :
 	QSqlQueryModel(parent)
@@ -23,11 +24,21 @@ QAction *SymbolListModel::createCopyAction(QAbstractItemView *view) const
 	return action;
 }
 
+void SymbolListModel::refresh()
+{
+	QSqlQuery query = this->query();
+	this->setQuery(QSqlQuery());
+	query.exec();
+	this->setQuery(query);
+}
+
 QVariant SymbolListModel::data(const QModelIndex &item, int role) const
 {
 	switch(role) {
 	case Qt::DisplayRole:
-		return Unicoder::code32ToSymbol(this->QSqlQueryModel::data(item, role).toUInt());
+		return Unicoder::code32ToSymbol(this->QSqlQueryModel::data(item, Qt::DisplayRole).toUInt());
+	case Qt::EditRole:
+		return this->QSqlQueryModel::data(item, Qt::DisplayRole);
 	case Qt::ToolTipRole:
 		return this->QSqlQueryModel::data(item.sibling(item.row(), 1), Qt::DisplayRole);
 	default:

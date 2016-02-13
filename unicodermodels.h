@@ -15,6 +15,8 @@ public:
 
 	QAction *createCopyAction(QAbstractItemView *view) const;
 
+	void refresh();
+
 	// QAbstractItemModel interface
 	QVariant data(const QModelIndex &item, int role) const;
 	QStringList mimeTypes() const Q_DECL_OVERRIDE;
