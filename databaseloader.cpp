@@ -223,7 +223,7 @@ SymbolListModel *DatabaseLoader::createEmojiGroupModel(int groupID, QObject *mod
 bool DatabaseLoader::createEmojiGroupModel(int groupID, SymbolListModel *updateModel) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID AS ID, Symbols.Name AS Name FROM (EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID) AS TTbl INNER JOIN Symbols ON TTbl.EmojiID = Symbols.Code WHERE EmojiGroups.ID = :groupID"));
+	query.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID AS ID, Symbols.Name AS Name FROM (EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID) AS TTbl INNER JOIN Symbols ON TTbl.EmojiID = Symbols.Code WHERE EmojiGroups.ID = :groupID ORDER BY EmojiMapping.SortHint ASC"));
 	query.bindValue(QStringLiteral(":groupID"), groupID);
 	if(query.exec()) {
 		updateModel->setQuery(query);
