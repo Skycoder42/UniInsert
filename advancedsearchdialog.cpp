@@ -40,8 +40,8 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	this->proxyModel->setFilterRole(Qt::DisplayRole);
 	this->ui->treeView->setModel(this->proxyModel);
 
-	this->ui->treeView->setItemDelegateForColumn(1, new UnicodeDelegate(this->ui->treeView));
-	this->ui->treeView->setItemDelegateForColumn(2, new UnicodeDelegate(this->ui->treeView));
+	this->ui->treeView->setItemDelegateForColumn(1, new UnicodeDelegate(false, this->ui->treeView));
+	this->ui->treeView->setItemDelegateForColumn(2, new UnicodeDelegate(false, this->ui->treeView));
 	this->ui->treeView->setColumnHidden(3, true);
 	this->ui->treeView->resizeColumnToContents(0);
 	this->ui->treeView->resizeColumnToContents(1);
@@ -62,7 +62,9 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	this->proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	this->ui->treeView->setModel(this->proxyModel);
 
-	this->ui->treeView->setItemDelegateForColumn(0, new UnicodeDelegate(this->ui->treeView));
+	this->ui->treeView->setItemDelegateForColumn(0, new UnicodeDelegate(true, this->ui->treeView));
+	this->ui->treeView->setItemDelegateForColumn(1, new UnicodeDelegate(false, this->ui->treeView));
+	this->ui->treeView->resizeColumnToContents(0);
 	this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
 }
 
@@ -91,7 +93,7 @@ void AdvancedSearchDialog::on_treeView_activated(const QModelIndex &index)
 {
 	this->selectedIndex = this->proxyModel->mapToSource(index);
 	if(this->symbolModel)
-		this->selectedIndex = this->selectedIndex.sibling(this->selectedIndex.row(), 0);
+		this->selectedIndex = this->selectedIndex.sibling(this->selectedIndex.row(), 1);
 	else
 		this->selectedIndex = this->selectedIndex.sibling(this->selectedIndex.row(), 3);
 	this->accept();

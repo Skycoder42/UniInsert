@@ -34,8 +34,10 @@ class UnicodeDelegate : public QStyledItemDelegate
 public:
 	static QString displayCode(uint code);
 
-	UnicodeDelegate(QObject *parent = nullptr);
+	UnicodeDelegate(bool isPreview, QObject *parent = nullptr);
 	QString displayText(const QVariant &value, const QLocale &locale) const Q_DECL_OVERRIDE;
+private:
+	bool isPreview;
 };
 
 #endif // UNICODERMODELS_H

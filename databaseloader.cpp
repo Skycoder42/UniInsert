@@ -56,8 +56,6 @@ QString DatabaseLoader::nameForSymbol(uint code) const
 QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent) const
 {
 	QSqlQueryModel *model = new QSqlQueryModel(modelParent);
-	model->setHeaderData(0, Qt::Horizontal, tr("Code"));
-	model->setHeaderData(1, Qt::Horizontal, tr("Name"));
 	this->clearSearchModel(model);
 	return model;
 }
@@ -65,11 +63,14 @@ QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent) const
 bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Code, Name FROM Symbols WHERE Name Like :term"));
+	query.prepare(QStringLiteral("SELECT Code, Code, Name FROM Symbols WHERE Name Like :term"));
 	query.bindValue(QStringLiteral(":term"),
 					DatabaseLoader::prepareSearch(nameTerm, mode));
 	if(query.exec()){
 		model->setQuery(query);
+		model->setHeaderData(0, Qt::Horizontal, tr("Preview"));
+		model->setHeaderData(1, Qt::Horizontal, tr("Code"));
+		model->setHeaderData(2, Qt::Horizontal, tr("Name"));
 		return true;
 	} else
 		return false;
@@ -77,7 +78,10 @@ bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQ
 
 void DatabaseLoader::clearSearchModel(QSqlQueryModel *model) const
 {
-	model->setQuery(QStringLiteral("SELECT Code, Name FROM Symbols WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
+	model->setQuery(QStringLiteral("SELECT Code, Code, Name FROM Symbols WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
+	model->setHeaderData(0, Qt::Horizontal, tr("Preview"));
+	model->setHeaderData(1, Qt::Horizontal, tr("Code"));
+	model->setHeaderData(2, Qt::Horizontal, tr("Name"));
 }
 
 SymbolListModel *DatabaseLoader::createBlock(int blockID, QObject *modelParent) const

@@ -82,18 +82,23 @@ QString UnicodeDelegate::displayCode(uint code)
 	return QStringLiteral("U+%1").arg(code, 4, 16, QLatin1Char('0')).toUpper();
 }
 
-UnicodeDelegate::UnicodeDelegate(QObject *parent) :
-	QStyledItemDelegate(parent)
+UnicodeDelegate::UnicodeDelegate(bool isPreview, QObject *parent) :
+	QStyledItemDelegate(parent),
+	isPreview(isPreview)
 {}
 
 QString UnicodeDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
 	Q_UNUSED(locale)
 	bool ok = false;
-	QString text = UnicodeDelegate::displayCode(value.toUInt(&ok));
+	QString text;
+	if(this->isPreview)
+		text = Unicoder::code32ToSymbol(value.toUInt(&ok));
+	else
+		text = UnicodeDelegate::displayCode(value.toUInt(&ok));
 	if(ok)
 		return text;
 	else
-		return tr("-/-");
+		return this->isPreview ? QString() : tr("-/-");
 }
 
