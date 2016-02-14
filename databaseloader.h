@@ -35,6 +35,8 @@ public:
 	explicit DatabaseLoader(QObject *parent = 0);
 	~DatabaseLoader();
 
+	static void reset();
+
 	//per symbol
 	inline QString nameForSymbol(const QString &symbol) const;
 	inline QString nameForSymbol(Unicoder::SurrogatePair code) const;
@@ -60,6 +62,7 @@ public:
 	inline void updateRecent(const QString &symbol);
 	inline void updateRecent(Unicoder::SurrogatePair code);
 	void updateRecent(uint code);
+	void resetRecent();
 
 	//emojis
 	QList<EmojiGroupInfo> listEmojiGroups() const;

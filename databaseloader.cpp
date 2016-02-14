@@ -23,9 +23,6 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
 	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
-#ifndef QT_NO_DEBUG
-	QFile::remove(file);
-#endif
 	if(!QFile::exists(file)) {
 		QFile::copy(QStringLiteral(":/data/mainDB.sqlite"), file);
 		QFile::setPermissions(file, QFileDevice::ReadUser | QFileDevice::WriteUser);
@@ -43,6 +40,14 @@ DatabaseLoader::~DatabaseLoader()
 	this->mainDB.close();
 	this->mainDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(DatabaseLoader::DBName);
+}
+
+void DatabaseLoader::reset()
+{
+	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+	sDir.mkpath(QStringLiteral("."));
+	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
+	QFile::remove(file);
 }
 
 QString DatabaseLoader::nameForSymbol(uint code) const
@@ -194,6 +199,13 @@ void DatabaseLoader::updateRecent(uint code)
 			qDebug() << "Failed to update recent entry";
 	} else
 		qDebug() << "Failed to insert/ignore recent entry";
+}
+
+void DatabaseLoader::resetRecent()
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("DELETE FROM Recent"));
+	query.exec();
 }
 
 QList<DatabaseLoader::EmojiGroupInfo> DatabaseLoader::listEmojiGroups() const

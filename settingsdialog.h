@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QVariant>
 #include <QSettings>
+class QAbstractButton;
 
 #define DECL_SETTINGS_CODE(code) \
 	static const QString code;\
@@ -23,6 +24,7 @@ public:
 	DECL_SETTINGS_CODE(allClip)
 	DECL_SETTINGS_CODE(autoHide)
 	DECL_SETTINGS_CODE(maxRecent)
+	DECL_SETTINGS_CODE(reset)
 
 	explicit SettingsDialog(QWidget *parent = 0);
 	~SettingsDialog();
@@ -38,6 +40,10 @@ public slots:
 
 signals:
 	void settingsChanged();
+
+private slots:
+	void on_buttonBox_clicked(QAbstractButton *button);
+	void on_resetRecentButton_clicked();
 
 private:
 	Ui::SettingsDialog *ui;

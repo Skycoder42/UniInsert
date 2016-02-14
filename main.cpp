@@ -23,6 +23,12 @@ int main(int argc, char *argv[])
 	QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/main.ico")));
 	QApplication::setQuitOnLastWindowClosed(false);
 
+	//check if reset was requested
+	if(SETTINGS_VALUE(SettingsDialog::reset).toBool()) {
+		DatabaseLoader::reset();
+		QSettings().clear();
+	}
+
 	QSystemTrayIcon trayIco(QApplication::windowIcon());
 	trayIco.setToolTip(QApplication::applicationDisplayName());
 

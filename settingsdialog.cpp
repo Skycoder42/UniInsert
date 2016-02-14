@@ -2,6 +2,7 @@
 #include "ui_settingsdialog.h"
 #include <QSettings>
 #include <QMessageBox>
+#include "databaseloader.h"
 
 #define SETTINGS_CODE(code, defaultValue) \
 	const QString SettingsDialog::code = QStringLiteral(#code);\
@@ -12,6 +13,7 @@ SETTINGS_CODE(useClip, true)
 SETTINGS_CODE(allClip, false)
 SETTINGS_CODE(autoHide, true)
 SETTINGS_CODE(maxRecent, 42)
+SETTINGS_CODE(reset, false)
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
@@ -86,4 +88,31 @@ void SettingsDialog::showAboutDialog()
 	box.setStandardButtons(QMessageBox::Ok);
 	box.setDefaultButton(QMessageBox::Ok);
 	box.exec();
+}
+
+void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
+{
+	if(this->ui->buttonBox->standardButton(button) == QDialogButtonBox::RestoreDefaults) {
+		if(QMessageBox::warning(this,
+								tr("Warning"),
+								tr("Do you really want to reset all settings and the database?\n"
+								   "This will include custom emoji settings and recently used!\n\n"
+								   "The application will be shut down!"),
+								QMessageBox::Ok,
+								QMessageBox::Abort)
+		   == QMessageBox::Ok) {
+			QSettings().setValue(SettingsDialog::reset, true);
+			qApp->quit();
+		}
+	}
+}
+
+void SettingsDialog::on_resetRecentButton_clicked()
+{
+	if(QMessageBox::question(this,
+							 tr("Reset Recently Used"),
+							 tr("Do you really want to reset the list of recently used symbols?"))
+	   == QMessageBox::Yes) {
+		Unicoder::databaseLoader()->resetRecent();
+	}
 }

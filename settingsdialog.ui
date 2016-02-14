@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>453</width>
-    <height>170</height>
+    <height>175</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,28 +90,6 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QSpinBox" name="maximumRecentlyUsedItemsSpinBox">
-       <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::PlusMinus</enum>
-       </property>
-       <property name="specialValueText">
-        <string>Deactivated</string>
-       </property>
-       <property name="accelerated">
-        <bool>true</bool>
-       </property>
-       <property name="correctionMode">
-        <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-       </property>
-       <property name="maximum">
-        <number>1000</number>
-       </property>
-       <property name="value">
-        <number>42</number>
-       </property>
-      </widget>
-     </item>
      <item row="4" column="0">
       <widget class="QLabel" name="changeUnicodeDatabaseLabel">
        <property name="enabled">
@@ -142,6 +120,45 @@
          <property name="text">
           <string>Update</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+       <item>
+        <widget class="QSpinBox" name="maximumRecentlyUsedItemsSpinBox">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+         <property name="specialValueText">
+          <string>Deactivated</string>
+         </property>
+         <property name="accelerated">
+          <bool>true</bool>
+         </property>
+         <property name="correctionMode">
+          <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+         </property>
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+         <property name="value">
+          <number>42</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="resetRecentButton">
+         <property name="text">
+          <string>Reset</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -161,7 +178,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
     </widget>
    </item>
