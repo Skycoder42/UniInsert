@@ -253,15 +253,26 @@ bool DatabaseLoader::removeEmoji(int groupID, uint code)
 bool DatabaseLoader::moveEmoji(int groupID, uint code, uint before)
 {
 	QSqlQuery listQuery(this->mainDB);
-	listQuery.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID FROM EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID WHERE EmojiGroups.ID = :groupID ORDER BY EmojiMapping.SortHint ASC"));
+	listQuery.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID, EmojiMapping.SortHint FROM EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID WHERE EmojiGroups.ID = :groupID ORDER BY EmojiMapping.SortHint ASC"));
 	listQuery.bindValue(QStringLiteral(":groupID"), groupID);
 	if(!listQuery.exec())
 		return false;
 
 	QList<uint> codeList;
-	while(listQuery.next())
-		codeList += listQuery.value(0).toUInt();
-	if(!codeList.removeOne(code))
+	int readState = 0;
+	int startHint = -1;
+	while(listQuery.next() && readState < 2) {
+		uint listCode = listQuery.value(0).toUInt();
+		if(listCode == code || listCode == before) {
+			if(readState == 0)
+				startHint = listQuery.value(1).toInt();
+			++readState;
+		}
+		if(readState > 0)
+			codeList.append(listCode);
+	}
+
+	if(startHint == -1 || !codeList.removeOne(code))
 		return false;
 	codeList.insert(codeList.indexOf(before), code);
 
@@ -272,7 +283,7 @@ bool DatabaseLoader::moveEmoji(int groupID, uint code, uint before)
 		insertQuery.prepare(QStringLiteral("UPDATE EmojiMapping SET SortHint = :hint WHERE GroupID = :group AND EmojiID = :emoji"));
 		insertQuery.bindValue(QStringLiteral(":group"), groupID);
 		insertQuery.bindValue(QStringLiteral(":emoji"), codeList[i]);
-		insertQuery.bindValue(QStringLiteral(":hint"), i + 1);
+		insertQuery.bindValue(QStringLiteral(":hint"), i + startHint);
 		if(!insertQuery.exec()) {
 			qDebug() << insertQuery.lastError().text();
 			this->mainDB.rollback();
