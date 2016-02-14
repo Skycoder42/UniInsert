@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include <QSettings>
+#include <QDir>
 #include "dialogmaster.h"
 #include "databaseloader.h"
 
@@ -13,15 +14,19 @@ SETTINGS_CODE(useClip, true)
 SETTINGS_CODE(allClip, false)
 SETTINGS_CODE(autoHide, true)
 SETTINGS_CODE(maxRecent, 42)
+SETTINGS_CODE(autoStart, true)
 SETTINGS_CODE(reset, false)
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::SettingsDialog)
 {
-	DialogMaster::masterDialog(this);
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
+	DialogMaster::masterDialog(this, true);
+
+	//make shure autostart is set as expected
+	this->updateAutostart(SETTINGS_VALUE(SettingsDialog::autoStart).toBool());
 }
 
 SettingsDialog::~SettingsDialog()
@@ -57,6 +62,7 @@ void SettingsDialog::showSettings()
 		this->ui->alwaysUseClipboardCheckBox->setChecked(settings.value(SettingsDialog::allClip, SettingsDialog::allClipDefault).toBool());
 		this->ui->autoHideWindowsCheckBox->setChecked(settings.value(SettingsDialog::autoHide, SettingsDialog::autoHideDefault).toBool());
 		this->ui->maximumRecentlyUsedItemsSpinBox->setValue(settings.value(SettingsDialog::maxRecent, SettingsDialog::maxRecentDefault).toInt());
+		this->ui->startWithWindowsCheckBox->setChecked(settings.value(SettingsDialog::autoStart, SettingsDialog::autoStartDefault).toBool());
 		this->exec();
 	}
 }
@@ -68,6 +74,8 @@ void SettingsDialog::accept()
 	settings.setValue(SettingsDialog::allClip, this->ui->alwaysUseClipboardCheckBox->isChecked());
 	settings.setValue(SettingsDialog::autoHide, this->ui->autoHideWindowsCheckBox->isChecked());
 	settings.setValue(SettingsDialog::maxRecent, this->ui->maximumRecentlyUsedItemsSpinBox->value());
+	settings.setValue(SettingsDialog::autoStart, this->ui->startWithWindowsCheckBox->isChecked());
+	this->updateAutostart(this->ui->startWithWindowsCheckBox->isChecked());
 	emit settingsChanged();
 	this->QDialog::accept();
 }
@@ -96,8 +104,8 @@ void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 								   "The application will be shut down!"),
 								 QString(),
 								 QString(),
-								 QMessageBox::Ok,
-								 QMessageBox::Abort)
+								 QMessageBox::Yes,
+								 QMessageBox::No)
 		   == QMessageBox::Ok) {
 			QSettings().setValue(SettingsDialog::reset, true);
 			qApp->quit();
@@ -113,4 +121,12 @@ void SettingsDialog::on_resetRecentButton_clicked()
 	   == QMessageBox::Yes) {
 		Unicoder::databaseLoader()->resetRecent();
 	}
+}
+void SettingsDialog::updateAutostart(bool on)
+{
+	QSettings regEdit(QStringLiteral("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), QSettings::NativeFormat);
+	if(on)
+		regEdit.setValue(QApplication::applicationName(), QDir::toNativeSeparators(QApplication::applicationFilePath()));
+	else
+		regEdit.remove(QApplication::applicationName());
 }

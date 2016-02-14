@@ -5,16 +5,14 @@
 #include <QDesktopWidget>
 #include <QSettings>
 #include "settingsdialog.h"
+#include "dialogmaster.h"
 
 PopupDialog::PopupDialog(bool isFixedSize) :
-	QDialog(new QWidget(nullptr), Qt::Dialog |
-			Qt::CustomizeWindowHint |
-			Qt::WindowTitleHint |
-			Qt::WindowCloseButtonHint |
-			Qt::WindowStaysOnTopHint |
-			(isFixedSize ? Qt::MSWindowsFixedSizeDialogHint : Qt::Widget)),
+	QDialog(new QWidget(nullptr)),
 	autoHide(true)
 {
+	DialogMaster::masterDialog(this, isFixedSize, Qt::WindowStaysOnTopHint);
+
 	connect(this, &PopupDialog::destroyed,
 			this->parentWidget(), &QWidget::deleteLater);
 }

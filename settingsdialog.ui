@@ -2,22 +2,16 @@
 <ui version="4.0">
  <class>SettingsDialog</class>
  <widget class="QDialog" name="SettingsDialog">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>175</height>
+    <width>436</width>
+    <height>163</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
-  </property>
-  <property name="sizeGripEnabled">
-   <bool>true</bool>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -90,43 +84,6 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="changeUnicodeDatabaseLabel">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Change &amp;Unicode Database:</string>
-       </property>
-       <property name="buddy">
-        <cstring>changeUnicodeDatabaseSpinBox</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
-       <item>
-        <widget class="QVersionEdit" name="changeUnicodeDatabaseSpinBox">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="changeUnicodeDatabaseButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Update</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="3" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
        <item>
@@ -163,6 +120,23 @@
        </item>
       </layout>
      </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="startWithWindowsLabel">
+       <property name="text">
+        <string>&amp;Start with Windows:</string>
+       </property>
+       <property name="buddy">
+        <cstring>startWithWindowsCheckBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="startWithWindowsCheckBox">
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -184,13 +158,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVersionEdit</class>
-   <extends>QSpinBox</extends>
-   <header>qversionedit.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

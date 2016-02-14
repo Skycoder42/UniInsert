@@ -5,6 +5,7 @@
 #include "unicoder.h"
 #include "advancedsearchdialog.h"
 #include "unicodermodels.h"
+#include "dialogmaster.h"
 
 const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(?:U\+?|\\u)?((?:10|[\dA-F])?[\dA-F]{4})$)__"),
 														  QRegularExpression::CaseInsensitiveOption);
@@ -38,8 +39,8 @@ uint SymbolSelectDialog::getSymbol(QWidget *parent)
 {
 	SymbolSelectDialog selectDialog;
 	selectDialog.setAutoHide(false);
-	selectDialog.setParent(parent, selectDialog.windowFlags());
-	selectDialog.setWindowModality(Qt::WindowModal);
+	selectDialog.setParent(parent);
+	DialogMaster::masterDialog(&selectDialog, true);
 	selectDialog.doInsert = false;
 	if(selectDialog.exec())
 		return Unicoder::symbolToCode32(selectDialog.ui->previewLineEdit->text());

@@ -24,6 +24,7 @@ public:
 	DECL_SETTINGS_CODE(allClip)
 	DECL_SETTINGS_CODE(autoHide)
 	DECL_SETTINGS_CODE(maxRecent)
+	DECL_SETTINGS_CODE(autoStart)
 	DECL_SETTINGS_CODE(reset)
 
 	explicit SettingsDialog(QWidget *parent = 0);
@@ -45,6 +46,7 @@ private slots:
 	void on_buttonBox_clicked(QAbstractButton *button);
 	void on_resetRecentButton_clicked();
 
+	void updateAutostart(bool on);
 private:
 	Ui::SettingsDialog *ui;
 };
