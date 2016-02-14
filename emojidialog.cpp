@@ -9,7 +9,7 @@
 #include "unicoder.h"
 #include "databaseloader.h"
 #include "unicodermodels.h"
-#include "advancedsearchdialog.h"
+#include "symbolselectdialog.h"
 #include "settingsdialog.h"
 
 EmojiDialog::EmojiDialog(QWidget *parent) :
@@ -84,7 +84,7 @@ void EmojiDialog::addTriggered(QObject *model)
 	SymbolListModel *symbolModel = static_cast<SymbolListModel*>(model);
 
 	this->setAutoHide(false);
-	uint code = AdvancedSearchDialog::searchSymbol(this);
+	uint code = SymbolSelectDialog::getSymbol(this);
 	if(code != UINT_MAX) {
 		int groupID = symbolModel->property("groupID").toInt();
 		if(Unicoder::databaseLoader()->addEmoji(groupID, code))
@@ -126,7 +126,9 @@ void EmojiDialog::pasteTriggered(QObject *model)
 		}
 	}
 
+	this->setAutoHide(false);
 	QMessageBox::critical(this, tr("Error"), tr("Failed to add the emoji to the list"));
+	this->setAutoHide(true);
 }
 
 void EmojiDialog::on_actionAdd_Emoji_Group_triggered()
@@ -231,7 +233,6 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	this->clipChange();
 }
 
-#include <QDebug>
 void EmojiDialog::clipChange()
 {
 	uint code = Unicoder::symbolToCode32(QApplication::clipboard()->text());

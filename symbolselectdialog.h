@@ -22,6 +22,8 @@ public:
 	explicit SymbolSelectDialog();
 	~SymbolSelectDialog();
 
+	static uint getSymbol(QWidget *parent);
+
 protected:
 	void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
 
@@ -52,6 +54,7 @@ private:
 	Ui::SymbolSelectDialog *ui;
 	QRegularExpressionValidator *validator;	
 	PreviewAction *previewAction;
+	bool doInsert;
 };
 
 #endif // SYMBOLSELECTDIALOG_H

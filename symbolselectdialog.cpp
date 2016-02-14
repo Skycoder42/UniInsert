@@ -13,7 +13,8 @@ SymbolSelectDialog::SymbolSelectDialog() :
 	PopupDialog(true),
 	ui(new Ui::SymbolSelectDialog),
 	validator(new QRegularExpressionValidator(SymbolSelectDialog::unicodeRegex, this)),
-	previewAction(new PreviewAction(this))
+	previewAction(new PreviewAction(this)),
+	doInsert(true)
 {
 	this->ui->setupUi(this);
 	this->ui->unicodeLineEdit->setValidator(this->validator);
@@ -31,6 +32,19 @@ SymbolSelectDialog::SymbolSelectDialog() :
 SymbolSelectDialog::~SymbolSelectDialog()
 {
 	delete this->ui;
+}
+
+uint SymbolSelectDialog::getSymbol(QWidget *parent)
+{
+	SymbolSelectDialog selectDialog;
+	selectDialog.setAutoHide(false);
+	selectDialog.setParent(parent, selectDialog.windowFlags());
+	selectDialog.setWindowModality(Qt::WindowModal);
+	selectDialog.doInsert = false;
+	if(selectDialog.exec())
+		return Unicoder::symbolToCode32(selectDialog.ui->previewLineEdit->text());
+	else
+		return UINT_MAX;
 }
 
 void SymbolSelectDialog::showEvent(QShowEvent *event)
@@ -66,7 +80,8 @@ void SymbolSelectDialog::on_unicodeLineEdit_textChanged(const QString &text)
 
 void SymbolSelectDialog::on_insertButton_clicked()
 {
-	Unicoder::sendSymbolInput(this->ui->previewLineEdit->text());
+	if(this->doInsert)
+		Unicoder::sendSymbolInput(this->ui->previewLineEdit->text());
 	this->accept();
 }
 
@@ -77,11 +92,12 @@ void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
 
 void SymbolSelectDialog::on_actionSearch_symbol_name_triggered()
 {
+	bool outHideOld = this->doesAutoHide();
 	this->setAutoHide(false);
 	uint code = AdvancedSearchDialog::searchSymbol(this);
 	if(code != UINT_MAX)
 		this->ui->unicodeLineEdit->setText(UnicodeDelegate::displayCode(code));
-	this->setAutoHide(true);
+	this->setAutoHide(outHideOld);
 }
 
 uint SymbolSelectDialog::calcUnicode(const QString &code)
