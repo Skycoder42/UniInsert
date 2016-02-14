@@ -67,6 +67,7 @@ public:
 	bool createEmojiGroupModel(int groupID, SymbolListModel *updateModel) const;
 	bool addEmoji(int groupID, uint code);
 	bool removeEmoji(int groupID, uint code);
+	bool moveEmoji(int groupID, uint code, uint before);
 	int createEmojiGroup(const QString &name);
 	bool deleteEmojiGroup(int groupID);
 	void updateEmojiGroupOrder(const QList<int> &idOrder);

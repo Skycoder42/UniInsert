@@ -154,14 +154,16 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	view->setContextMenuPolicy(Qt::ActionsContextMenu);
 	view->setFrameShape(QFrame::NoFrame);
 	view->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	view->setDropIndicatorShown(false);
+	view->setDropIndicatorShown(true);
 	view->setDragEnabled(true);
 	view->setMovement(QListView::Static);
 	view->setFlow(QListView::LeftToRight);
 	view->setResizeMode(QListView::Adjust);
 	view->setWrapping(true);
 	view->setSelectionRectVisible(false);
-	view->setDragDropMode(QAbstractItemView::DragOnly);
+	view->setDragDropMode(QAbstractItemView::DragDrop);
+	view->setDragDropOverwriteMode(false);
+	view->setDefaultDropAction(Qt::MoveAction);
 
 	model->createCopyAction(view);
 	connect(view, &QListView::activated, this, &EmojiDialog::accept);

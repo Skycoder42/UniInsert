@@ -3,8 +3,11 @@
 #include <QMimeData>
 #include <QSqlQuery>
 
-SymbolListModel::SymbolListModel(QObject *parent) :
-	QSqlQueryModel(parent)
+const QString SymbolListModel::IndexMimeType = QStringLiteral("uniinsert/listindex");
+
+SymbolListModel::SymbolListModel(QObject *parent, bool canDrop) :
+	QSqlQueryModel(parent),
+	isEmoji(canDrop)
 {}
 
 QAction *SymbolListModel::createCopyAction(QAbstractItemView *view) const
@@ -48,25 +51,62 @@ QVariant SymbolListModel::data(const QModelIndex &item, int role) const
 
 QStringList SymbolListModel::mimeTypes() const
 {
-	QStringList types = this->QSqlQueryModel::mimeTypes();
-	types.prepend(QStringLiteral("text/plain"));
-	return types;
+	return {QStringLiteral("text/plain"), SymbolListModel::IndexMimeType};
 }
 
 QMimeData *SymbolListModel::mimeData(const QModelIndexList &indexes) const
 {
-	QMimeData *data = this->QSqlQueryModel::mimeData(indexes);
-	if(data && indexes.size() == 1) {
+	if(indexes.size() == 1) {
+		QMimeData *data = new QMimeData();
 		QString symbol = this->getSymbol(indexes.first());
 		Unicoder::databaseLoader()->updateRecent(symbol);
 		data->setText(symbol);
-	}
-	return data;
+		data->setData(SymbolListModel::IndexMimeType, QByteArray::number(indexes.first().row()));
+		return data;
+	} else
+		return NULL;
 }
 
 Qt::ItemFlags SymbolListModel::flags(const QModelIndex &index) const
 {
-	return this->QSqlQueryModel::flags(index) | Qt::ItemIsDragEnabled;
+	if(this->isEmoji && !index.isValid())
+		return this->QSqlQueryModel::flags(index) | Qt::ItemIsDropEnabled;
+	else
+		return this->QSqlQueryModel::flags(index) | Qt::ItemIsDragEnabled;
+}
+
+Qt::DropActions SymbolListModel::supportedDropActions() const
+{
+	return this->isEmoji ? Qt::MoveAction : Qt::IgnoreAction;
+}
+
+Qt::DropActions SymbolListModel::supportedDragActions() const
+{
+	return this->isEmoji ? (Qt::CopyAction | Qt::MoveAction) : Qt::CopyAction;
+}
+
+bool SymbolListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+	Q_UNUSED(action)
+	if(this->isEmoji) {
+		if(column != 0 ||
+		   parent.isValid() ||
+		   !data->hasFormat(SymbolListModel::IndexMimeType) ||
+		   !this->property("groupID").isValid())
+			return false;
+		int oldRow = data->data(SymbolListModel::IndexMimeType).toInt();
+		if(oldRow == row || row == oldRow + 1)
+			return false;
+
+		uint dragCode = this->index(oldRow, 0).data(Qt::EditRole).toUInt();
+		uint targetCode = this->index(row, 0).data(Qt::EditRole).toUInt();
+		if(Unicoder::databaseLoader()->moveEmoji(this->property("groupID").toInt(), dragCode, targetCode)) {
+			this->refresh();
+			return true;
+		} else
+			return false;
+	} else
+		return false;
 }
 
 void SymbolListModel::activateItem(const QModelIndex &index) const

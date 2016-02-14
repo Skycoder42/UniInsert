@@ -11,17 +11,22 @@
 class SymbolListModel : public QSqlQueryModel
 {
 public:
-	SymbolListModel(QObject *parent = nullptr);
+	static const QString IndexMimeType;
+
+	SymbolListModel(QObject *parent = nullptr, bool isEmoji = false);
 
 	QAction *createCopyAction(QAbstractItemView *view) const;
 
 	void refresh();
 
 	// QAbstractItemModel interface
-	QVariant data(const QModelIndex &item, int role) const;
+	QVariant data(const QModelIndex &item, int role) const Q_DECL_OVERRIDE;
 	QStringList mimeTypes() const Q_DECL_OVERRIDE;
 	QMimeData *mimeData(const QModelIndexList &indexes) const Q_DECL_OVERRIDE;
-	Qt::ItemFlags flags(const QModelIndex &index) const;
+	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
+	Qt::DropActions supportedDropActions() const Q_DECL_OVERRIDE;
+	Qt::DropActions supportedDragActions() const Q_DECL_OVERRIDE;
+	bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) Q_DECL_OVERRIDE;
 
 public slots:
 	void activateItem(const QModelIndex &index) const;
@@ -29,6 +34,8 @@ public slots:
 
 private:
 	QString getSymbol(const QModelIndex &index) const;
+
+	bool isEmoji;
 };
 
 class UnicodeDelegate : public QStyledItemDelegate
