@@ -19,22 +19,28 @@ public:
 
 	bool eventFilter(QObject *, QEvent *event) Q_DECL_OVERRIDE;
 
+signals:
+	void updatePasteEnabled(bool canPaste, QPrivateSignal);
+
 protected:
 	void closeEvent(QCloseEvent *ev);
 
 private slots:
 	void addTriggered(QObject *model);
 	void deleteTriggered(QObject *model);
+	void pasteTriggered(QObject *model);
 
 	void on_actionAdd_Emoji_Group_triggered();
 	void on_actionRemove_Emoji_Group_triggered();
 
 	void createTab(int groupID, const QString &groupName);
+	void clipChange();
 
 private:
 	Ui::EmojiDialog *ui;
 	QSignalMapper *addMapper;
 	QSignalMapper *deleteMapper;
+	QSignalMapper *pasteMapper;
 
 	QWidget* tabContextWidget;
 	QHash<QWidget*, SymbolListModel*> tabModels;

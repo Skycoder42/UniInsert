@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QMouseEvent>
+#include <QApplication>
+#include <QClipboard>
 #include "unicoder.h"
 #include "databaseloader.h"
 #include "unicodermodels.h"
@@ -15,11 +17,15 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 	ui(new Ui::EmojiDialog),
 	addMapper(new QSignalMapper(this)),
 	deleteMapper(new QSignalMapper(this)),
+	pasteMapper(new QSignalMapper(this)),
 	tabContextWidget(nullptr),
 	tabModels()
 {
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
+
+	connect(QApplication::clipboard(), &QClipboard::dataChanged,
+			this, &EmojiDialog::clipChange, Qt::QueuedConnection);
 
 	this->ui->tabWidget->installEventFilter(this);
 	this->ui->tabWidget->addActions({
@@ -31,6 +37,8 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 			this, SLOT(addTriggered(QObject*)));
 	connect(this->deleteMapper, SIGNAL(mapped(QObject*)),
 			this, SLOT(deleteTriggered(QObject*)));
+	connect(this->pasteMapper, SIGNAL(mapped(QObject*)),
+			this, SLOT(pasteTriggered(QObject*)));
 
 	typedef QList<DatabaseLoader::EmojiGroupInfo>::const_iterator itr;
 	QList<DatabaseLoader::EmojiGroupInfo> groups = Unicoder::databaseLoader()->listEmojiGroups();
@@ -106,6 +114,21 @@ void EmojiDialog::deleteTriggered(QObject *model)
 	}
 }
 
+void EmojiDialog::pasteTriggered(QObject *model)
+{
+	Q_ASSERT(dynamic_cast<SymbolListModel*>(model));
+	SymbolListModel *symbolModel = static_cast<SymbolListModel*>(model);
+	uint code = Unicoder::symbolToCode32(QApplication::clipboard()->text());
+	if(code != UINT_MAX) {
+		if(Unicoder::databaseLoader()->addEmoji(symbolModel->property("groupID").toInt(), code)) {
+			symbolModel->refresh();
+			return;
+		}
+	}
+
+	QMessageBox::critical(this, tr("Error"), tr("Failed to add the emoji to the list"));
+}
+
 void EmojiDialog::on_actionAdd_Emoji_Group_triggered()
 {
 	this->setAutoHide(false);
@@ -171,20 +194,30 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	view->setModel(model);
 	model->setProperty("view", QVariant::fromValue(view));
 
+	QAction *pasteAction = new QAction(QIcon(QStringLiteral(":/icons/paste.ico")), tr("Paste Symbol"), view);
+	pasteAction->setShortcut(QKeySequence::Paste);
+	pasteAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+	this->pasteMapper->setMapping(pasteAction, model);
+	connect(pasteAction, SIGNAL(triggered()), this->pasteMapper, SLOT(map()));
+	connect(this, &EmojiDialog::updatePasteEnabled, pasteAction, &QAction::setEnabled);
+
 	QAction *seperator = new QAction(view);
 	seperator->setSeparator(true);
 
 	QAction *addAction = new QAction(QIcon(QStringLiteral(":/icons/add.ico")), tr("Add Emoji"), view);
 	addAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Insert));
+	addAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	this->addMapper->setMapping(addAction, model);
 	connect(addAction, SIGNAL(triggered()), this->addMapper, SLOT(map()));
 
 	QAction *removeAction = new QAction(QIcon(QStringLiteral(":/icons/delete.ico")), tr("Remove Emoji"), view);
 	removeAction->setShortcut(QKeySequence::Delete);
+	removeAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	this->deleteMapper->setMapping(removeAction, model);
 	connect(removeAction, SIGNAL(triggered()), this->deleteMapper, SLOT(map()));
 
 	view->addActions({
+						 pasteAction,
 						 seperator,
 						 addAction,
 						 removeAction
@@ -194,4 +227,13 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	title.replace(QLatin1Char('&'), QStringLiteral("&&"));
 	this->ui->tabWidget->addTab(view, title);
 	this->tabModels.insert(view, model);
+
+	this->clipChange();
+}
+
+#include <QDebug>
+void EmojiDialog::clipChange()
+{
+	uint code = Unicoder::symbolToCode32(QApplication::clipboard()->text());
+	emit updatePasteEnabled(code != UINT_MAX, QPrivateSignal());
 }
