@@ -1,7 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include <QSettings>
-#include <QMessageBox>
+#include "dialogmaster.h"
 #include "databaseloader.h"
 
 #define SETTINGS_CODE(code, defaultValue) \
@@ -19,6 +19,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::SettingsDialog)
 {
+	DialogMaster::masterDialog(this);
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
 }
@@ -73,33 +74,30 @@ void SettingsDialog::accept()
 
 void SettingsDialog::showAboutDialog()
 {
-	QMessageBox box(NULL);
-	box.setModal(true);
-	box.setWindowTitle(tr("About"));
 	QImage img = QApplication::windowIcon().pixmap(64, 64).toImage();
 	img.invertPixels();
-	box.setIconPixmap(QPixmap::fromImage(img));
-	box.setText(tr("<b>About %1 — Version %2</b>")
-				.arg(QApplication::applicationDisplayName())
-				.arg(QApplication::applicationVersion()));
-	box.setInformativeText(tr("<p>An application to easily insert unicode characters EVERYWHERE.</p>"
-							  "<p>Author: Sykcoder Soft (<a href=\"https://github.com/Skycoder42\">Skycoder42</a>)</p>"
-							  "<p>For Updates and further Information, check <a href=\"https://github.com/Skycoder42/UniInsert\">https://github.com/Skycoder42/UniInsert</a></p>"));
-	box.setStandardButtons(QMessageBox::Ok);
-	box.setDefaultButton(QMessageBox::Ok);
-	box.exec();
+	DialogMaster::msgBox(NULL,
+						 QPixmap::fromImage(img),
+						 tr("<p>An application to easily insert unicode characters EVERYWHERE.</p>"
+							"<p>Author: Sykcoder Soft (<a href=\"https://github.com/Skycoder42\">Skycoder42</a>)</p>"
+							"<p>For Updates and further Information, check <a href=\"https://github.com/Skycoder42/UniInsert\">https://github.com/Skycoder42/UniInsert</a></p>"),
+						 tr("About %1 — Version %2")
+						 .arg(QApplication::applicationDisplayName())
+						 .arg(QApplication::applicationVersion()),
+						 tr("About"));
 }
 
 void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 {
 	if(this->ui->buttonBox->standardButton(button) == QDialogButtonBox::RestoreDefaults) {
-		if(QMessageBox::warning(this,
-								tr("Warning"),
-								tr("Do you really want to reset all settings and the database?\n"
+		if(DialogMaster::warning(this,
+								 tr("Do you really want to reset all settings and the database?\n"
 								   "This will include custom emoji settings and recently used!\n\n"
 								   "The application will be shut down!"),
-								QMessageBox::Ok,
-								QMessageBox::Abort)
+								 QString(),
+								 QString(),
+								 QMessageBox::Ok,
+								 QMessageBox::Abort)
 		   == QMessageBox::Ok) {
 			QSettings().setValue(SettingsDialog::reset, true);
 			qApp->quit();
@@ -109,9 +107,9 @@ void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 
 void SettingsDialog::on_resetRecentButton_clicked()
 {
-	if(QMessageBox::question(this,
-							 tr("Reset Recently Used"),
-							 tr("Do you really want to reset the list of recently used symbols?"))
+	if(DialogMaster::question(this,
+							  tr("Do you really want to reset the list of recently used symbols?"),
+							  tr("Reset Recently Used"))
 	   == QMessageBox::Yes) {
 		Unicoder::databaseLoader()->resetRecent();
 	}

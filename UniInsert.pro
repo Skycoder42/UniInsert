@@ -30,6 +30,7 @@ LIBS += -lUser32
 
 include(C:/C++Libraries/Qt/QHotkey/qhotkey.pri)
 include(C:/C++Libraries/Qt/QVersionedit/qversionedit.pri)
+include(C:/C++Libraries/Qt/dialogmaster/dialogmaster.pri)
 
 SOURCES += main.cpp\
         symbolselectdialog.cpp \

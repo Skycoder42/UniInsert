@@ -1,8 +1,6 @@
 #include "emojidialog.h"
 #include "ui_emojidialog.h"
 #include <QListView>
-#include <QMessageBox>
-#include <QInputDialog>
 #include <QMouseEvent>
 #include <QApplication>
 #include <QClipboard>
@@ -11,6 +9,7 @@
 #include "unicodermodels.h"
 #include "symbolselectdialog.h"
 #include "settingsdialog.h"
+#include "dialogmaster.h"
 
 EmojiDialog::EmojiDialog(QWidget *parent) :
 	PopupDialog(parent),
@@ -90,7 +89,7 @@ void EmojiDialog::addTriggered(QObject *model)
 		if(Unicoder::databaseLoader()->addEmoji(groupID, code))
 			symbolModel->refresh();
 		else
-			QMessageBox::critical(this, tr("Error"), tr("Failed to add the emoji to the list"));
+			DialogMaster::critical(this, tr("Failed to add the emoji to the list"));
 	}
 	this->setAutoHide(true);
 }
@@ -108,7 +107,7 @@ void EmojiDialog::deleteTriggered(QObject *model)
 			symbolModel->refresh();
 		else {
 			this->setAutoHide(false);
-			QMessageBox::critical(this, tr("Error"), tr("Failed to remove the emoji from the list"));
+			DialogMaster::critical(this, tr("Failed to remove the emoji from the list"));
 			this->setAutoHide(true);
 		}
 	}
@@ -127,22 +126,22 @@ void EmojiDialog::pasteTriggered(QObject *model)
 	}
 
 	this->setAutoHide(false);
-	QMessageBox::critical(this, tr("Error"), tr("Failed to add the emoji to the list"));
+	DialogMaster::critical(this, tr("Failed to add the emoji to the list"));
 	this->setAutoHide(true);
 }
 
 void EmojiDialog::on_actionAdd_Emoji_Group_triggered()
 {
 	this->setAutoHide(false);
-	QString name = QInputDialog::getText(this,
-										 tr("Create Emoji Group"),
-										 tr("Enter the name for the new group:"));
+	QString name = DialogMaster::getText(this,
+										 tr("Enter the name for the new group:"),
+										 tr("Create Emoji Group"));
 	if(!name.isEmpty()) {
 		int id = Unicoder::databaseLoader()->createEmojiGroup(name);
 		if(id != -1)
 			this->createTab(id, name);
 		else
-			QMessageBox::critical(this, tr("Error"), tr("Failed to create the emoji group"));
+			DialogMaster::critical(this, tr("Failed to create the emoji group"));
 	}
 	this->setAutoHide(true);
 }
@@ -153,16 +152,16 @@ void EmojiDialog::on_actionRemove_Emoji_Group_triggered()
 	if(!model)
 		return;
 	this->setAutoHide(false);
-	if(QMessageBox::question(this,
-							 tr("Delete Emoji Group"),
-							 tr("Do you really want to delete the emoji group?"))
+	if(DialogMaster::question(this,
+							  tr("Do you really want to delete the emoji group?"),
+							  tr("Delete Emoji Group"))
 	   == QMessageBox::Yes) {
 		if(Unicoder::databaseLoader()->deleteEmojiGroup(model->property("groupID").toInt())) {
 			this->tabModels.remove(this->tabContextWidget);
 			this->tabContextWidget->deleteLater();
 			this->tabContextWidget = nullptr;
 		} else
-			QMessageBox::critical(this, tr("Error"), tr("Failed to delete the emoji group"));
+			DialogMaster::critical(this, tr("Failed to delete the emoji group"));
 	}
 	this->setAutoHide(true);
 }

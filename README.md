@@ -3,7 +3,6 @@ An application to easily insert unicode characters EVERYWHERE
 
 ## TODO
  - Symbol details smiley groups
- - DialogMaster
  - Automated unicode database update -> select by version
 
 ##Links
