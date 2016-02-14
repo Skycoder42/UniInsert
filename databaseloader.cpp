@@ -253,39 +253,28 @@ bool DatabaseLoader::removeEmoji(int groupID, uint code)
 bool DatabaseLoader::moveEmoji(int groupID, uint code, uint before)
 {
 	QSqlQuery listQuery(this->mainDB);
-	listQuery.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID, EmojiMapping.SortHint FROM EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID WHERE EmojiGroups.ID = :groupID ORDER BY EmojiMapping.SortHint ASC"));
+	listQuery.prepare(QStringLiteral("SELECT EmojiMapping.EmojiID FROM EmojiGroups INNER JOIN EmojiMapping ON EmojiGroups.ID = EmojiMapping.GroupID WHERE EmojiGroups.ID = :groupID ORDER BY EmojiMapping.SortHint ASC"));
 	listQuery.bindValue(QStringLiteral(":groupID"), groupID);
 	if(!listQuery.exec())
 		return false;
-	if(!this->mainDB.transaction())
-		return false;
 
 	QList<uint> codeList;
-	bool isCollecting = false;
-	while(listQuery.next()) {
-		uint idCode = listQuery.value(0).toUInt();
-		if(idCode == code || idCode == before)
-			isCollecting = true;
-		if(isCollecting) {
-			codeList.append(idCode);
-			QSqlQuery removeQuery(this->mainDB);
-			removeQuery.prepare(QStringLiteral("DELETE FROM EmojiMapping WHERE SortHint = :hint"));
-			removeQuery.bindValue(QStringLiteral(":hint"), listQuery.value(1).toInt());
-			if(!removeQuery.exec()) {
-				this->mainDB.rollback();
-				return false;
-			}
-		}
-	}
-
-	codeList.removeOne(code);
+	while(listQuery.next())
+		codeList += listQuery.value(0).toUInt();
+	if(!codeList.removeOne(code))
+		return false;
 	codeList.insert(codeList.indexOf(before), code);
-	for(uint insCode : codeList) {
+
+	if(!this->mainDB.transaction())
+		return false;
+	for(int i = 0, max = codeList.size(); i < max; ++i) {
 		QSqlQuery insertQuery(this->mainDB);
-		insertQuery.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID) VALUES(:group, :emoji)"));
+		insertQuery.prepare(QStringLiteral("UPDATE EmojiMapping SET SortHint = :hint WHERE GroupID = :group AND EmojiID = :emoji"));
 		insertQuery.bindValue(QStringLiteral(":group"), groupID);
-		insertQuery.bindValue(QStringLiteral(":emoji"), insCode);
+		insertQuery.bindValue(QStringLiteral(":emoji"), codeList[i]);
+		insertQuery.bindValue(QStringLiteral(":hint"), i + 1);
 		if(!insertQuery.exec()) {
+			qDebug() << insertQuery.lastError().text();
 			this->mainDB.rollback();
 			return false;
 		}
