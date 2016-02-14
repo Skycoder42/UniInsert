@@ -235,7 +235,7 @@ bool DatabaseLoader::createEmojiGroupModel(int groupID, SymbolListModel *updateM
 bool DatabaseLoader::addEmoji(int groupID, uint code)
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID) VALUES(:group, :emoji)"));
+	query.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID, SortHint) VALUES(:group, :emoji, (SELECT IFNULL(MAX(SortHint), 0) + 1 FROM EmojiMapping WHERE GroupID = :group))"));
 	query.bindValue(QStringLiteral(":group"), groupID);
 	query.bindValue(QStringLiteral(":emoji"), code);
 	return query.exec();
