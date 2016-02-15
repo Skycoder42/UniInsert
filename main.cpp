@@ -2,6 +2,7 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QHotkey>
+#include <qsingleinstance.h>
 
 #include "settingsdialog.h"
 #include "symbolselectdialog.h"
@@ -23,52 +24,76 @@ int main(int argc, char *argv[])
 	QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/main.ico")));
 	QApplication::setQuitOnLastWindowClosed(false);
 
-	//check if reset was requested
-	if(SETTINGS_VALUE(SettingsDialog::reset).toBool()) {
-		DatabaseLoader::reset();
-		QSettings().clear();
-	}
+	QSingleInstance instance;
 
-	QSystemTrayIcon trayIco(QApplication::windowIcon());
-	trayIco.setToolTip(QApplication::applicationDisplayName());
+	QSystemTrayIcon *trayIco = nullptr;
 
-	SettingsDialog settingsDiag;
-	SymbolSelectDialog symbDiag;
-	GetCodeDialog codeDiag;
-	EmojiDialog emojiDialog;
-	BlockSelectDialog blockDiag;
+	SettingsDialog *settingsDiag = nullptr;
+	SymbolSelectDialog *symbDiag = nullptr;
+	GetCodeDialog *codeDiag = nullptr;
+	EmojiDialog *emojiDialog = nullptr;
+	BlockSelectDialog *blockDiag = nullptr;
 
-	QObject::connect(&codeDiag, &GetCodeDialog::showBlock, &blockDiag, &BlockSelectDialog::showBlock);
+	instance.setStartupFunction([&]() -> int {
+		//check if reset was requested
+		if(SETTINGS_VALUE(SettingsDialog::reset).toBool()) {
+			DatabaseLoader::reset();
+			QSettings().clear();
+		}
 
-	QMenu *trayMenu = new QMenu();
-	trayIco.setContextMenu(trayMenu);
-	QObject::connect(&trayIco, &QSystemTrayIcon::destroyed, trayMenu, [&](){
-		delete trayMenu;
-	}, Qt::DirectConnection);
+		trayIco = new QSystemTrayIcon(QApplication::windowIcon());
+		trayIco->setToolTip(QApplication::applicationDisplayName());
 
-	QAction *codeAction = trayMenu->addAction(Global::tr("Enter Code"), &symbDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+#"));
-	QHotkey *codeHotkey = new QHotkey(codeAction->shortcut(), true, codeAction);
-	QObject::connect(codeHotkey, &QHotkey::activated, codeAction, &QAction::trigger);
+		settingsDiag = new SettingsDialog();
+		symbDiag = new SymbolSelectDialog();
+		codeDiag = new GetCodeDialog();
+		emojiDialog = new EmojiDialog();
+		blockDiag = new BlockSelectDialog();
 
-	QAction *symbolAction = trayMenu->addAction(Global::tr("Show symbol data"), &codeDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+*"));
-	QHotkey *symbolHotkey = new QHotkey(symbolAction->shortcut(), true, symbolAction);
-	QObject::connect(symbolHotkey, &QHotkey::activated, symbolAction, &QAction::trigger);
+		QObject::connect(codeDiag, &GetCodeDialog::showBlock, blockDiag, &BlockSelectDialog::showBlock);
 
-	QAction *emojiAction = trayMenu->addAction(Global::tr("Emojis"), &emojiDialog, SLOT(popup()), QKeySequence("Ctrl+Meta+Ins"));
-	QHotkey *emojiHotkey = new QHotkey(emojiAction->shortcut(), true, emojiAction);
-	QObject::connect(emojiHotkey, &QHotkey::activated, emojiAction, &QAction::trigger);
+		QMenu *trayMenu = new QMenu();
+		trayIco->setContextMenu(trayMenu);
+		QObject::connect(trayIco, &QSystemTrayIcon::destroyed, trayMenu, [=](){
+			delete trayMenu;
+		}, Qt::DirectConnection);
 
-	QAction *blockAction = trayMenu->addAction(Global::tr("Blocklist/Recently used"), &blockDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+Del"));
-	QHotkey *blockHotkey = new QHotkey(blockAction->shortcut(), true, blockAction);
-	QObject::connect(blockHotkey, &QHotkey::activated, blockAction, &QAction::trigger);
+		QAction *codeAction = trayMenu->addAction(Global::tr("Enter Code"), symbDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+#"));
+		QHotkey *codeHotkey = new QHotkey(codeAction->shortcut(), true, codeAction);
+		QObject::connect(codeHotkey, &QHotkey::activated, codeAction, &QAction::trigger);
 
-	trayMenu->addSeparator();
-	trayMenu->addAction(Global::tr("Settings"), &settingsDiag, SLOT(showSettings()));
-	trayMenu->addAction(Global::tr("About"), &settingsDiag, SLOT(showAboutDialog()));
-	trayMenu->addAction(Global::tr("About Qt"), qApp, SLOT(aboutQt()));
-	trayMenu->addSeparator();
-	trayMenu->addAction(Global::tr("Quit"), qApp, SLOT(quit()));
+		QAction *symbolAction = trayMenu->addAction(Global::tr("Show symbol data"), codeDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+*"));
+		QHotkey *symbolHotkey = new QHotkey(symbolAction->shortcut(), true, symbolAction);
+		QObject::connect(symbolHotkey, &QHotkey::activated, symbolAction, &QAction::trigger);
 
-	trayIco.show();
-	return a.exec();
+		QAction *emojiAction = trayMenu->addAction(Global::tr("Emojis"), emojiDialog, SLOT(popup()), QKeySequence("Ctrl+Meta+Ins"));
+		QHotkey *emojiHotkey = new QHotkey(emojiAction->shortcut(), true, emojiAction);
+		QObject::connect(emojiHotkey, &QHotkey::activated, emojiAction, &QAction::trigger);
+
+		QAction *blockAction = trayMenu->addAction(Global::tr("Blocklist/Recently used"), blockDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+Del"));
+		QHotkey *blockHotkey = new QHotkey(blockAction->shortcut(), true, blockAction);
+		QObject::connect(blockHotkey, &QHotkey::activated, blockAction, &QAction::trigger);
+
+		trayMenu->addSeparator();
+		trayMenu->addAction(Global::tr("Settings"), settingsDiag, SLOT(showSettings()));
+		trayMenu->addAction(Global::tr("About"), settingsDiag, SLOT(showAboutDialog()));
+		trayMenu->addAction(Global::tr("About Qt"), qApp, SLOT(aboutQt()));
+		trayMenu->addSeparator();
+		trayMenu->addAction(Global::tr("Quit"), qApp, SLOT(quit()));
+
+		trayIco->show();
+		return 0;
+	});
+
+	QObject::connect(qApp, &QApplication::aboutToQuit, [&](){
+		trayIco->hide();
+		settingsDiag->deleteLater();
+		symbDiag->deleteLater();
+		codeDiag->deleteLater();
+		emojiDialog->deleteLater();
+		blockDiag->deleteLater();
+		trayIco->deleteLater();
+	});
+
+	return instance.singleExec();
 }

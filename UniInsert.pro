@@ -10,7 +10,7 @@ CONFIG += C++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = UnicodeUtil
-VERSION = 1.0.0
+VERSION = 1.1.0
 TEMPLATE = app
 
 DEFINES += "TARGET=\\\"$$TARGET\\\""
@@ -29,7 +29,8 @@ win32 {
 LIBS += -lUser32
 
 include(C:/C++Libraries/Qt/QHotkey/qhotkey.pri)
-include(C:/C++Libraries/Qt/dialogmaster/dialogmaster.pri)
+include(C:/C++Libraries/Qt/QSingleInstance/qsingleinstance.pri)
+include(C:/C++Libraries/Qt/DialogMaster/dialogmaster.pri)
 
 SOURCES += main.cpp\
         symbolselectdialog.cpp \
