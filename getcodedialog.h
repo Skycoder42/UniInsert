@@ -7,7 +7,7 @@ namespace Ui {
 	class GetCodeDialog;
 }
 
-class GetCodeDialog : public PopupDialog
+class GetCodeDialog : public PopupDialog//TODO add to recent button
 {
 	Q_OBJECT
 

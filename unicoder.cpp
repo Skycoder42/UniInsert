@@ -71,7 +71,7 @@ Unicoder::SurrogatePair Unicoder::code32ToCode16(uint code)
 	if(QChar::requiresSurrogates(code))
 		return {QChar::highSurrogate(code), QChar::lowSurrogate(code)};
 	else
-		return {0, code};
+        return {0, (ushort)code};
 }
 
 void Unicoder::sendSymbolInput(const QString &symbol)
