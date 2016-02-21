@@ -19,7 +19,7 @@ public slots:
 	void startInstalling();
 	void abortInstalling();
 
-	void addDownloadFile(QTemporaryFile *downloadFile);
+	void handleDownloadFile(QTemporaryFile *downloadFile);
 
 signals:
 	void beginInstall(const QString &text, int max);
@@ -29,11 +29,16 @@ signals:
 
 	void abortDone();
 
-private:
-	QQueue<QTemporaryFile*> downloadFiles;
-	bool aborted;
+private slots:
+	void installCodeData(QTemporaryFile *file);
 
+	void doAbort();
+	void countNext(uint counter, uint max, uint &buffer);
+
+private:
 	QSqlDatabase newDB;
+	bool abortRequested;
+	int nextFunc;
 };
 
 #endif // DATABASEUPDATER_H

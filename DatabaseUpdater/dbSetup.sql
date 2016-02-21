@@ -32,10 +32,10 @@ CREATE TABLE 'Blocks' (
 CREATE TABLE 'Aliases' (
 	'Code'	INTEGER NOT NULL,
 	'Alias'	TEXT NOT NULL,
-	FOREIGN KEY('Code') REFERENCES Symbols('Code')
+	FOREIGN KEY('Code') REFERENCES 'Symbols'('Code')
 );
 CREATE INDEX 'TopRecent' ON 'Recent'('Count' DESC);
 CREATE INDEX 'SymbolSearch' ON 'Aliases'('Alias');
 CREATE INDEX 'MappingSort' ON 'EmojiMapping'('SortHint' ASC);
 CREATE INDEX 'GroupSorting' ON 'EmojiGroups'('SortHint' ASC);
-CREATE INDEX 'BlockSearch' ON 'Blocks'('Name');
+CREATE INDEX 'BlockSearch' ON 'Blocks'('Name')

@@ -45,6 +45,10 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	connect(this->updater, &DatabaseUpdater::abortDone,
 			this, &UpdaterWindow::abortInstallDone);
 
+	connect(this->downloader, &BaseDownloader::downloadReady,
+			this->updater, &DatabaseUpdater::handleDownloadFile,
+			Qt::QueuedConnection);
+
 	QMetaObject::invokeMethod(this, "initialize", Qt::QueuedConnection);
 }
 
@@ -74,8 +78,8 @@ void UpdaterWindow::initialize()
 	this->mainProgress->setValue(0);
 	this->mainProgress->setBarState(QProgressGroup::Active);
 
-	this->downloader->startDownloading();
 	QMetaObject::invokeMethod(this->updater, "startInstalling", Qt::QueuedConnection);
+	this->downloader->startDownloading();
 }
 
 void UpdaterWindow::error(const QString &error, bool critical)
@@ -124,12 +128,10 @@ void UpdaterWindow::installReady()
 {
 	int val = this->mainProgress->value() + 1;
 	this->mainProgress->setValue(val);
-	this->ui->downloadLabel->setText(tr("Installation finished!"));
-	if(val == this->installMax) {
-		DialogMaster::information(this,
-								  tr("Database update completed!"));
-		qApp->quit();
-	}
+	if(val == this->installMax)
+		this->completeInstall();
+	else
+		this->ui->updateLabel->setText(tr("Waiting for the next component to finish downloading…"));
 }
 
 void UpdaterWindow::updateInstallProgress(int value)
@@ -142,6 +144,21 @@ void UpdaterWindow::abortInstallDone()
 	this->installerAborted = true;
 	if(this->downloaderAborted && this->installerAborted)
 		qApp->quit();
+}
+
+void UpdaterWindow::completeInstall()
+{
+	this->ui->downloadLabel->setText(tr("Database update completed!"));
+	QString path = ARG_LOCAL_DB_PATH;
+
+	if(QFile::remove(path)) {
+		if(QFile::rename(path + QStringLiteral(".update"), path)) {
+			DialogMaster::information(this, tr("Database update completed!"));//TODO
+			qApp->quit();
+		} else
+			this->error(tr("Failed to rename update to real database!"), true);
+	} else
+		this->error(tr("Failed to delete old database!"), true);
 }
 
 void UpdaterWindow::on_buttonBox_rejected()
@@ -160,5 +177,6 @@ void UpdaterWindow::on_buttonBox_rejected()
 		this->ui->buttonBox->setEnabled(false);
 		this->setCursor(Qt::WaitCursor);
 		this->downloader->abortDownloading();
+		this->updater->abortInstalling();
 	}
 }

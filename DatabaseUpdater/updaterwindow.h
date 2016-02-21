@@ -47,6 +47,8 @@ private slots:
 	void updateInstallProgress(int value);
 	void abortInstallDone();
 
+	void completeInstall();
+
 	void on_buttonBox_rejected();
 
 private:
