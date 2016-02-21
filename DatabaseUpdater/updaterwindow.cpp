@@ -94,9 +94,8 @@ void UpdaterWindow::beginDownload(const QUrl &url)
 	this->ui->downloadLabel->setText(tr("Downloading: %1…").arg(url.toString()));
 }
 
-void UpdaterWindow::downloadReady(QTemporaryFile *downloadFile)
+void UpdaterWindow::downloadReady(QTemporaryFile *)
 {
-	downloadFile->deleteLater();
 	this->ui->allDownloadProgressBar->setValue(this->ui->allDownloadProgressBar->value() + 1);
 	this->ui->downloadLabel->setText(tr("Download finished!"));
 }
@@ -114,24 +113,35 @@ void UpdaterWindow::abortDownloaderDone()
 		qApp->quit();
 }
 
-void UpdaterWindow::beginInstall(const QString &text, bool indeterminated)
+void UpdaterWindow::beginInstall(const QString &text, int max)
 {
-
+	this->ui->updateLabel->setText(text + "…");
+	this->ui->currentInstallProgressBar->setRange(0, max);
+	this->ui->currentInstallProgressBar->setValue(0);
 }
 
 void UpdaterWindow::installReady()
 {
-
+	int val = this->mainProgress->value() + 1;
+	this->mainProgress->setValue(val);
+	this->ui->downloadLabel->setText(tr("Installation finished!"));
+	if(val == this->installMax) {
+		DialogMaster::information(this,
+								  tr("Database update completed!"));
+		qApp->quit();
+	}
 }
 
-void UpdaterWindow::updateInstallProgress(int value, int max)
+void UpdaterWindow::updateInstallProgress(int value)
 {
-
+	this->ui->currentInstallProgressBar->setValue(value);
 }
 
 void UpdaterWindow::abortInstallDone()
 {
-
+	this->installerAborted = true;
+	if(this->downloaderAborted && this->installerAborted)
+		qApp->quit();
 }
 
 void UpdaterWindow::on_buttonBox_rejected()

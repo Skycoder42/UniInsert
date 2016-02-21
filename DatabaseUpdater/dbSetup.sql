@@ -1,4 +1,3 @@
-BEGIN TRANSACTION;
 CREATE TABLE 'Meta' (
 	'UnicodeVersion'	TEXT NOT NULL
 );
@@ -40,4 +39,3 @@ CREATE INDEX 'SymbolSearch' ON 'Aliases'('Alias');
 CREATE INDEX 'MappingSort' ON 'EmojiMapping'('SortHint' ASC);
 CREATE INDEX 'GroupSorting' ON 'EmojiGroups'('SortHint' ASC);
 CREATE INDEX 'BlockSearch' ON 'Blocks'('Name');
-COMMIT;

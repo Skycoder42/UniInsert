@@ -37,23 +37,34 @@ int DatabaseUpdater::getInstallCount() const
 
 void DatabaseUpdater::startInstalling()
 {
-	emit updateInstallProgress(0, 0);
+	QFile queryFile(QStringLiteral(":/data/dbSetup.sql"));
+	queryFile.open(QIODevice::ReadOnly);
+	Q_ASSERT(queryFile.isOpen());
+	QStringList queries = QString::fromUtf8(queryFile.readAll())
+						  .split(QLatin1Char(';'), QString::SkipEmptyParts);
+	queryFile.close();
+	emit beginInstall(tr("Creating database"), queries.size());
+
+	QString path = ARG_LOCAL_DB_PATH + QStringLiteral(".update");
+	QFile::remove(path);
 
 	this->newDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"),
 											QStringLiteral("newDB"));
-	this->newDB.setDatabaseName(ARG_LOCAL_DB_PATH + QStringLiteral(".update"));
+	this->newDB.setDatabaseName(path);
 	if(!this->newDB.open() || !this->newDB.isValid()) {
 		emit error(this->newDB.lastError().text(), true);
 		return;
 	}
 
-	QFile queryFile(QStringLiteral(":/data/dbSetup.sql"));
-	queryFile.open(QIODevice::ReadOnly);
-	Q_ASSERT(queryFile.isOpen());
-	QSqlQuery setupQuery(this->newDB);
-	if(!setupQuery.exec(QString::fromUtf8(queryFile.readAll()))) {
-		emit error(this->newDB.lastError().text(), true);
-		return;
+	for(int i = 0, max = queries.size(); i < max; ++i) {
+		if(!queries[i].simplified().isEmpty()) {
+			QSqlQuery setupQuery(this->newDB);
+			if(!setupQuery.exec(queries[i])) {
+				emit error(setupQuery.lastError().text(), true);
+				return;
+			}
+		}
+		emit updateInstallProgress(i + 1);
 	}
 
 	emit installReady();

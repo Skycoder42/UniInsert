@@ -38,13 +38,13 @@ private slots:
 	void error(const QString &error, bool critical);
 
 	void beginDownload(const QUrl &url);
-	void downloadReady(QTemporaryFile *downloadFile);
+	void downloadReady(QTemporaryFile *);
 	void updateDownloadProgress(qint64 value, qint64 max);
 	void abortDownloaderDone();
 
-	void beginInstall(const QString &text, bool indeterminated);
+	void beginInstall(const QString &text, int max);
 	void installReady();
-	void updateInstallProgress(int value, int max);
+	void updateInstallProgress(int value);
 	void abortInstallDone();
 
 	void on_buttonBox_rejected();
