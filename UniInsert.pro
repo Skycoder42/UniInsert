@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += UnicodeUtil
+SUBDIRS += UnicodeUtil \
+    DatabaseUpdater
 
 DISTFILES += \
 	LICENSE \

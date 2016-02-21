@@ -24,9 +24,9 @@ win32 {
 
 	DEFINES += "COMPANY=\"\\\"$$QMAKE_TARGET_COMPANY\\\"\""
 	DEFINES += "DISPLAY_NAME=\"\\\"$$QMAKE_TARGET_PRODUCT\\\"\""
-}
 
-LIBS += -lUser32
+	LIBS += -lUser32
+}
 
 include(C:/C++Libraries/Qt/QHotkey/qhotkey.pri)
 include(C:/C++Libraries/Qt/QSingleInstance/qsingleinstance.pri)
