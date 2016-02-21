@@ -64,7 +64,7 @@ QMimeData *SymbolListModel::mimeData(const QModelIndexList &indexes) const
 		data->setData(SymbolListModel::IndexMimeType, QByteArray::number(indexes.first().row()));
 		return data;
 	} else
-		return NULL;
+		return Q_NULLPTR;
 }
 
 Qt::ItemFlags SymbolListModel::flags(const QModelIndex &index) const

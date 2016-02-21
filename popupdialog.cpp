@@ -8,7 +8,7 @@
 #include "dialogmaster.h"
 
 PopupDialog::PopupDialog(bool isFixedSize) :
-	QDialog(new QWidget(nullptr)),
+	QDialog(new QWidget(Q_NULLPTR)),
 	autoHide(true)
 {
 	DialogMaster::masterDialog(this, isFixedSize, Qt::WindowStaysOnTopHint);
@@ -37,17 +37,22 @@ void PopupDialog::popup()
 	this->activateWindow();
 }
 
-bool PopupDialog::event(QEvent *event)
-{
-	if(this->autoHide && event->type() == QEvent::WindowDeactivate) {
-		if(SETTINGS_VALUE(SettingsDialog::autoHide).toBool())
-			this->close();
-	}
-	return this->QDialog::event(event);
-}
-
 void PopupDialog::closeEvent(QCloseEvent *ev)
 {
 	ev->accept();
 	emit didClose();
+}
+
+bool PopupDialog::event(QEvent *ev)
+{
+	if(this->autoHide && ev->type() == QEvent::WindowDeactivate) {
+		if(SETTINGS_VALUE(SettingsDialog::autoHide).toBool())
+			this->close();
+		else
+			this->setWindowOpacity(SETTINGS_VALUE(SettingsDialog::transparency).toDouble());
+	} else if(ev->type() == QEvent::WindowActivate) {
+		this->setWindowOpacity(1.0);
+	}
+
+	return this->QDialog::event(ev);
 }

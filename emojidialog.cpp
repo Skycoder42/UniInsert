@@ -17,7 +17,7 @@ EmojiDialog::EmojiDialog(QWidget *parent) :
 	addMapper(new QSignalMapper(this)),
 	deleteMapper(new QSignalMapper(this)),
 	pasteMapper(new QSignalMapper(this)),
-	tabContextWidget(nullptr),
+	tabContextWidget(Q_NULLPTR),
 	tabModels()
 {
 	ui->setupUi(this);
@@ -148,7 +148,7 @@ void EmojiDialog::on_actionAdd_Emoji_Group_triggered()
 
 void EmojiDialog::on_actionRemove_Emoji_Group_triggered()
 {
-	SymbolListModel *model = this->tabModels.value(this->tabContextWidget, nullptr);
+	SymbolListModel *model = this->tabModels.value(this->tabContextWidget, Q_NULLPTR);
 	if(!model)
 		return;
 	this->setAutoHide(false);
@@ -159,7 +159,7 @@ void EmojiDialog::on_actionRemove_Emoji_Group_triggered()
 		if(Unicoder::databaseLoader()->deleteEmojiGroup(model->property("groupID").toInt())) {
 			this->tabModels.remove(this->tabContextWidget);
 			this->tabContextWidget->deleteLater();
-			this->tabContextWidget = nullptr;
+			this->tabContextWidget = Q_NULLPTR;
 		} else
 			DialogMaster::critical(this, tr("Failed to delete the emoji group"));
 	}

@@ -33,8 +33,8 @@ private:
 
 	QModelIndex selectedIndex;
 
-	explicit AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent = nullptr);
-	explicit AdvancedSearchDialog(QWidget *parent = nullptr);
+	explicit AdvancedSearchDialog(QAbstractItemModel *model, QWidget *parent = Q_NULLPTR);
+	explicit AdvancedSearchDialog(QWidget *parent = Q_NULLPTR);
 	~AdvancedSearchDialog();
 
 	void updateSearch(const QString &text, bool force);

@@ -29,7 +29,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::AdvancedSearchDialog),
 	proxyModel(new QSortFilterProxyModel(this)),
-	symbolModel(nullptr),
+	symbolModel(Q_NULLPTR),
 	mode(DatabaseLoader::Contains)
 {
 	ui->setupUi(this);

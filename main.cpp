@@ -26,13 +26,13 @@ int main(int argc, char *argv[])
 
 	QSingleInstance instance;
 
-	QSystemTrayIcon *trayIco = nullptr;
+	QSystemTrayIcon *trayIco = Q_NULLPTR;
 
-	SettingsDialog *settingsDiag = nullptr;
-	SymbolSelectDialog *symbDiag = nullptr;
-	GetCodeDialog *codeDiag = nullptr;
-	EmojiDialog *emojiDialog = nullptr;
-	BlockSelectDialog *blockDiag = nullptr;
+	SettingsDialog *settingsDiag = Q_NULLPTR;
+	SymbolSelectDialog *symbDiag = Q_NULLPTR;
+	GetCodeDialog *codeDiag = Q_NULLPTR;
+	EmojiDialog *emojiDialog = Q_NULLPTR;
+	BlockSelectDialog *blockDiag = Q_NULLPTR;
 
 	instance.setStartupFunction([&]() -> int {
 		//check if reset was requested
@@ -81,18 +81,18 @@ int main(int argc, char *argv[])
 		trayMenu->addSeparator();
 		trayMenu->addAction(Global::tr("Quit"), qApp, SLOT(quit()));
 
+		QObject::connect(qApp, &QApplication::aboutToQuit, [&](){
+			trayIco->hide();
+			settingsDiag->deleteLater();
+			symbDiag->deleteLater();
+			codeDiag->deleteLater();
+			emojiDialog->deleteLater();
+			blockDiag->deleteLater();
+			trayIco->deleteLater();
+		});
+
 		trayIco->show();
 		return 0;
-	});
-
-	QObject::connect(qApp, &QApplication::aboutToQuit, [&](){
-		trayIco->hide();
-		settingsDiag->deleteLater();
-		symbDiag->deleteLater();
-		codeDiag->deleteLater();
-		emojiDialog->deleteLater();
-		blockDiag->deleteLater();
-		trayIco->deleteLater();
 	});
 
 	return instance.singleExec();

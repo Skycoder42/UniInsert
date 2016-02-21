@@ -13,6 +13,7 @@
 SETTINGS_CODE(useClip, true)
 SETTINGS_CODE(allClip, false)
 SETTINGS_CODE(autoHide, true)
+SETTINGS_CODE(transparency, 0.5)
 SETTINGS_CODE(maxRecent, 42)
 SETTINGS_CODE(autoStart, true)
 SETTINGS_CODE(reset, false)
@@ -61,8 +62,12 @@ void SettingsDialog::showSettings()
 		this->ui->useClipboardSendCheckBox->setChecked(settings.value(SettingsDialog::useClip, SettingsDialog::useClipDefault).toBool());
 		this->ui->alwaysUseClipboardCheckBox->setChecked(settings.value(SettingsDialog::allClip, SettingsDialog::allClipDefault).toBool());
 		this->ui->autoHideWindowsCheckBox->setChecked(settings.value(SettingsDialog::autoHide, SettingsDialog::autoHideDefault).toBool());
+		this->ui->inactiveWindowTransparencySlider->setValue(settings.value(SettingsDialog::transparency, SettingsDialog::transparencyDefault).toDouble() * 100);
 		this->ui->maximumRecentlyUsedItemsSpinBox->setValue(settings.value(SettingsDialog::maxRecent, SettingsDialog::maxRecentDefault).toInt());
 		this->ui->startWithWindowsCheckBox->setChecked(settings.value(SettingsDialog::autoStart, SettingsDialog::autoStartDefault).toBool());
+		this->ui->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(false);
+		this->ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setDefault(false);
+		this->ui->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 		this->exec();
 	}
 }
@@ -73,6 +78,7 @@ void SettingsDialog::accept()
 	settings.setValue(SettingsDialog::useClip, this->ui->useClipboardSendCheckBox->isChecked());
 	settings.setValue(SettingsDialog::allClip, this->ui->alwaysUseClipboardCheckBox->isChecked());
 	settings.setValue(SettingsDialog::autoHide, this->ui->autoHideWindowsCheckBox->isChecked());
+	settings.setValue(SettingsDialog::transparency, this->ui->inactiveWindowTransparencySlider->value() / 100.);
 	settings.setValue(SettingsDialog::maxRecent, this->ui->maximumRecentlyUsedItemsSpinBox->value());
 	settings.setValue(SettingsDialog::autoStart, this->ui->startWithWindowsCheckBox->isChecked());
 	this->updateAutostart(this->ui->startWithWindowsCheckBox->isChecked());
@@ -84,7 +90,7 @@ void SettingsDialog::showAboutDialog()
 {
 	QImage img = QApplication::windowIcon().pixmap(64, 64).toImage();
 	img.invertPixels();
-	DialogMaster::msgBox(NULL,
+	DialogMaster::msgBox(Q_NULLPTR,
 						 QPixmap::fromImage(img),
 						 tr("<p>An application to easily insert unicode characters EVERYWHERE.</p>"
 							"<p>Author: Sykcoder Soft (<a href=\"https://github.com/Skycoder42\">Skycoder42</a>)</p>"
@@ -106,7 +112,7 @@ void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 								 QString(),
 								 QMessageBox::Yes,
 								 QMessageBox::No)
-		   == QMessageBox::Ok) {
+		   == QMessageBox::Yes) {
 			QSettings().setValue(SettingsDialog::reset, true);
 			qApp->quit();
 		}

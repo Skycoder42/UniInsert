@@ -99,7 +99,7 @@ SymbolListModel *DatabaseLoader::createBlock(int blockID, QObject *modelParent) 
 		return updateModel;
 	else {
 		delete updateModel;
-		return nullptr;
+		return Q_NULLPTR;
 	}
 }
 
@@ -228,7 +228,7 @@ SymbolListModel *DatabaseLoader::createEmojiGroupModel(int groupID, QObject *mod
 		return updateModel;
 	else {
 		delete updateModel;
-		return nullptr;
+		return Q_NULLPTR;
 	}
 }
 

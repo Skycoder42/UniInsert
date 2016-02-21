@@ -22,8 +22,8 @@ signals:
 	void didClose();
 
 protected:
-	bool event(QEvent *event) Q_DECL_OVERRIDE;
 	void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
+	bool event(QEvent *ev) Q_DECL_OVERRIDE;
 
 private:
 	bool autoHide;

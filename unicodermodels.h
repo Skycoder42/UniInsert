@@ -13,7 +13,7 @@ class SymbolListModel : public QSqlQueryModel
 public:
 	static const QString IndexMimeType;
 
-	SymbolListModel(QObject *parent = nullptr, bool isEmoji = false);
+	SymbolListModel(QObject *parent = Q_NULLPTR, bool isEmoji = false);
 
 	QAction *createCopyAction(QAbstractItemView *view) const;
 
@@ -43,7 +43,7 @@ class UnicodeDelegate : public QStyledItemDelegate
 public:
 	static QString displayCode(uint code);
 
-	UnicodeDelegate(bool isPreview, QObject *parent = nullptr);
+	UnicodeDelegate(bool isPreview, QObject *parent = Q_NULLPTR);
 	QString displayText(const QVariant &value, const QLocale &locale) const Q_DECL_OVERRIDE;
 private:
 	bool isPreview;

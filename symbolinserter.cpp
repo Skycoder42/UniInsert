@@ -14,7 +14,7 @@ SymbolInserter::SymbolInserter(QObject *parent) :
 
 void SymbolInserter::insertSymbol(const QString &symbol)
 {
-	const char *method = nullptr;
+	const char *method = Q_NULLPTR;
 	if(SETTINGS_VALUE(SettingsDialog::allClip).toBool())
 		method = "sendClipInput";
 	else
