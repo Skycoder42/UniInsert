@@ -7,88 +7,104 @@
     <x>0</x>
     <y>0</y>
     <width>280</width>
-    <height>103</height>
+    <height>111</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Enter Code</string>
   </property>
-  <layout class="QFormLayout" name="formLayout_2">
-   <item row="0" column="0">
-    <widget class="QLabel" name="previewLabel">
-     <property name="text">
-      <string>Preview:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
-      <number>0</number>
-     </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="previewLayout">
      <item>
-      <widget class="QLineEdit" name="previewLineEdit">
-       <property name="cursor">
-        <cursorShape>IBeamCursor</cursorShape>
-       </property>
-       <property name="contextMenuPolicy">
-        <enum>Qt::ActionsContextMenu</enum>
-       </property>
-       <property name="dragEnabled">
-        <bool>true</bool>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-       <property name="placeholderText">
-        <string>No valid symbol</string>
-       </property>
-      </widget>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="previewLineEdit">
+           <property name="cursor">
+            <cursorShape>IBeamCursor</cursorShape>
+           </property>
+           <property name="contextMenuPolicy">
+            <enum>Qt::ActionsContextMenu</enum>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="placeholderText">
+            <string>No valid symbol</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="copyButton"/>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="previewTagLabel">
+         <property name="text">
+          <string>Preview:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="unicodeLineEdit">
+           <property name="placeholderText">
+            <string>Enter Unicode Number, e.g. U+0042</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="searchButton"/>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="unicodeLabel">
+         <property name="text">
+          <string>Unicode:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QToolButton" name="previewButton">
-       <property name="toolTip">
-        <string>Show in bigger size (zoomed)</string>
+      <widget class="DragLabel" name="previewLabel">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
-         <normaloff>:/icons/zoom.ico</normaloff>:/icons/zoom.ico</iconset>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
        </property>
-       <property name="popupMode">
-        <enum>QToolButton::InstantPopup</enum>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="copyButton"/>
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="unicodeLabel">
-     <property name="text">
-      <string>Unicode:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="unicodeLineEdit">
-       <property name="placeholderText">
-        <string>Enter Unicode Number, e.g. U+0042</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="searchButton"/>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="1">
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -157,6 +173,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>DragLabel</class>
+   <extends>QLabel</extends>
+   <header>symbolselectdialog.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="uniinsert_res.qrc"/>
  </resources>

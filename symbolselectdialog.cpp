@@ -2,6 +2,11 @@
 #include "ui_symbolselectdialog.h"
 #include <QRegularExpressionMatch>
 #include <QShowEvent>
+#include <QMouseEvent>
+#include <QMimeData>
+#include <QDrag>
+#include <QWindow>
+#include <QScreen>
 #include "unicoder.h"
 #include "advancedsearchdialog.h"
 #include "unicodermodels.h"
@@ -14,12 +19,15 @@ SymbolSelectDialog::SymbolSelectDialog() :
 	PopupDialog(true),
 	ui(new Ui::SymbolSelectDialog),
 	validator(new QRegularExpressionValidator(SymbolSelectDialog::unicodeRegex, this)),
-	previewAction(new PreviewAction(this)),
 	doInsert(true)
 {
 	this->ui->setupUi(this);
 	this->ui->unicodeLineEdit->setValidator(this->validator);
-	this->ui->previewButton->addAction(this->previewAction);
+	QFont font = this->ui->previewLabel->font();
+	font.setPixelSize(32);
+	this->ui->previewLabel->setFont(font);
+	this->ui->previewLabel->setFixedHeight(this->ui->previewLayout->sizeHint().height());
+	this->ui->previewLabel->setFixedWidth(this->ui->previewLayout->sizeHint().height());
 
 	this->ui->actionCopy_Symbol->setShortcut(QKeySequence::Copy);
 	this->ui->copyButton->setDefaultAction(this->ui->actionCopy_Symbol);
@@ -71,11 +79,13 @@ void SymbolSelectDialog::on_unicodeLineEdit_textChanged(const QString &text)
 		QString name = Unicoder::databaseLoader()->nameForSymbol(code);
 		this->ui->previewLineEdit->setText(symbol);
 		this->ui->previewLineEdit->setToolTip(name);
-		this->previewAction->setText(symbol, name);
+		this->ui->previewLabel->setText(symbol);
+		this->ui->previewLabel->setToolTip(name);
 	} else {
 		this->ui->previewLineEdit->clear();
 		this->ui->previewLineEdit->setToolTip(QString());
-		this->previewAction->setText(QString(), QString());
+		this->ui->previewLabel->clear();
+		this->ui->previewLabel->setToolTip(QString());
 	}
 }
 
@@ -116,37 +126,42 @@ uint SymbolSelectDialog::calcUnicode(const QString &code)
 
 
 
-
-SymbolSelectDialog::PreviewAction::PreviewAction(QObject *parent) :
-	QWidgetAction(parent)
+DragLabel::DragLabel(QWidget *parent) :
+	QLabel(parent),
+	dragStartPosition()
 {}
 
-void SymbolSelectDialog::PreviewAction::setText(const QString &text, const QString &toolTip)
+void DragLabel::mousePressEvent(QMouseEvent *event)
 {
-	this->text = text;
-	this->toolTip = toolTip;
-	for(QWidget *widget : this->createdWidgets()) {
-		Q_ASSERT(dynamic_cast<QLabel*>(widget));
-		QLabel *label = static_cast<QLabel*>(widget);
-		label->setText(text);
-		label->setToolTip(toolTip);
-		label->setFixedWidth(qMax(label->fontMetrics().width(text),
-								  label->height()));
-	}
+	if (event->button() == Qt::LeftButton)
+		this->dragStartPosition = event->pos();
 }
-
-QWidget *SymbolSelectDialog::PreviewAction::createWidget(QWidget *parent)
+#include <QBitmap>
+void DragLabel::mouseMoveEvent(QMouseEvent *event)
 {
-	QLabel *previewLabel = new QLabel(parent);
-	QFont font = previewLabel->font();
-	font.setPixelSize(32);
-	previewLabel->setFont(font);
-	previewLabel->setAlignment(Qt::AlignCenter);
+	if (!(event->buttons() & Qt::LeftButton))
+		return;
+	if ((event->pos() - this->dragStartPosition).manhattanLength()
+		 < QApplication::startDragDistance())
+		return;
+	if(this->text().isNull())
+		return;
 
-	previewLabel->setText(this->text);
-	previewLabel->setToolTip(this->toolTip);
-	previewLabel->setFixedHeight(previewLabel->fontMetrics().height());
-	previewLabel->setFixedWidth(qMax(previewLabel->fontMetrics().width(this->text),
-									 previewLabel->height()));
-	return previewLabel;
+	QDrag *drag = new QDrag(this);
+
+	QWidget *window = this->window();
+	Q_ASSERT(window);
+	Q_ASSERT(window->windowHandle());
+	Q_ASSERT(window->windowHandle()->screen());
+	QRect geom = this->geometry();
+	geom.moveTopLeft(this->mapTo(window, QPoint(0,0)));
+	QPixmap grab = window->windowHandle()->screen()->grabWindow(window->winId(), geom.x(), geom.y(), geom.width(), geom.height());
+	if(!grab.isNull())
+		drag->setDragCursor(grab, Qt::CopyAction);
+
+	QMimeData *mimeData = new QMimeData();
+	mimeData->setText(this->text());
+	drag->setMimeData(mimeData);
+
+	drag->exec(Qt::CopyAction);
 }

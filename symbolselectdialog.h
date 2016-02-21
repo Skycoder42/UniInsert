@@ -12,6 +12,18 @@ namespace Ui {
 	class SymbolSelectDialog;
 }
 
+class DragLabel : public QLabel
+{
+public:
+	DragLabel(QWidget *parent = Q_NULLPTR);
+protected:
+	// QWidget interface
+	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+private:
+	QPoint dragStartPosition;
+};
+
 class SymbolSelectDialog : public PopupDialog
 {
 	Q_OBJECT
@@ -37,23 +49,8 @@ private:/*functions*/
 	uint calcUnicode(const QString &code);
 
 private:
-	class PreviewAction : public QWidgetAction
-	{
-	public:
-		PreviewAction(QObject *parent);
-		void setText(const QString &text, const QString &toolTip);
-
-	protected:
-		QWidget *createWidget(QWidget *parent) Q_DECL_OVERRIDE;
-
-	private:
-		QString text;
-		QString toolTip;
-	};
-
 	Ui::SymbolSelectDialog *ui;
 	QRegularExpressionValidator *validator;	
-	PreviewAction *previewAction;
 	bool doInsert;
 };
 
