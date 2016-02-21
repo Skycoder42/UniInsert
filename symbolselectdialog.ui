@@ -61,8 +61,11 @@
          </property>
          <item>
           <widget class="QLineEdit" name="unicodeLineEdit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The code can be entered as &lt;span style=&quot; font-weight:600;&quot;&gt;unicode codepoint&lt;/span&gt; or as &lt;span style=&quot; font-weight:600;&quot;&gt;html code&lt;/span&gt;:&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;U+0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;\u0024&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;amp;#66;&lt;/p&gt;&lt;p&gt;If you don't know the code, you can search a symbol by it's name by using the button on the right or pressing &lt;span style=&quot; font-style:italic;&quot;&gt;CTRL+F&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="placeholderText">
-            <string>Enter Unicode Number, e.g. U+0042</string>
+            <string>Enter Unicode Number</string>
            </property>
           </widget>
          </item>
@@ -183,6 +186,13 @@
    <header>symbolselectdialog.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>previewLineEdit</tabstop>
+  <tabstop>copyButton</tabstop>
+  <tabstop>unicodeLineEdit</tabstop>
+  <tabstop>searchButton</tabstop>
+  <tabstop>insertButton</tabstop>
+ </tabstops>
  <resources>
   <include location="uniinsert_res.qrc"/>
  </resources>

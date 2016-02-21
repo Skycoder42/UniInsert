@@ -7,6 +7,7 @@ namespace Ui {
 	class GetCodeDialog;
 }
 
+class AliasAction;
 class GetCodeDialog : public PopupDialog//TODO add to recent button
 {
 	Q_OBJECT
@@ -29,6 +30,7 @@ private slots:
 
 private:
 	Ui::GetCodeDialog *ui;
+	AliasAction *aliasAction;
 };
 
 #endif // GETCODEDIALOG_H

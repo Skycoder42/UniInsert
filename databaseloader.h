@@ -41,6 +41,7 @@ public:
 	inline QString nameForSymbol(const QString &symbol) const;
 	inline QString nameForSymbol(Unicoder::SurrogatePair code) const;
 	QString nameForSymbol(uint code) const;
+	QStringList symbolAliases(uint code) const;
 	QSqlQueryModel *createSearchModel(QObject *modelParent) const;
 	bool searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const;
 	void clearSearchModel(QSqlQueryModel *model) const;

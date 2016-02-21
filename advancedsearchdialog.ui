@@ -10,9 +10,6 @@
     <height>450</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Advanced Block Search</string>
-  </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
@@ -27,7 +24,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="nameFilterLineEdit"/>
+      <widget class="QLineEdit" name="nameFilterLineEdit">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a string to be searched for. The search is &lt;span style=&quot; font-weight:600;&quot;&gt;case insensitive&lt;/span&gt;.&lt;/p&gt;&lt;p&gt;The search supports &lt;span style=&quot; font-weight:600;&quot;&gt;wildcard matching&lt;/span&gt;:&lt;br/&gt;   •  &lt;span style=&quot; font-weight:600;&quot;&gt;*&lt;/span&gt; can be used to match anything&lt;br/&gt;   •  &lt;span style=&quot; font-weight:600;&quot;&gt;?&lt;/span&gt; can be used to match any single character&lt;br/&gt;Only ASCII upper case letters are used in the names, thus no escape is required.&lt;/p&gt;&lt;p&gt;The search will start automatically if you enter 3 or more words. You can start it manually by pressing &lt;span style=&quot; font-style:italic;&quot;&gt;&amp;lt;RETURN&amp;gt;&lt;/span&gt;.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="placeholderText">
+        <string>Enter a searchterm (with wildcard syntax)</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="label_2">

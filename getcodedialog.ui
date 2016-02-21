@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>357</width>
-    <height>178</height>
+    <height>182</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,7 +42,7 @@
      <item>
       <widget class="QToolButton" name="pasteButton">
        <property name="toolTip">
-        <string>Paste from clipboard</string>
+        <string>Paste a symbol from the clipboard</string>
        </property>
        <property name="icon">
         <iconset resource="uniinsert_res.qrc">
@@ -56,7 +56,7 @@
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>Add symbol to recently used list</string>
+        <string>Add the symbol to recently used list</string>
        </property>
        <property name="icon">
         <iconset resource="uniinsert_res.qrc">
@@ -90,7 +90,7 @@
         <bool>true</bool>
        </property>
        <property name="placeholderText">
-        <string>High Code</string>
+        <string>High Surrogate</string>
        </property>
       </widget>
      </item>
@@ -109,7 +109,7 @@
         <bool>true</bool>
        </property>
        <property name="placeholderText">
-        <string>Low Code</string>
+        <string>Low Surrogate/Code</string>
        </property>
       </widget>
      </item>
@@ -172,17 +172,41 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QLineEdit" name="symbolNameLineEdit">
-     <property name="dragEnabled">
-      <bool>true</bool>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
+      <number>0</number>
      </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="placeholderText">
-      <string>The symbols name</string>
-     </property>
-    </widget>
+     <item>
+      <widget class="QLineEdit" name="symbolNameLineEdit">
+       <property name="dragEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Symbol name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="showAliasesButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Show all other names (aliases) of the symbol</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uniinsert_res.qrc">
+         <normaloff>:/icons/detailedSearch.ico</normaloff>:/icons/detailedSearch.ico</iconset>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="5" column="0">
     <widget class="QLabel" name="symbolGroupLabel">

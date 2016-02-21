@@ -35,6 +35,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
 	DialogMaster::masterDialog(this);
+	this->setWindowTitle(tr("Advanced Block Search"));
 
 	this->proxyModel->setSourceModel(model);
 	this->proxyModel->setSortLocaleAware(true);
@@ -62,6 +63,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
 	DialogMaster::masterDialog(this);
+	this->setWindowTitle(tr("Advanced Symbol Search"));
 
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
