@@ -5,6 +5,7 @@
 #include <QWinTaskbarButton>
 #include <qprogressgroup.h>
 #include "basedownloader.h"
+#include "databaseupdater.h"
 
 namespace Ui {
 class UpdaterWindow;
@@ -41,6 +42,11 @@ private slots:
 	void updateDownloadProgress(qint64 value, qint64 max);
 	void abortDownloaderDone();
 
+	void beginInstall(const QString &text, bool indeterminated);
+	void installReady();
+	void updateInstallProgress(int value, int max);
+	void abortInstallDone();
+
 	void on_buttonBox_rejected();
 
 private:
@@ -49,6 +55,8 @@ private:
 	QWinTaskbarButton *taskButton;
 
 	BaseDownloader *downloader;
+	DatabaseUpdater *updater;
+	int installMax;
 	bool downloaderAborted;
 	bool installerAborted;
 };

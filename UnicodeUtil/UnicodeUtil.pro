@@ -15,6 +15,7 @@ TEMPLATE = app
 
 DEFINES += "TARGET=\\\"$$TARGET\\\""
 DEFINES += "VERSION=\\\"$$VERSION\\\""
+DEFINES += QT_USE_STRINGBUILDER
 
 win32 {
 	RC_ICONS += ./icons/UNI.Logo.ico

@@ -15,6 +15,7 @@ TEMPLATE = app
 
 DEFINES += "TARGET=\\\"$$TARGET\\\""
 DEFINES += "VERSION=\\\"$$VERSION\\\""
+DEFINES += QT_USE_STRINGBUILDER
 
 win32 {
 	RC_ICONS += ./Fatcow-Farm-Fresh-Database-refresh.ico
@@ -34,11 +35,13 @@ include(C:/C++Libraries/Qt/DialogMaster/dialogmaster.pri)
 
 SOURCES += main.cpp\
         updaterwindow.cpp \
-    basedownloader.cpp
+    basedownloader.cpp \
+    databaseupdater.cpp
 
 HEADERS  += updaterwindow.h \
     global.h \
-    basedownloader.h
+    basedownloader.h \
+    databaseupdater.h
 
 FORMS    += updaterwindow.ui
 

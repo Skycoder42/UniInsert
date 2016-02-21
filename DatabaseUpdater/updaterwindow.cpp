@@ -11,6 +11,8 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	mainProgress(new QProgressGroup(this)),
 	taskButton(new QWinTaskbarButton(this)),
 	downloader(new BaseDownloader(this)),
+	updater(new DatabaseUpdater(this)),
+	installMax(0),
 	downloaderAborted(false),
 	installerAborted(false)
 {
@@ -31,6 +33,17 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 			this, &UpdaterWindow::error);
 	connect(this->downloader, &BaseDownloader::abortDone,
 			this, &UpdaterWindow::abortDownloaderDone);
+
+	connect(this->updater, &DatabaseUpdater::beginInstall,
+			this, &UpdaterWindow::beginInstall);
+	connect(this->updater, &DatabaseUpdater::installReady,
+			this, &UpdaterWindow::installReady);
+	connect(this->updater, &DatabaseUpdater::updateInstallProgress,
+			this, &UpdaterWindow::updateInstallProgress);
+	connect(this->updater, &DatabaseUpdater::error,
+			this, &UpdaterWindow::error);
+	connect(this->updater, &DatabaseUpdater::abortDone,
+			this, &UpdaterWindow::abortInstallDone);
 
 	QMetaObject::invokeMethod(this, "initialize", Qt::QueuedConnection);
 }
@@ -53,21 +66,16 @@ void UpdaterWindow::initialize()
 {
 	this->ui->titleLabel->setText(this->ui->titleLabel->text().arg(ARG_UPDATE_VERSION));
 
-	UpdateFlags flags = ARG_UPDATE_MODE;
-
 	this->ui->allDownloadProgressBar->setRange(0, this->downloader->getDownloadCount());
 	this->ui->allDownloadProgressBar->setValue(0);
 
-	int installCount = 42;
-	if(flags.testFlag(RecentlyUsed))
-		installCount += 1;
-	if(flags.testFlag(Emojis))
-		installCount += 7;
-	this->mainProgress->setRange(0, installCount);
+	this->installMax = this->updater->getInstallCount();
+	this->mainProgress->setRange(0, this->installMax);
 	this->mainProgress->setValue(0);
 	this->mainProgress->setBarState(QProgressGroup::Active);
 
 	this->downloader->startDownloading();
+	QMetaObject::invokeMethod(this->updater, "startInstalling", Qt::QueuedConnection);
 }
 
 void UpdaterWindow::error(const QString &error, bool critical)
@@ -104,6 +112,26 @@ void UpdaterWindow::abortDownloaderDone()
 	this->downloaderAborted = true;
 	if(this->downloaderAborted && this->installerAborted)
 		qApp->quit();
+}
+
+void UpdaterWindow::beginInstall(const QString &text, bool indeterminated)
+{
+
+}
+
+void UpdaterWindow::installReady()
+{
+
+}
+
+void UpdaterWindow::updateInstallProgress(int value, int max)
+{
+
+}
+
+void UpdaterWindow::abortInstallDone()
+{
+
 }
 
 void UpdaterWindow::on_buttonBox_rejected()
