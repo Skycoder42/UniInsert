@@ -25,12 +25,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
 	DialogMaster::masterDialog(this, true);
-	this->ui->buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
-	this->ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setAutoDefault(false);
-	this->ui->buttonBox->button(QDialogButtonBox::Ok)->setAutoDefault(false);
-	this->ui->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(false);
-	this->ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setDefault(false);
-	this->ui->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
 	//make shure autostart is set as expected
 	this->updateAutostart(SETTINGS_VALUE(SettingsDialog::autoStart).toBool());
