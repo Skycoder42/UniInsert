@@ -22,9 +22,9 @@ public slots:
 	void addDownloadFile(QTemporaryFile *downloadFile);
 
 signals:
-	void beginInstall(const QString &text, bool indeterminated);
+	void beginInstall(const QString &text, int max);
 	void installReady();
-	void updateInstallProgress(int value, int max);
+	void updateInstallProgress(int value);
 	void error(const QString &error, bool critical);
 
 	void abortDone();
