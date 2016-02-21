@@ -88,6 +88,21 @@
     </widget>
    </item>
   </layout>
+  <action name="actionRemove_from_list">
+   <property name="icon">
+    <iconset resource="uniinsert_res.qrc">
+     <normaloff>:/icons/delete.ico</normaloff>:/icons/delete.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Remove from list</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="uniinsert_res.qrc"/>

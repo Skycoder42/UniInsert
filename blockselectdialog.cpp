@@ -20,6 +20,12 @@ BlockSelectDialog::BlockSelectDialog() :
 	SettingsDialog::loadSize(this);
 
 	this->displayModel->createCopyAction(this->ui->listView);
+	QAction *seperator = new QAction(this);
+	seperator->setSeparator(true);
+	this->ui->listView->addActions({
+									   seperator,
+									   this->ui->actionRemove_from_list
+								   });
 	this->ui->listView->setDragDropMode(QAbstractItemView::DragOnly);
 	connect(this->ui->listView, &QListView::activated,
 			this, &BlockSelectDialog::accept);
@@ -73,6 +79,8 @@ void BlockSelectDialog::on_comboBox_currentIndexChanged(int index)
 	if(modelIndex.isValid()) {
 		int blockID = this->blockModel->data(modelIndex).toInt();
 		Unicoder::databaseLoader()->createBlock(blockID, this->displayModel);
+		this->ui->actionRemove_from_list->setEnabled(blockID == 0);
+		this->ui->actionRemove_from_list->setVisible(blockID == 0);
 	}
 }
 
@@ -83,4 +91,10 @@ void BlockSelectDialog::on_toolButton_clicked()
 	if(index.isValid())
 		this->ui->comboBox->setCurrentIndex(index.row());
 	this->setAutoHide(true);
+}
+
+void BlockSelectDialog::on_actionRemove_from_list_triggered()
+{
+	if(this->ui->comboBox->currentIndex() == 0)
+		this->displayModel->removeRecentItem(this->ui->listView->currentIndex());
 }

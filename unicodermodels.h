@@ -18,6 +18,7 @@ public:
 	QAction *createCopyAction(QAbstractItemView *view) const;
 
 	void refresh();
+	QString getSymbol(const QModelIndex &index) const;
 
 	// QAbstractItemModel interface
 	QVariant data(const QModelIndex &item, int role) const Q_DECL_OVERRIDE;
@@ -31,9 +32,9 @@ public:
 public slots:
 	void activateItem(const QModelIndex &index) const;
 	void copyItem(const QModelIndex &index) const;
+	void removeRecentItem(const QModelIndex &index);
 
 private:
-	QString getSymbol(const QModelIndex &index) const;
 
 	bool isEmoji;
 };

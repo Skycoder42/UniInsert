@@ -62,6 +62,7 @@ public:
 	inline void updateRecent(const QString &symbol);
 	inline void updateRecent(Unicoder::SurrogatePair code);
 	void updateRecent(uint code);
+	void removeRecent(uint code);
 	void resetRecent();
 
 	//emojis

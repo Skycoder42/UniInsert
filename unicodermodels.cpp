@@ -35,6 +35,11 @@ void SymbolListModel::refresh()
 	this->setQuery(query);
 }
 
+QString SymbolListModel::getSymbol(const QModelIndex &index) const
+{
+	return this->data(index.sibling(index.row(), 0), Qt::DisplayRole).toString();
+}
+
 QVariant SymbolListModel::data(const QModelIndex &item, int role) const
 {
 	switch(role) {
@@ -121,9 +126,13 @@ void SymbolListModel::copyItem(const QModelIndex &index) const
 		Unicoder::copySymbol(this->getSymbol(index));
 }
 
-QString SymbolListModel::getSymbol(const QModelIndex &index) const
+void SymbolListModel::removeRecentItem(const QModelIndex &index)
 {
-	return this->data(index.sibling(index.row(), 0), Qt::DisplayRole).toString();
+	QString symbol = this->getSymbol(index);
+	if(!symbol.isNull()) {
+		Unicoder::databaseLoader()->removeRecent(Unicoder::symbolToCode32(symbol));
+		this->refresh();
+	}
 }
 
 

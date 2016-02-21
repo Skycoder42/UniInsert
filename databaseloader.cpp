@@ -201,6 +201,14 @@ void DatabaseLoader::updateRecent(uint code)
 		qDebug() << "Failed to insert/ignore recent entry";
 }
 
+void DatabaseLoader::removeRecent(uint code)
+{
+	QSqlQuery query(this->mainDB);
+	query.prepare(QStringLiteral("DELETE FROM Recent WHERE Code = :code"));
+	query.bindValue(QStringLiteral(":code"), code);
+	query.exec();
+}
+
 void DatabaseLoader::resetRecent()
 {
 	QSqlQuery query(this->mainDB);
