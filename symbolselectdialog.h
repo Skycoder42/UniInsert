@@ -19,6 +19,7 @@ public:
 protected:
 	// QWidget interface
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
 	QPoint dragStartPosition;

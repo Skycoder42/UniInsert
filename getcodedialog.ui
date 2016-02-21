@@ -50,6 +50,20 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="addRecentButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Add symbol to recently used list</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uniinsert_res.qrc">
+         <normaloff>:/icons/add.ico</normaloff>:/icons/add.ico</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="1" column="0">

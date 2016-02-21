@@ -25,6 +25,8 @@ private slots:
 	void on_symbolLineEdit_textChanged(const QString &text);
 	void on_exploreGroupButton_clicked();
 
+	void on_addRecentButton_clicked();
+
 private:
 	Ui::GetCodeDialog *ui;
 };

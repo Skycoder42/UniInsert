@@ -82,6 +82,9 @@
      </item>
      <item>
       <widget class="DragLabel" name="previewLabel">
+       <property name="cursor">
+        <cursorShape>ForbiddenCursor</cursorShape>
+       </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>

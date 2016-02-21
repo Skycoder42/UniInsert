@@ -47,6 +47,7 @@ void GetCodeDialog::on_symbolLineEdit_textChanged(const QString &text)
 		}
 		this->ui->symbolNameLineEdit->setText(Unicoder::databaseLoader()->nameForSymbol(text));
 		this->ui->symbolGroupLineEdit->setText(Unicoder::databaseLoader()->findBlockName(text));
+		this->ui->addRecentButton->setEnabled(true);
 		this->ui->exploreGroupButton->setEnabled(true);
 	} else {
 		this->ui->uTF16CodeHighLineEdit->setEnabled(true);
@@ -56,6 +57,7 @@ void GetCodeDialog::on_symbolLineEdit_textChanged(const QString &text)
 		this->ui->hTMLCodeLineEdit->clear();
 		this->ui->symbolNameLineEdit->clear();
 		this->ui->symbolGroupLineEdit->clear();
+		this->ui->addRecentButton->setEnabled(false);
 		this->ui->exploreGroupButton->setEnabled(false);
 	}
 }
@@ -65,4 +67,9 @@ void GetCodeDialog::on_exploreGroupButton_clicked()
 	int blockID = Unicoder::databaseLoader()->findBlock(this->ui->symbolLineEdit->text());
 	if(blockID > -1)
 		emit showBlock(blockID);
+}
+
+void GetCodeDialog::on_addRecentButton_clicked()
+{
+	Unicoder::databaseLoader()->updateRecent(this->ui->symbolLineEdit->text());
 }

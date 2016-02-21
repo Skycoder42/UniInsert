@@ -81,11 +81,13 @@ void SymbolSelectDialog::on_unicodeLineEdit_textChanged(const QString &text)
 		this->ui->previewLineEdit->setToolTip(name);
 		this->ui->previewLabel->setText(symbol);
 		this->ui->previewLabel->setToolTip(name);
+		this->ui->previewLabel->setCursor(Qt::OpenHandCursor);
 	} else {
 		this->ui->previewLineEdit->clear();
 		this->ui->previewLineEdit->setToolTip(QString());
 		this->ui->previewLabel->clear();
 		this->ui->previewLabel->setToolTip(QString());
+		this->ui->previewLabel->setCursor(Qt::ForbiddenCursor);
 	}
 }
 
@@ -133,10 +135,21 @@ DragLabel::DragLabel(QWidget *parent) :
 
 void DragLabel::mousePressEvent(QMouseEvent *event)
 {
-	if (event->button() == Qt::LeftButton)
+	if (event->button() == Qt::LeftButton) {
 		this->dragStartPosition = event->pos();
+		if(!this->text().isNull())
+			this->setCursor(Qt::ClosedHandCursor);
+	}
+	event->accept();
 }
-#include <QBitmap>
+
+void DragLabel::mouseReleaseEvent(QMouseEvent *event)
+{
+	if(!this->text().isNull())
+		this->setCursor(Qt::OpenHandCursor);
+	event->accept();
+}
+
 void DragLabel::mouseMoveEvent(QMouseEvent *event)
 {
 	if (!(event->buttons() & Qt::LeftButton))
@@ -164,4 +177,6 @@ void DragLabel::mouseMoveEvent(QMouseEvent *event)
 	drag->setMimeData(mimeData);
 
 	drag->exec(Qt::CopyAction);
+	this->setCursor(Qt::OpenHandCursor);
+	event->accept();
 }
