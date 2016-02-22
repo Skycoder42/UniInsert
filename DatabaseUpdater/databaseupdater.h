@@ -31,6 +31,7 @@ signals:
 
 private slots:
 	void installCodeData(QTemporaryFile *file);
+	void findName(const QStringList &entry, QString &name, QStringList &aliases);
 
 	void doAbort();
 	void countNext(uint counter, uint max, uint &buffer);
@@ -39,6 +40,9 @@ private:
 	QSqlDatabase newDB;
 	bool abortRequested;
 	int nextFunc;
+
+	QString nameBuffer;
+	QStringList aliasBuffer;
 };
 
 #endif // DATABASEUPDATER_H
