@@ -3,7 +3,11 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QTextStream>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include "global.h"
+
+static QRegularExpression groupMatchRegex(QStringLiteral(R"__(^\<(.+),\s*(First|Last)\s*\>$)__"));
 
 #define DELETE_QUEUED(obj) QMetaObject::invokeMethod(obj, "deleteLater", Qt::QueuedConnection)
 #define TRY_EXEC(query)  \
@@ -67,7 +71,7 @@ void DatabaseUpdater::startInstalling()
 	}
 
 	this->newDB.transaction();
-	for(int i = 0, max = queries.size(); i < max; ++i) {
+	for(int i = 0, max = queries.size() - 1; i < max; ++i) {//skip last -> empty because of ';'
 		QSqlQuery setupQuery(this->newDB);
 		if(!setupQuery.exec(queries[i])) {
 			emit error(setupQuery.lastError().text(), true);
@@ -149,32 +153,40 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 			return;
 		}
 
-		QString name = this->nameBuffer;
-		QStringList aliases = this->aliasBuffer;
-		for(; counter <= code; counter++) {
-			if(counter == code)
-				this->findName(line, name, aliases);
-
-			QSqlQuery insertSymbolQuery(this->newDB);
-			if(name.isEmpty())
-				insertSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
-			else {
-				insertSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code, Name) VALUES(:code, :name)"));
-				insertSymbolQuery.bindValue(QStringLiteral(":name"), name);
-			}
-			insertSymbolQuery.bindValue(QStringLiteral(":code"), counter);
-			TRY_EXEC(insertSymbolQuery)
-
-			for(QString alias : aliases) {
-				QSqlQuery insertAliasQuery(this->newDB);
-				insertAliasQuery.prepare(QStringLiteral("INSERT INTO Aliases (Code, Alias) VALUES(:code, :alias)"));
-				insertAliasQuery.bindValue(QStringLiteral(":code"), counter);
-				insertAliasQuery.bindValue(QStringLiteral(":alias"), alias);
-				TRY_EXEC(insertAliasQuery)
-			}
-
+		for(; counter < code; counter++) {
+			QSqlQuery insertUnnamedSymbolQuery(this->newDB);
+			insertUnnamedSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
+			insertUnnamedSymbolQuery.bindValue(QStringLiteral(":code"), counter);
+			TRY_EXEC(insertUnnamedSymbolQuery)
 			countNext(counter + 1, max, buffer);
 		}
+		if(counter != code) {
+			emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
+			return;
+		}
+
+		QString name;
+		QStringList aliases;
+		this->findName(line, name, aliases);
+		QSqlQuery insertSymbolQuery(this->newDB);
+		if(name.isEmpty())
+			insertSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
+		else {
+			insertSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code, Name) VALUES(:code, :name)"));
+			insertSymbolQuery.bindValue(QStringLiteral(":name"), name);
+		}
+		insertSymbolQuery.bindValue(QStringLiteral(":code"), counter);
+		TRY_EXEC(insertSymbolQuery)
+
+		for(QString alias : aliases) {
+			QSqlQuery insertAliasQuery(this->newDB);
+			insertAliasQuery.prepare(QStringLiteral("INSERT OR IGNORE INTO Aliases (Code, Alias) VALUES(:code, :alias)"));
+			insertAliasQuery.bindValue(QStringLiteral(":code"), counter);
+			insertAliasQuery.bindValue(QStringLiteral(":alias"), alias);
+			TRY_EXEC(insertAliasQuery)
+		}
+
+		countNext(++counter, max, buffer);
 	}
 
 	if(this->newDB.commit())
@@ -184,22 +196,34 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 		return;
 	}
 
+	DELETE_QUEUED(file);
+
 	this->newDB.close();
 	this->newDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
-
 }
 
 void DatabaseUpdater::findName(const QStringList &entry, QString &name, QStringList &aliases)
-{
+{	
 	name = entry[1];
+	bool hasAlias = (entry.size() >= 11) && !entry[10].isEmpty();
+
+	if(name == QLatin1String("<control>"))
+		aliases += name;
+
+	if(name.startsWith(QLatin1Char('<')) &&
+	   name.endsWith(QLatin1Char('>')))
+		name.clear();
+
+	if(hasAlias) {
+		if(name.isEmpty())
+			name = entry[10];
+		else
+			aliases += entry[10];
+	}
+
 	if(!name.isEmpty())
 		aliases += name;
-	if(entry.size() >= 11) {
-		QString al = entry[10];
-		if(!al.isEmpty())
-			aliases += al;
-	}
 }
 
 void DatabaseUpdater::doAbort()

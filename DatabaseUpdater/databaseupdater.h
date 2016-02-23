@@ -40,9 +40,6 @@ private:
 	QSqlDatabase newDB;
 	bool abortRequested;
 	int nextFunc;
-
-	QString nameBuffer;
-	QStringList aliasBuffer;
 };
 
 #endif // DATABASEUPDATER_H
