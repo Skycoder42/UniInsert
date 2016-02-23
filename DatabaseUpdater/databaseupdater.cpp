@@ -15,6 +15,13 @@ static QRegularExpression groupMatchRegex(QStringLiteral(R"__(^\<(.+),\s*(First|
 		emit error(query.lastError().text(), true);\
 		return;\
 	}
+#define COMMIT_FINISH \
+	if(this->newDB.commit())\
+		emit installReady();\
+	else {\
+		emit error(this->newDB.lastError().text(), true);\
+		return;\
+	}
 
 DatabaseUpdater::DatabaseUpdater(QObject *parent) :
 	QObject(Q_NULLPTR),
@@ -46,7 +53,7 @@ DatabaseUpdater::~DatabaseUpdater()
 
 int DatabaseUpdater::getInstallCount() const
 {
-	return 2;
+	return 3;
 }
 
 void DatabaseUpdater::startInstalling()
@@ -90,12 +97,7 @@ void DatabaseUpdater::startInstalling()
 		return;
 	}
 
-	if(this->newDB.commit())
-		emit installReady();
-	else {
-		emit error(this->newDB.lastError().text(), true);
-		return;
-	}
+	COMMIT_FINISH
 }
 
 void DatabaseUpdater::abortInstalling()
@@ -114,6 +116,9 @@ void DatabaseUpdater::handleDownloadFile(QTemporaryFile *downloadFile)
 	switch (this->nextFunc++) {
 	case 0:
 		this->installCodeData(downloadFile);
+		break;
+	case 1:
+		this->installBlocks(downloadFile);
 		break;
 	default:
 		break;
@@ -134,7 +139,7 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 		}
 	} while(file->peek(1) != "\n");
 	QByteArrayList lst = file->readAll().split(';');
-	uint max = lst.first().toUInt(&ok, 16);
+	this->symbolMax = lst.first().toUInt(&ok, 16);
 	if(!ok) {
 		emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
 		return;
@@ -146,6 +151,8 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 	uint counter = 0;
 	uint buffer = 0;
 	while(!stream.atEnd()) {
+		if(this->abortRequested)
+			return;
 		QStringList line = stream.readLine().split(QLatin1Char(';'));
 		uint code = line.first().toUInt(&ok, 16);
 		if(!ok || line.size() < 2) {
@@ -154,11 +161,13 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 		}
 
 		for(; counter < code; counter++) {
+			if(this->abortRequested)
+				return;
 			QSqlQuery insertUnnamedSymbolQuery(this->newDB);
 			insertUnnamedSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
 			insertUnnamedSymbolQuery.bindValue(QStringLiteral(":code"), counter);
 			TRY_EXEC(insertUnnamedSymbolQuery)
-			countNext(counter + 1, max, buffer);
+			countNext(counter + 1, this->symbolMax, buffer);
 		}
 		if(counter != code) {
 			emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
@@ -186,21 +195,11 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 			TRY_EXEC(insertAliasQuery)
 		}
 
-		countNext(++counter, max, buffer);
+		countNext(++counter, this->symbolMax, buffer);
 	}
 
-	if(this->newDB.commit())
-		emit installReady();
-	else {
-		emit error(this->newDB.lastError().text(), true);
-		return;
-	}
-
+	COMMIT_FINISH
 	DELETE_QUEUED(file);
-
-	this->newDB.close();
-	this->newDB = QSqlDatabase();
-	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
 }
 
 void DatabaseUpdater::findName(const QStringList &entry, QString &name, QStringList &aliases)
@@ -224,6 +223,57 @@ void DatabaseUpdater::findName(const QStringList &entry, QString &name, QStringL
 
 	if(!name.isEmpty())
 		aliases += name;
+}
+
+void DatabaseUpdater::installBlocks(QTemporaryFile *file)
+{
+	emit beginInstall(tr("Creating symbol blocks"), 0);
+
+	typedef QPair<uint, uint> Range;
+	typedef QPair<Range, QString> BlockInfo;
+	typedef QList<BlockInfo> BlockList;
+
+	BlockList list;
+	uint newMax = 0;
+	QRegularExpression regex(QStringLiteral(R"__(^([0-9A-F]{4,})\.\.([0-9A-F]{4,});\s*(.+)$)__"));
+	regex.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+	regex.optimize();
+
+	QTextStream stream(file);
+	while(!stream.atEnd()) {
+		QRegularExpressionMatch match = regex.match(stream.readLine());
+		if(match.hasMatch()) {
+			BlockInfo info;
+			info.first.first = match.captured(1).toUInt(Q_NULLPTR, 16);
+			info.first.second = match.captured(2).toUInt(Q_NULLPTR, 16);
+			if(info.first.first > info.first.second)
+				continue;
+			info.second = match.captured(3);
+			list += info;
+			newMax = qMax(newMax, info.first.second);
+		}
+	}
+
+	emit beginInstall(tr("Creating symbol blocks"), list.size());
+	this->newDB.transaction();
+
+	for(int i = 0, max = list.size(); i < max; ++i) {
+		qDebug() << list[i].second << list[i].first.first << list[i].first.second;
+		QSqlQuery createBlockQuery(this->newDB);
+		createBlockQuery.prepare(QStringLiteral("INSERT INTO Blocks (Name, Start, End) VALUES(:name, :start, :end)"));
+		createBlockQuery.bindValue(":name", list[i].second);
+		createBlockQuery.bindValue(":start", list[i].first.first);
+		createBlockQuery.bindValue(":end", list[i].first.second);
+		TRY_EXEC(createBlockQuery);
+		emit updateInstallProgress(i + 1);
+	}
+
+	COMMIT_FINISH
+	DELETE_QUEUED(file);
+
+	this->newDB.close();
+	this->newDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
 }
 
 void DatabaseUpdater::doAbort()

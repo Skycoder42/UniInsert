@@ -16,4 +16,7 @@ template<typename... Args> struct SELECT {
 	}
 };
 
+//TODO
+#include <QDebug>
+
 #endif // GLOBAL_H
