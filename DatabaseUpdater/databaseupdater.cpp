@@ -189,7 +189,7 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 
 		for(QString alias : aliases) {
 			QSqlQuery insertAliasQuery(this->newDB);
-			insertAliasQuery.prepare(QStringLiteral("INSERT OR IGNORE INTO Aliases (Code, Alias) VALUES(:code, :alias)"));
+			insertAliasQuery.prepare(QStringLiteral("INSERT OR IGNORE INTO Aliases (Code, NameAlias) VALUES(:code, :alias)"));
 			insertAliasQuery.bindValue(QStringLiteral(":code"), counter);
 			insertAliasQuery.bindValue(QStringLiteral(":alias"), alias);
 			TRY_EXEC(insertAliasQuery)
@@ -258,9 +258,8 @@ void DatabaseUpdater::installBlocks(QTemporaryFile *file)
 	this->newDB.transaction();
 
 	for(int i = 0, max = list.size(); i < max; ++i) {
-		qDebug() << list[i].second << list[i].first.first << list[i].first.second;
 		QSqlQuery createBlockQuery(this->newDB);
-		createBlockQuery.prepare(QStringLiteral("INSERT INTO Blocks (Name, Start, End) VALUES(:name, :start, :end)"));
+		createBlockQuery.prepare(QStringLiteral("INSERT INTO Blocks (Name, BlockStart, BlockEnd) VALUES(:name, :start, :end)"));
 		createBlockQuery.bindValue(":name", list[i].second);
 		createBlockQuery.bindValue(":start", list[i].first.first);
 		createBlockQuery.bindValue(":end", list[i].first.second);
