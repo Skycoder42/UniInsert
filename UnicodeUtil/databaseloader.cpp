@@ -33,6 +33,8 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	this->mainDB.setDatabaseName(file);
 	if(!this->mainDB.isValid() || !this->mainDB.open())
 		qDebug() << "Failed to open DB";
+	else
+		this->mainDB.exec(QStringLiteral("PRAGMA foreign_keys = ON"));
 }
 
 DatabaseLoader::~DatabaseLoader()

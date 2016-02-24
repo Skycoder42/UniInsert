@@ -77,6 +77,7 @@ void DatabaseUpdater::startInstalling()
 		return;
 	}
 
+	this->newDB.exec(QStringLiteral("PRAGMA foreign_keys = ON"));
 	this->newDB.transaction();
 	for(int i = 0, max = queries.size() - 1; i < max; ++i) {//skip last -> empty because of ';'
 		QSqlQuery setupQuery(this->newDB);
