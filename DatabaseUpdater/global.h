@@ -16,6 +16,11 @@ template<typename... Args> struct SELECT {
 	}
 };
 
+inline QString emojiPediaError() {
+	return QCoreApplication::translate("GLOBAL", "Emojipedia changed it's layout and cannot be parsed anymore. "
+												 "Please retry without emoji updates and contact me to update the parser!");
+}
+
 //TODO
 #include <QDebug>
 

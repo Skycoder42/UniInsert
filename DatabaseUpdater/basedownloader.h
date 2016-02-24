@@ -26,11 +26,17 @@ signals:
 	void updateDownloadProgress(qint64 value, qint64 max);
 	void error(const QString &error, bool critical);
 
+	void emojiCountLoaded(int emojiGroups);
+
 	void abortDone();
 
 private slots:
 	void doDownload(const QUrl &url);
 	void replyReady();
+
+	void doEmoDownload(const QUrl &url);
+	void emoReplyReady();
+	QList<QUrl> parseEmojiSide(const QByteArray &data);
 
 	void downloadError(QNetworkReply::NetworkError);
 
