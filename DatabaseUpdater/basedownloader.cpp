@@ -51,7 +51,8 @@ void BaseDownloader::abortDownloading()
 		disconnect(this->currentReply, &QNetworkReply::downloadProgress,
 				   this, &BaseDownloader::updateDownloadProgress);
 		this->currentReply->abort();
-	}
+	} else if(this->downloadFiles.isEmpty())
+		emit abortDone();
 }
 
 void BaseDownloader::doDownload(const QUrl &url)
