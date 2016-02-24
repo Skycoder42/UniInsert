@@ -64,7 +64,7 @@ QString DatabaseLoader::nameForSymbol(uint code) const
 QStringList DatabaseLoader::symbolAliases(uint code) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Alias FROM Aliases WHERE Code = :code"));
+	query.prepare(QStringLiteral("SELECT NameAlias FROM Aliases WHERE Code = :code"));
 	query.bindValue(QStringLiteral(":code"), code);
 	if(query.exec()) {
 		QStringList aliases;
@@ -85,7 +85,7 @@ QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent) const
 bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Code, Code, Alias FROM Aliases WHERE Alias Like :term"));
+	query.prepare(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE NameAlias Like :term"));
 	query.bindValue(QStringLiteral(":term"),
 					DatabaseLoader::prepareSearch(nameTerm, mode));
 	if(query.exec()){
@@ -100,7 +100,7 @@ bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQ
 
 void DatabaseLoader::clearSearchModel(QSqlQueryModel *model) const
 {
-	model->setQuery(QStringLiteral("SELECT Code, Code, Alias FROM Aliases WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
+	model->setQuery(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
 	model->setHeaderData(0, Qt::Horizontal, tr("Preview"));
 	model->setHeaderData(1, Qt::Horizontal, tr("Code"));
 	model->setHeaderData(2, Qt::Horizontal, tr("Name/Alias"));
@@ -121,7 +121,7 @@ bool DatabaseLoader::createBlock(int blockID, SymbolListModel *updateModel) cons
 {
 	if(blockID == 0) {
 		QSqlQuery query(this->mainDB);
-		query.prepare(QStringLiteral("SELECT Recent.Code, Symbols.Name FROM Recent INNER JOIN Symbols ON Recent.Code = Symbols.Code ORDER BY Count DESC LIMIT 0, :limit"));
+		query.prepare(QStringLiteral("SELECT Recent.Code, Symbols.Name FROM Recent INNER JOIN Symbols ON Recent.Code = Symbols.Code ORDER BY Recent.SymCount DESC LIMIT 0, :limit"));
 		query.bindValue(QStringLiteral(":limit"), SETTINGS_VALUE(SettingsDialog::maxRecent).toInt());
 		if(query.exec()) {
 			updateModel->setQuery(query);
@@ -149,7 +149,7 @@ bool DatabaseLoader::createBlock(int blockID, SymbolListModel *updateModel) cons
 int DatabaseLoader::findBlock(uint code) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT ID FROM Blocks WHERE Start <= :code AND End >= :code"));
+	query.prepare(QStringLiteral("SELECT ID FROM Blocks WHERE BlockStart <= :code AND BlockEnd >= :code"));
 	query.bindValue(QStringLiteral(":code"), code);
 	if(query.exec() && query.first())
 		return query.value(0).toInt();
@@ -171,7 +171,7 @@ QString DatabaseLoader::blockName(int blockID) const
 DatabaseLoader::Range DatabaseLoader::blockRange(int blockID) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Start, End FROM Blocks WHERE ID = :id"));
+	query.prepare(QStringLiteral("SELECT BlockStart, BlockEnd FROM Blocks WHERE ID = :id"));
 	query.bindValue(QStringLiteral(":id"), blockID);
 	if(query.exec() && query.first()) {
 		bool ok1 = false, ok2 = false;
@@ -196,7 +196,7 @@ QString DatabaseLoader::findBlockName(uint code) const
 QSqlQueryModel *DatabaseLoader::createBlockModel(QObject *modelParent) const
 {
 	QSqlQueryModel *model = new QSqlQueryModel(modelParent);
-	model->setQuery(QStringLiteral("SELECT Name, Start, End, ID FROM Blocks"), this->mainDB);
+	model->setQuery(QStringLiteral("SELECT Name, BlockStart, BlockEnd, ID FROM Blocks"), this->mainDB);
 	return model;
 }
 
@@ -207,7 +207,7 @@ void DatabaseLoader::updateRecent(uint code)
 	insertQuery.bindValue(QStringLiteral(":code"), code);
 	if(insertQuery.exec()) {
 		QSqlQuery updateQuery(this->mainDB);
-		updateQuery.prepare(QStringLiteral("UPDATE Recent SET Count = Count + 1 WHERE Code = :code"));
+		updateQuery.prepare(QStringLiteral("UPDATE Recent SET SymCount = SymCount + 1 WHERE Code = :code"));
 		updateQuery.bindValue(QStringLiteral(":code"), code);
 		if(!updateQuery.exec())
 			qDebug() << "Failed to update recent entry";
