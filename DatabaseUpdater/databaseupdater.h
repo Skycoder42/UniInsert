@@ -2,13 +2,15 @@
 #define DATABASEUPDATER_H
 
 #include <QObject>
-#include <QTemporaryFile>
+#include <QByteArray>
 #include <QQueue>
 #include <QSqlDatabase>
 
 class DatabaseUpdater : public QObject
 {
 	Q_OBJECT
+
+	typedef QList<QStringList> UniMatrix;
 public:
 	explicit DatabaseUpdater(QObject *parent = Q_NULLPTR);
 	~DatabaseUpdater();
@@ -19,7 +21,7 @@ public slots:
 	void startInstalling();
 	void abortInstalling();
 
-	void handleDownloadFile(QTemporaryFile *downloadFile);
+	void handleDownload(const QByteArray &downloadData);
 
 signals:
 	void beginInstall(const QString &text, int max);
@@ -30,13 +32,18 @@ signals:
 	void abortDone();
 
 private slots:
-	void installCodeData(QTemporaryFile *file);
+	void installCodeData(const QByteArray &downloadData);
 	void findName(const QStringList &entry, QString &name, QStringList &aliases);
 
-	void installBlocks(QTemporaryFile *file);
+	void installBlocks(const QByteArray &downloadData);
 	void adjustMax(uint newMax);
 
-	void installNameIndex(QTemporaryFile *file);
+	void installNameIndex(const QByteArray &downloadData);
+
+	void installAliases(const QByteArray &downloadData);
+
+	UniMatrix readDownload(const QByteArray &data, QChar seperator, int columns);
+	UniMatrix readDownload(const QByteArray &data, const QRegularExpression &regex);
 
 	void doAbort();
 	void countNext(uint counter, uint max, uint &buffer);

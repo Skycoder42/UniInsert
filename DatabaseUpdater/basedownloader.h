@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
-#include <QTemporaryFile>
+#include <QByteArray>
 #include <QUrl>
 #include <QNetworkReply>
 #include <functional>
@@ -22,7 +22,7 @@ public slots:
 
 signals:
 	void beginDownload(const QUrl &url);
-	void downloadReady(QTemporaryFile *downloadFile);
+	void downloadReady(const QByteArray &downloadData);
 	void updateDownloadProgress(qint64 value, qint64 max);
 	void error(const QString &error, bool critical);
 
@@ -30,7 +30,6 @@ signals:
 
 private slots:
 	void doDownload(const QUrl &url);
-	void writePart();
 	void replyReady();
 
 	void downloadError(QNetworkReply::NetworkError);
@@ -41,7 +40,6 @@ private:
 	bool aborted;
 
 	QNetworkReply *currentReply;
-	QTemporaryFile *currentFile;
 };
 
 #endif // BASEDOWNLOADER_H

@@ -38,7 +38,7 @@ private slots:
 	void error(const QString &error, bool critical);
 
 	void beginDownload(const QUrl &url);
-	void downloadReady(QTemporaryFile *);
+	void downloadReady(const QByteArray &);
 	void updateDownloadProgress(qint64 value, qint64 max);
 	void abortDownloaderDone();
 

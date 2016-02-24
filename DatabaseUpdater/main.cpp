@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 																 "   •  Path to the local unicode database\n"
 																 "   •  Unicode version to update to\n"
 																 "   •  The key of the Unicode Utility single instance\n"
-																 "   •  The updater mode (0-3)"),
+																 "   •  The updater mode flags (0-3)"),
 							   QApplication::translate("GLOBAL", "Invalid commandline arguments!"));
 		return EXIT_FAILURE;
 	} else {

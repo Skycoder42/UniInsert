@@ -1,5 +1,6 @@
 #include "updaterwindow.h"
 #include "ui_updaterwindow.h"
+#include <QFile>
 #include <progressbaradapter.h>
 #include <wintaskbarprogressadapter.h>
 #include <dialogmaster.h>
@@ -46,7 +47,7 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 			this, &UpdaterWindow::abortInstallDone);
 
 	connect(this->downloader, &BaseDownloader::downloadReady,
-			this->updater, &DatabaseUpdater::handleDownloadFile,
+			this->updater, &DatabaseUpdater::handleDownload,
 			Qt::QueuedConnection);
 
 	QMetaObject::invokeMethod(this, "initialize", Qt::QueuedConnection);
@@ -98,7 +99,7 @@ void UpdaterWindow::beginDownload(const QUrl &url)
 	this->ui->downloadLabel->setText(tr("Downloading: %1…").arg(url.toString()));
 }
 
-void UpdaterWindow::downloadReady(QTemporaryFile *)
+void UpdaterWindow::downloadReady(const QByteArray &)
 {
 	this->ui->allDownloadProgressBar->setValue(this->ui->allDownloadProgressBar->value() + 1);
 	this->ui->downloadLabel->setText(tr("Download finished!"));

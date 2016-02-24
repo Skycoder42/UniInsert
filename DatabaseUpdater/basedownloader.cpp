@@ -7,7 +7,6 @@ BaseDownloader::BaseDownloader(QObject *parent) :
 	nam(new QNetworkAccessManager(this)),
 	downloadFiles(),
 	currentReply(Q_NULLPTR),
-	currentFile(Q_NULLPTR),
 	aborted(false)
 {}
 
@@ -58,48 +57,27 @@ void BaseDownloader::abortDownloading()
 void BaseDownloader::doDownload(const QUrl &url)
 {
 	Q_ASSERT(!this->currentReply);
-	Q_ASSERT(!this->currentFile);
 
-	this->currentFile = new QTemporaryFile(this);
-	if(!this->currentFile->open())
-		emit error(tr("Failed to create temporary file!"), true);
-	else {
-		emit beginDownload(url);
-		this->currentReply = this->nam->get(QNetworkRequest(url));
-		connect(this->currentReply, &QNetworkReply::downloadProgress,
-				this, &BaseDownloader::updateDownloadProgress);
-		connect(this->currentReply, &QNetworkReply::readyRead,
-				this, &BaseDownloader::writePart);
-		connect(this->currentReply, &QNetworkReply::finished,
-				this, &BaseDownloader::replyReady, Qt::QueuedConnection);
-		connect(this->currentReply, SELECT<QNetworkReply::NetworkError>::OVERLOAD_OF(&QNetworkReply::error),
-				this, &BaseDownloader::downloadError);
-	}
-}
-
-void BaseDownloader::writePart()
-{
-	Q_ASSERT(this->currentReply);
-	Q_ASSERT(this->currentFile);
-	this->currentFile->write(this->currentReply->readAll());
+	emit beginDownload(url);
+	this->currentReply = this->nam->get(QNetworkRequest(url));
+	connect(this->currentReply, &QNetworkReply::downloadProgress,
+			this, &BaseDownloader::updateDownloadProgress);
+	connect(this->currentReply, &QNetworkReply::finished,
+			this, &BaseDownloader::replyReady, Qt::QueuedConnection);
+	connect(this->currentReply, SELECT<QNetworkReply::NetworkError>::OVERLOAD_OF(&QNetworkReply::error),
+			this, &BaseDownloader::downloadError);
 }
 
 void BaseDownloader::replyReady()
 {
 	Q_ASSERT(this->currentReply);
-	Q_ASSERT(this->currentFile);
+
 	if(this->aborted) {
-		this->currentFile->close();
-		this->currentFile->deleteLater();
-		this->currentFile = Q_NULLPTR;
 		this->currentReply->deleteLater();
 		this->currentReply = Q_NULLPTR;
 		emit abortDone();
 	} else {
-		this->currentFile->write(this->currentReply->readAll());
-		this->currentFile->seek(0);
-		emit downloadReady(this->currentFile);
-		this->currentFile = Q_NULLPTR;
+		emit downloadReady(this->currentReply->readAll());
 		this->currentReply->deleteLater();
 		this->currentReply = Q_NULLPTR;
 		if(!this->downloadFiles.isEmpty())
