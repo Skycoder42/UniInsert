@@ -34,6 +34,7 @@ private slots:
 	void findName(const QStringList &entry, QString &name, QStringList &aliases);
 
 	void installBlocks(QTemporaryFile *file);
+	void adjustMax(uint newMax);
 
 	void doAbort();
 	void countNext(uint counter, uint max, uint &buffer);

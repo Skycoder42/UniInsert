@@ -270,9 +270,18 @@ void DatabaseUpdater::installBlocks(QTemporaryFile *file)
 	COMMIT_FINISH
 	DELETE_QUEUED(file);
 
+	this->adjustMax(newMax);
+
+	this->newDB.close();
+	this->newDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
+}
+
+void DatabaseUpdater::adjustMax(uint newMax)
+{
 	if(newMax > this->symbolMax) {
 		uint delta = newMax - this->symbolMax;
-		qDebug() << delta;
+		qDebug() << "newMax" << delta;
 		uint buffer = 0;
 		emit beginInstall(tr("Adding remaining missing symbols"), DatabaseUpdater::PercentMax);
 		this->newDB.transaction();
@@ -284,15 +293,11 @@ void DatabaseUpdater::installBlocks(QTemporaryFile *file)
 			TRY_EXEC(insertUnnamedSymbolQuery)
 			countNext(i, delta, buffer);
 		}
-		this->symbolMax += delta;
+		this->symbolMax = newMax;
 
 		COMMIT_FINISH
 	} else
 		emit installReady();
-
-	this->newDB.close();
-	this->newDB = QSqlDatabase();
-	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
 }
 
 void DatabaseUpdater::doAbort()
