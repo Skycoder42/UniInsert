@@ -36,6 +36,8 @@ private slots:
 	void installBlocks(QTemporaryFile *file);
 	void adjustMax(uint newMax);
 
+	void installNameIndex(QTemporaryFile *file);
+
 	void doAbort();
 	void countNext(uint counter, uint max, uint &buffer);
 

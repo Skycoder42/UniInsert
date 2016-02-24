@@ -9,7 +9,6 @@
 
 static QRegularExpression groupMatchRegex(QStringLiteral(R"__(^\<(.+),\s*(First|Last)\s*\>$)__"));
 
-#define DELETE_QUEUED(obj) QMetaObject::invokeMethod(obj, "deleteLater", Qt::QueuedConnection)
 #define TRY_EXEC(query)  \
 	if(!query.exec()) {\
 		emit error(query.lastError().text(), true);\
@@ -53,7 +52,7 @@ DatabaseUpdater::~DatabaseUpdater()
 
 int DatabaseUpdater::getInstallCount() const
 {
-	return 4;
+	return 5;
 }
 
 void DatabaseUpdater::startInstalling()
@@ -108,52 +107,51 @@ void DatabaseUpdater::abortInstalling()
 
 void DatabaseUpdater::handleDownloadFile(QTemporaryFile *downloadFile)
 {
-	if(this->abortRequested){
-		DELETE_QUEUED(downloadFile);
-		return;
+	if(!this->abortRequested) {
+		switch (this->nextFunc++) {
+		case 0:
+			this->installCodeData(downloadFile);
+			break;
+		case 1:
+			this->installBlocks(downloadFile);
+			break;
+		case 2:
+			this->installNameIndex(downloadFile);
+			break;
+		default:
+			break;
+			Q_UNREACHABLE();//TODO
+		}
 	}
 
-	switch (this->nextFunc++) {
-	case 0:
-		this->installCodeData(downloadFile);
-		break;
-	case 1:
-		this->installBlocks(downloadFile);
-		break;
-	default:
-		break;
-		Q_UNREACHABLE();//TODO
-	}
+	QMetaObject::invokeMethod(downloadFile, "deleteLater", Qt::QueuedConnection);
 }
 
 void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 {
 	bool ok = false;
-	emit beginInstall(tr("Creating unicode symbols"), DatabaseUpdater::PercentMax);//"percent"...
+	emit beginInstall(tr("Creating unicode symbols"), 0);
 
-	file->seek(file->size() - 5);//saveguard for the last \n
-	do {
-		if(!file->seek(file->pos() - 1)) {
-			emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
-			return;
-		}
-	} while(file->peek(1) != "\n");
-	QByteArrayList lst = file->readAll().split(';');
-	this->symbolMax = lst.first().toUInt(&ok, 16);
+	QList<QStringList> codeMatrix;
+	QTextStream stream(file);
+	while(!stream.atEnd())
+		codeMatrix += stream.readLine().split(QLatin1Char(';'));
+
+	if(!codeMatrix.isEmpty())
+		this->symbolMax = codeMatrix.last().first().toUInt(&ok, 16);
 	if(!ok) {
 		emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
 		return;
 	}
 
-	file->seek(0);
+	emit beginInstall(tr("Creating unicode symbols"), DatabaseUpdater::PercentMax);
 	this->newDB.transaction();
-	QTextStream stream(file);
+
 	uint counter = 0;
 	uint buffer = 0;
-	while(!stream.atEnd()) {
+	for(QStringList line : codeMatrix) {
 		if(this->abortRequested)
 			return;
-		QStringList line = stream.readLine().split(QLatin1Char(';'));
 		uint code = line.first().toUInt(&ok, 16);
 		if(!ok || line.size() < 2) {
 			emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
@@ -199,7 +197,6 @@ void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 	}
 
 	COMMIT_FINISH
-	DELETE_QUEUED(file);
 }
 
 void DatabaseUpdater::findName(const QStringList &entry, QString &name, QStringList &aliases)
@@ -268,13 +265,8 @@ void DatabaseUpdater::installBlocks(QTemporaryFile *file)
 	}
 
 	COMMIT_FINISH
-	DELETE_QUEUED(file);
 
 	this->adjustMax(newMax);
-
-	this->newDB.close();
-	this->newDB = QSqlDatabase();
-	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
 }
 
 void DatabaseUpdater::adjustMax(uint newMax)
@@ -298,6 +290,49 @@ void DatabaseUpdater::adjustMax(uint newMax)
 		COMMIT_FINISH
 	} else
 		emit installReady();
+}
+
+void DatabaseUpdater::installNameIndex(QTemporaryFile *file)
+{
+	emit beginInstall(tr("Adding new aliases from name index"), 0);
+
+	typedef QPair<uint, QString> NamePair;
+	QList<NamePair> entries;
+	QTextStream stream(file);
+	while(!stream.atEnd()) {
+		QStringList namePair = stream.readLine().split(QLatin1Char('\t'));
+		if(namePair.size() == 2) {
+			NamePair pair;
+			bool ok = false;
+			pair.first = namePair.last().toUInt(&ok, 16);
+			pair.second = namePair.first();
+			if(ok &&
+			   (pair.second == pair.second.toUpper() ||
+				pair.second == pair.second.toLower())) {
+				entries += pair;
+			}
+		}
+	}
+
+	emit beginInstall(tr("Adding new aliases from name index"), DatabaseUpdater::PercentMax);
+	this->newDB.transaction();
+
+	uint buffer = 0;
+	uint max = entries.size();
+	for(uint i = 0; i < max; ++i) {
+		QSqlQuery insertAliasQuery(this->newDB);
+		insertAliasQuery.prepare(QStringLiteral("INSERT OR IGNORE INTO Aliases (Code, NameAlias) VALUES(:code, :alias)"));
+		insertAliasQuery.bindValue(QStringLiteral(":code"), entries[i].first);
+		insertAliasQuery.bindValue(QStringLiteral(":alias"), entries[i].second);
+		TRY_EXEC(insertAliasQuery)
+		countNext(i + 1, max, buffer);
+	}
+
+	COMMIT_FINISH
+
+	this->newDB.close();
+	this->newDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
 }
 
 void DatabaseUpdater::doAbort()

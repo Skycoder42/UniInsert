@@ -151,7 +151,7 @@ void UpdaterWindow::completeInstall()
 	this->ui->downloadLabel->setText(tr("Database update completed!"));
 	QString path = ARG_LOCAL_DB_PATH;
 
-	if(QFile::remove(path)) {
+	if(!QFile::exists(path) || QFile::remove(path)) {
 		if(QFile::rename(path + QStringLiteral(".update"), path)) {
 			DialogMaster::information(this, tr("Database update completed!"));//TODO
 			qApp->quit();
