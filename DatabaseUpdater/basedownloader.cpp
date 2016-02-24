@@ -62,7 +62,7 @@ void BaseDownloader::doDownload(const QUrl &url)
 
 void BaseDownloader::replyReady()
 {
-	if(this->currentReply->error() == QNetworkReply::NoError) {
+	if(this->currentReply && this->currentReply->error() == QNetworkReply::NoError) {
 		Q_ASSERT(this->currentReply);
 		emit downloadReady(this->currentReply->readAll());
 		this->currentReply->deleteLater();
@@ -88,7 +88,7 @@ void BaseDownloader::doEmoDownload(const QUrl &url)
 
 void BaseDownloader::emoReplyReady()
 {
-	if(this->currentReply->error() == QNetworkReply::NoError) {
+	if(this->currentReply && this->currentReply->error() == QNetworkReply::NoError) {
 		Q_ASSERT(this->currentReply);
 		QList<QUrl> emojiSubs = this->parseEmojiSide(this->currentReply->readAll());
 		this->currentReply->deleteLater();
@@ -102,8 +102,8 @@ void BaseDownloader::emoReplyReady()
 	}
 }
 
-#define EMOJI_ERROR(var, i) if(var == -1) {\
-		emit error(emojiPediaError() + QString::number(i), true);\
+#define EMOJI_ERROR(var) if(var == -1) {\
+		emit error(emojiPediaError(), true);\
 		return QList<QUrl>();\
 	}
 
@@ -113,28 +113,26 @@ QList<QUrl> BaseDownloader::parseEmojiSide(const QByteArray &data)
 
 	// Parse the file!!!
 	int start = data.indexOf("Categories");
-	EMOJI_ERROR(start, 0);
+	EMOJI_ERROR(start);
 	start = data.indexOf("<ul>", start);
-	EMOJI_ERROR(start, 1);
+	EMOJI_ERROR(start);
 	int finish = data.indexOf("</ul>", start);
-	EMOJI_ERROR(finish, 2);
+	EMOJI_ERROR(finish);
 
 	int nextStart = start;
 	while (nextStart < finish && nextStart != -1) {
 		int begin = data.indexOf("<li><a href=\"", nextStart);
-		EMOJI_ERROR(begin, 3);
+		EMOJI_ERROR(begin);
 		begin += 13;
 		int end = data.indexOf("\"", begin);
-		EMOJI_ERROR(end, 4);
+		EMOJI_ERROR(end);
 
-		qDebug() << begin << end - begin;
-		emojiSubs += QString::fromUtf8("http://emojipedia.org/" + data.mid(begin, end - begin));
+		emojiSubs += QString::fromUtf8("http://emojipedia.org" + data.mid(begin, end - begin));
 		nextStart = data.indexOf("</li>", end);
-		EMOJI_ERROR(nextStart, 5);
+		EMOJI_ERROR(nextStart);
 		nextStart = data.indexOf("<li>", nextStart);
 	}
 
-	qDebug() << emojiSubs;
 	return emojiSubs;
 }
 
