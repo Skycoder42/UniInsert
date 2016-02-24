@@ -53,7 +53,7 @@ DatabaseUpdater::~DatabaseUpdater()
 
 int DatabaseUpdater::getInstallCount() const
 {
-	return 3;
+	return 4;
 }
 
 void DatabaseUpdater::startInstalling()
@@ -129,7 +129,7 @@ void DatabaseUpdater::handleDownloadFile(QTemporaryFile *downloadFile)
 void DatabaseUpdater::installCodeData(QTemporaryFile *file)
 {
 	bool ok = false;
-	emit beginInstall(tr("Creating unicode symbols"), 1000);//"percent"...
+	emit beginInstall(tr("Creating unicode symbols"), DatabaseUpdater::PercentMax);//"percent"...
 
 	file->seek(file->size() - 5);//saveguard for the last \n
 	do {
@@ -270,6 +270,26 @@ void DatabaseUpdater::installBlocks(QTemporaryFile *file)
 	COMMIT_FINISH
 	DELETE_QUEUED(file);
 
+	if(newMax > this->symbolMax) {
+		uint delta = newMax - this->symbolMax;
+		qDebug() << delta;
+		uint buffer = 0;
+		emit beginInstall(tr("Adding remaining missing symbols"), DatabaseUpdater::PercentMax);
+		this->newDB.transaction();
+
+		for(uint i = 1; i <= delta; ++i) {
+			QSqlQuery insertUnnamedSymbolQuery(this->newDB);
+			insertUnnamedSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
+			insertUnnamedSymbolQuery.bindValue(QStringLiteral(":code"), this->symbolMax + i);
+			TRY_EXEC(insertUnnamedSymbolQuery)
+			countNext(i, delta, buffer);
+		}
+		this->symbolMax += delta;
+
+		COMMIT_FINISH
+	} else
+		emit installReady();
+
 	this->newDB.close();
 	this->newDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
@@ -288,7 +308,7 @@ void DatabaseUpdater::doAbort()
 
 void DatabaseUpdater::countNext(uint counter, uint max, uint &buffer)
 {
-	uint val = 1000 * counter / max;
+	uint val = DatabaseUpdater::PercentMax * counter / max;
 	if(val > buffer) {
 		buffer = val;
 		emit updateInstallProgress(val);

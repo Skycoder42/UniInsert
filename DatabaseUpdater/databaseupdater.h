@@ -39,6 +39,8 @@ private slots:
 	void countNext(uint counter, uint max, uint &buffer);
 
 private:
+	static const int PercentMax = 1000;
+
 	QSqlDatabase newDB;
 	bool abortRequested;
 	int nextFunc;
