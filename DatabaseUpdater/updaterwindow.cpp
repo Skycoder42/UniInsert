@@ -16,7 +16,7 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	installMax(0),
 	downloaderAborted(false),
 	installerAborted(false),
-	softErrorList("test test test test test test test test test test test test test test test test ")
+	softErrorList()
 {
 	ui->setupUi(this);
 	this->adjustSize();
