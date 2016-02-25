@@ -94,7 +94,7 @@ void UpdaterWindow::error(const QString &error, bool critical)
 							 error);
 		qApp->exit(EXIT_FAILURE);
 	} else
-		this->softErrorList += QStringLiteral(" • ") + error;
+		this->softErrorList += tr(" • ") + error;
 }
 
 void UpdaterWindow::beginDownload(const QUrl &url)

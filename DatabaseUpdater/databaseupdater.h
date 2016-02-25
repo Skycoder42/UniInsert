@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QQueue>
 #include <QSqlDatabase>
+#include <QHash>
 
 class DatabaseUpdater : public QObject
 {
@@ -45,7 +46,7 @@ private slots:
 	void transferRecent();
 
 	void transferEmojiGroups();
-	void transferEmojiMapping();
+	void transferEmojiMapping(QSqlDatabase &oldDB, const QHash<int, int> &groupIDMapping);
 
 	void completeUpdate();
 

@@ -360,7 +360,7 @@ void DatabaseUpdater::installAliases(const QByteArray &downloadData)
 
 void DatabaseUpdater::transferRecent()
 {
-	emit beginInstall(tr("Transfering recently used elements from the old database"), 0);
+	emit beginInstall(tr("Transfering recently used elements from old database"), 0);
 	this->newDB.transaction();
 
 	QSqlDatabase oldDB = QSqlDatabase::database(QStringLiteral("oldDB"));
@@ -369,13 +369,15 @@ void DatabaseUpdater::transferRecent()
 	QSqlQuery recentQuery(oldDB);
 	recentQuery.prepare(QStringLiteral("SELECT Code, SymCount FROM Recent"));
 	TRY_EXEC(recentQuery)
+//TODO
+	emit error(tr("Recently used Symbol U+0042 could not be transfered!"), false);
 
 	while(recentQuery.next()) {
 		QSqlQuery transferQuery(this->newDB);
 		uint code = recentQuery.value(0).toUInt();
 		transferQuery.prepare(QStringLiteral("INSERT INTO Recent (Code, SymCount) VALUES(:code, :num)"));
 		transferQuery.bindValue(QStringLiteral(":code"), code);
-		transferQuery.bindValue(QStringLiteral(":num"), recentQuery.value(1).toInt());
+		transferQuery.bindValue(QStringLiteral(":num"), recentQuery.value(1));
 		if(!transferQuery.exec()) {
 			emit error(tr("Recently used Symbol U+%1 could not be transfered!")
 					   .arg(code, 4, 16, QChar('0')),
@@ -396,13 +398,58 @@ void DatabaseUpdater::transferRecent()
 
 void DatabaseUpdater::transferEmojiGroups()
 {
-	emit installReady();
-	QMetaObject::invokeMethod(this, "transferEmojiMapping", Qt::QueuedConnection);
+	emit beginInstall(tr("Transfering emoji groups from old database"), 0);
+	this->newDB.transaction();
+
+	QSqlDatabase oldDB = QSqlDatabase::database(QStringLiteral("oldDB"));
+	TRY_OPEN(oldDB)
+
+	QSqlQuery loadGroupsQuery(oldDB);
+	loadGroupsQuery.prepare(QStringLiteral("SELECT ID, Name, SortHint FROM EmojiGroups"));
+	TRY_EXEC(loadGroupsQuery)
+
+	QHash<int, int> groupIDMapping;
+	while(loadGroupsQuery.next()) {
+		QSqlQuery transferQuery(this->newDB);
+		transferQuery.prepare(QStringLiteral("INSERT INTO EmojiGroups (Name, SortHint) VALUES(:name, :hint)"));
+		transferQuery.bindValue(QStringLiteral(":name"), loadGroupsQuery.value(1));
+		transferQuery.bindValue(QStringLiteral(":hint"), loadGroupsQuery.value(2));
+		TRY_EXEC(transferQuery)
+		groupIDMapping.insert(loadGroupsQuery.value(0).toInt(),
+							  transferQuery.lastInsertId().toInt());
+	}
+
+	COMMIT_FINISH
+
+	this->transferEmojiMapping(oldDB, groupIDMapping);
+	oldDB.close();
 }
 
-void DatabaseUpdater::transferEmojiMapping()
+void DatabaseUpdater::transferEmojiMapping(QSqlDatabase &oldDB, const QHash<int, int> &groupIDMapping)
 {
-	emit installReady();
+	emit beginInstall(tr("Transfering emoji mapping from old database"), 0);
+	this->newDB.transaction();
+
+	QSqlQuery mappingQuery(oldDB);
+	mappingQuery.prepare(QStringLiteral("SELECT GroupID, EmojiID, SortHint FROM EmojiMapping"));
+	TRY_EXEC(mappingQuery)
+
+	while(mappingQuery.next()) {
+		QSqlQuery transferQuery(this->newDB);
+		uint code = mappingQuery.value(1).toUInt();
+		transferQuery.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID, SortHint) VALUES(:group, :emoji, :hint)"));
+		transferQuery.bindValue(QStringLiteral(":group"), groupIDMapping.value(mappingQuery.value(0).toInt()));
+		transferQuery.bindValue(QStringLiteral(":emoji"), code);
+		transferQuery.bindValue(QStringLiteral(":hint"), mappingQuery.value(2));
+		if(!transferQuery.exec()) {
+			emit error(tr("Emoji Symbol U+%1 could not be transfered!")
+					   .arg(code, 4, 16, QChar('0')),
+					   false);
+		}
+	}
+
+	COMMIT_FINISH
+
 	QMetaObject::invokeMethod(this, "completeUpdate", Qt::QueuedConnection);
 }
 
