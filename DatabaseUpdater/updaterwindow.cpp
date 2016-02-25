@@ -7,6 +7,7 @@
 #include "global.h"
 
 #include "tasks/emojigroupscantask.h"
+#include "tasks/createdbstructuretask.h"
 
 UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	QWidget(parent, Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::MSWindowsFixedSizeDialogHint),
@@ -77,6 +78,7 @@ void UpdaterWindow::initialize()
 {
 	this->ui->titleLabel->setText(this->ui->titleLabel->text().arg(ARG_UPDATE_VERSION));
 
+	this->engine->addTask(new CreateDBStructureTask());
 	this->engine->addTask(new EmojiGroupScanTask());
 }
 

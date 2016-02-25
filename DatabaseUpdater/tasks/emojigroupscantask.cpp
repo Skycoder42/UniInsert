@@ -7,7 +7,8 @@
 	}
 
 EmojiGroupScanTask::EmojiGroupScanTask() :
-	UpdateTask()
+	UpdateTask(),
+	downloadUrls()
 {}
 
 QUrl EmojiGroupScanTask::downloadUrl() const

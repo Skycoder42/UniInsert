@@ -3,6 +3,7 @@
 #include <QNetworkReply>
 #include <QtConcurrent>
 #include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QSqlError>
 #include "global.h"
 
@@ -254,6 +255,7 @@ bool SetupTask::run()
 		this->engine->failure(newDB.lastError().text());
 		return false;
 	}
+	newDB.exec(QStringLiteral("PRAGMA foreign_keys = ON"));
 
 	QSqlDatabase oldDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), UpdateEngineCore::oldDB);
 	oldDB.setDatabaseName(ARG_LOCAL_DB_PATH);
