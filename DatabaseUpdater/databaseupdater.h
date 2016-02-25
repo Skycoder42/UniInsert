@@ -44,6 +44,9 @@ private slots:
 
 	void transferRecent();
 
+	void transferEmojiGroups();
+	void transferEmojiMapping();
+
 	void completeUpdate();
 
 	UniMatrix readDownload(const QByteArray &data, QChar seperator, int columns);

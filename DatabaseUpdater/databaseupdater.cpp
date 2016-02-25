@@ -62,6 +62,8 @@ int DatabaseUpdater::getInstallCount() const
 	UpdaterWindow::UpdateFlags flags = ARG_UPDATE_MODE;
 	if(flags.testFlag(UpdaterWindow::RecentlyUsed))
 		count += 1;
+	if(!flags.testFlag(UpdaterWindow::Emojis))
+		count += 2;//TODO
 	return count;
 }
 
@@ -384,6 +386,23 @@ void DatabaseUpdater::transferRecent()
 	oldDB.close();
 	COMMIT_FINISH
 
+	if(!ARG_UPDATE_MODE.testFlag(UpdaterWindow::Emojis))
+		QMetaObject::invokeMethod(this, "transferEmojiGroups", Qt::QueuedConnection);
+	else {
+		//TODO emoji lists...
+		QMetaObject::invokeMethod(this, "completeUpdate", Qt::QueuedConnection);
+	}
+}
+
+void DatabaseUpdater::transferEmojiGroups()
+{
+	emit installReady();
+	QMetaObject::invokeMethod(this, "transferEmojiMapping", Qt::QueuedConnection);
+}
+
+void DatabaseUpdater::transferEmojiMapping()
+{
+	emit installReady();
 	QMetaObject::invokeMethod(this, "completeUpdate", Qt::QueuedConnection);
 }
 
