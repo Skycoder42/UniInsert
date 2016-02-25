@@ -122,13 +122,13 @@ void UpdaterWindow::engineDone()
 
 void UpdaterWindow::beginDownload(const QString &text)
 {
-	this->ui->currentDownloadProgressBar->setValue(0);
-	this->ui->currentDownloadProgressBar->setMaximum(1);
+	this->ui->currentDownloadProgressBar->setRange(0, 0);
 	this->ui->downloadLabel->setText(text + tr("…"));
 }
 
 void UpdaterWindow::updateDownloadProgress(qint64 value, qint64 max)
 {
+	//TODO
 	this->ui->currentDownloadProgressBar->setMaximum(max);
 	this->ui->currentDownloadProgressBar->setValue(value);
 }

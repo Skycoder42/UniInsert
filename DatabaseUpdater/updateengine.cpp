@@ -69,7 +69,7 @@ void UpdateEngine::updateInstallMax(int max)
 	this->installProgressMax = max;
 	this->installProgressBuffer = 0;
 	QMetaObject::invokeMethod(this, "beginInstallProgress", Qt::QueuedConnection,
-							  Q_ARG(int, max));
+							  Q_ARG(int, 1000));
 }
 
 void UpdateEngine::updateInstallValue(int value)
@@ -166,7 +166,7 @@ void UpdateEngine::nextDownload()
 
 void UpdateEngine::downloadReady()
 {
-	if(this->currentReply->error() == QNetworkReply::NoError) {
+	if(this->currentReply && this->currentReply->error() == QNetworkReply::NoError) {
 		if(this->abortRequested) {
 			this->didAbortDownload = true;
 			this->currentReply->deleteLater();
