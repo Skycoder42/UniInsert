@@ -35,14 +35,12 @@ include(C:/C++Libraries/Qt/DialogMaster/dialogmaster.pri)
 
 SOURCES += main.cpp\
         updaterwindow.cpp \
-    basedownloader.cpp \
     databaseupdater.cpp \
     updatetask.cpp \
     updateengine.cpp
 
 HEADERS  += updaterwindow.h \
     global.h \
-    basedownloader.h \
     databaseupdater.h \
     updatetask.h \
     updateengine.h \

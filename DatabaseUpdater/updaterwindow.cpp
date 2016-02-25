@@ -12,6 +12,7 @@
 #include "tasks/createsymbolstask.h"
 #include "tasks/createblockstask.h"
 #include "tasks/readnameindextask.h"
+#include "tasks/readaliasestask.h"
 
 UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	QWidget(parent, Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::MSWindowsFixedSizeDialogHint),
@@ -87,6 +88,7 @@ void UpdaterWindow::initialize()
 	this->engine->addTask(new CreateSymbolsTask());
 	this->engine->addTask(new CreateBlocksTask());
 	this->engine->addTask(new ReadNameIndexTask());
+	this->engine->addTask(new ReadAliasesTask());
 }
 
 void UpdaterWindow::error(const QString &error)

@@ -4,7 +4,8 @@ HEADERS += \
     $$PWD/createdbstructuretask.h \
     $$PWD/createsymbolstask.h \
     $$PWD/createblockstask.h \
-    $$PWD/readnameindextask.h
+    $$PWD/readnameindextask.h \
+    $$PWD/readaliasestask.h
 
 SOURCES += \
     $$PWD/emojigroupscantask.cpp \
@@ -12,4 +13,5 @@ SOURCES += \
     $$PWD/createdbstructuretask.cpp \
     $$PWD/createsymbolstask.cpp \
     $$PWD/createblockstask.cpp \
-    $$PWD/readnameindextask.cpp
+    $$PWD/readnameindextask.cpp \
+    $$PWD/readaliasestask.cpp
