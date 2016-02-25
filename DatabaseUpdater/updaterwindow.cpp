@@ -5,9 +5,11 @@
 #include <wintaskbarprogressadapter.h>
 #include <dialogmaster.h>
 #include "global.h"
+#include "updateengine.h"
 
 #include "tasks/emojigroupscantask.h"
 #include "tasks/createdbstructuretask.h"
+#include "tasks/createsymbolstask.h"
 
 UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	QWidget(parent, Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::MSWindowsFixedSizeDialogHint),
@@ -80,6 +82,7 @@ void UpdaterWindow::initialize()
 
 	this->engine->addTask(new CreateDBStructureTask());
 	this->engine->addTask(new EmojiGroupScanTask());
+	this->engine->addTask(new CreateSymbolsTask());
 }
 
 void UpdaterWindow::error(const QString &error)

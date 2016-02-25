@@ -37,7 +37,9 @@ UpdateEngine::UpdateEngine(QObject *parent) :
 	installs(),
 	currentInstall(Q_NULLPTR),
 	isInstallCompleted(false),
-	watcher(new QFutureWatcher<bool>(this))
+	watcher(new QFutureWatcher<bool>(this)),
+	installProgressMax(0),
+	installProgressBuffer(0)
 {
 	connect(this->watcher, &QFutureWatcherBase::finished,
 			this, &UpdateEngine::watcherReady);
@@ -64,14 +66,47 @@ bool UpdateEngine::testAbort() const
 
 void UpdateEngine::updateInstallMax(int max)
 {
+	this->installProgressMax = max;
+	this->installProgressBuffer = 0;
 	QMetaObject::invokeMethod(this, "beginInstallProgress", Qt::QueuedConnection,
 							  Q_ARG(int, max));
 }
 
 void UpdateEngine::updateInstallValue(int value)
 {
-	QMetaObject::invokeMethod(this, "updateInstallProgress", Qt::QueuedConnection,
-							  Q_ARG(int, value));
+	int val = 1000 * value / this->installProgressMax;
+	if(val > this->installProgressBuffer) {
+		this->installProgressBuffer = val;
+		QMetaObject::invokeMethod(this, "updateInstallProgress", Qt::QueuedConnection,
+								  Q_ARG(int, val));
+	}
+}
+
+UpdateEngineCore::UniMatrix UpdateEngine::readDownload(const QByteArray &data, QChar seperator, int columns)
+{
+	UniMatrix codeMatrix;
+	QTextStream stream(data);
+	while(!stream.atEnd()) {
+		QString lineString = stream.readLine();
+		if(lineString.isEmpty() || lineString.startsWith(QLatin1Char('#')))
+		   continue;
+		QStringList line = lineString.split(seperator);
+		if(line.size() >= columns)
+			codeMatrix += line;
+	}
+	return codeMatrix;
+}
+
+UpdateEngineCore::UniMatrix UpdateEngine::readDownload(const QByteArray &data, const QRegularExpression &regex)
+{
+	UniMatrix codeMatrix;
+	QTextStream stream(data);
+	while(!stream.atEnd()) {
+		QRegularExpressionMatch match = regex.match(stream.readLine());
+		if(match.hasMatch())
+			codeMatrix += match.capturedTexts();
+	}
+	return codeMatrix;
 }
 
 void UpdateEngine::addTask(UpdateTask *task)

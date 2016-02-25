@@ -1,6 +1,5 @@
 #include "createdbstructuretask.h"
 #include <QFile>
-#include <QSqlQuery>
 #include "global.h"
 
 QString CreateDBStructureTask::installText() const

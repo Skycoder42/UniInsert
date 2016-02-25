@@ -20,6 +20,8 @@ public:
 	bool testAbort() const Q_DECL_OVERRIDE;
 	void updateInstallMax(int max) Q_DECL_OVERRIDE;
 	void updateInstallValue(int value) Q_DECL_OVERRIDE;
+	UniMatrix readDownload(const QByteArray &data, QChar seperator, int columns) Q_DECL_OVERRIDE;
+	UniMatrix readDownload(const QByteArray &data, const QRegularExpression &regex) Q_DECL_OVERRIDE;
 
 public slots:
 	void addTask(UpdateTask *task);
@@ -86,6 +88,8 @@ private:
 	bool didAbortInstall;
 
 	QFutureWatcher<bool> *watcher;
+	int installProgressMax;
+	int installProgressBuffer;
 };
 
 #endif // UPDATEENGINE_H

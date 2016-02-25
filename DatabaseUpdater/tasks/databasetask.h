@@ -3,6 +3,7 @@
 
 #include "updatetask.h"
 #include <QSqlDatabase>
+#include <QSqlQuery>
 
 class DatabaseTask : public UpdateTask
 {
@@ -25,5 +26,11 @@ public:
 	// UpdateTask interface
 	bool run() Q_DECL_OVERRIDE;
 };
+
+#define TRY_EXEC(query)  \
+	if(!query.exec()) {\
+		this->error(query);\
+		return false;\
+	}
 
 #endif // DATABASETASK_H

@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QWinTaskbarButton>
 #include <qprogressgroup.h>
-#include "updateengine.h"
+class UpdateEngine;
 
 namespace Ui {
 class UpdaterWindow;
