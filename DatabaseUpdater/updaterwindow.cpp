@@ -13,6 +13,7 @@
 #include "tasks/createblockstask.h"
 #include "tasks/readnameindextask.h"
 #include "tasks/readaliasestask.h"
+#include "tasks/transferrecenttask.h"
 
 UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	QWidget(parent, Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::MSWindowsFixedSizeDialogHint),
@@ -83,16 +84,21 @@ void UpdaterWindow::initialize()
 {
 	this->ui->titleLabel->setText(this->ui->titleLabel->text().arg(ARG_UPDATE_VERSION));
 
+	UpdateFlags flags = ARG_UPDATE_MODE;
+
 	this->engine->addTask(new CreateDBStructureTask());
 	this->engine->addTask(new EmojiGroupScanTask());
 	this->engine->addTask(new CreateSymbolsTask());
 	this->engine->addTask(new CreateBlocksTask());
 	this->engine->addTask(new ReadNameIndexTask());
 	this->engine->addTask(new ReadAliasesTask());
+	if(flags.testFlag(RecentlyUsed))
+		this->engine->addTask(new TransferRecentTask());
 }
 
 void UpdaterWindow::error(const QString &error)
 {
+	this->mainProgress->setBarState(QProgressGroup::Stopped);
 	DialogMaster::critical(this, error);
 	qApp->exit(EXIT_FAILURE);
 }
@@ -110,19 +116,35 @@ void UpdaterWindow::engineDone()
 	this->ui->currentDownloadProgressBar->setValue(1);
 	this->ui->currentInstallProgressBar->setRange(0, 1);
 	this->ui->currentInstallProgressBar->setValue(1);
+	this->ui->currentInstallProgressBar->setTextVisible(true);
 
 	bool checked = true;
-	DialogMaster::msgBox(this,
-						 QMessageBox::Information,
-						 tr("The Unicode database update to Version %1 finished successfully.\n\n"
-							"Open the details to check for errors while transferring data from the "
-							"old database.").arg(ARG_UPDATE_VERSION),
-						 tr("Database update completed!"),
-						 tr("Finished!"),
-						 this->softErrorList.join(QLatin1Char('\n')),
-						 &checked,
-						 tr("Start Unicode Utility"));
-	qDebug() << checked;//TODO
+	QMessageBox::StandardButton btn = QMessageBox::NoButton;
+	if(this->softErrorList.isEmpty()) {
+		btn = DialogMaster::msgBox(this,
+								   QMessageBox::Information,
+								   tr("The Unicode database update to Version %1 finished successfully.")
+								   .arg(ARG_UPDATE_VERSION),
+								   tr("Database update completed!"),
+								   tr("Finished!"),
+								   QString(),
+								   &checked,
+								   tr("Start Unicode Utility"));
+	} else {
+		this->mainProgress->setBarState(QProgressGroup::Paused);
+		btn = DialogMaster::msgBox(this,
+								   QMessageBox::Warning,
+								   tr("<p>The Unicode database update to Version %1 finished successfully.</p>"
+									  "<p><b>Warning:</b> Some recently used symbols or emojis could not be transfered "
+									  "to the new database. Press &lt;Details&gt; for more information.</p>")
+								   .arg(ARG_UPDATE_VERSION),
+								   tr("Database update completed (with errors)!"),
+								   tr("Finished!"),
+								   this->softErrorList.join(QLatin1Char('\n')),
+								   &checked,
+								   tr("Start Unicode Utility"));
+	}
+	qDebug() << btn << checked;//TODO
 	qApp->quit();
 }
 
@@ -154,6 +176,7 @@ void UpdaterWindow::beginInstall(const QString &text)
 {
 	this->ui->currentInstallProgressBar->setRange(0, 0);
 	this->ui->currentInstallProgressBar->setValue(0);
+	this->ui->currentInstallProgressBar->setTextVisible(true);
 	this->ui->updateLabel->setText(text + tr("…"));
 }
 
@@ -161,12 +184,14 @@ void UpdaterWindow::installDone()
 {
 	this->mainProgress->setValue(this->mainProgress->value() + 1);
 	this->ui->currentInstallProgressBar->setRange(0, 1);
-	this->ui->currentInstallProgressBar->setValue(0);
+	this->ui->currentInstallProgressBar->setValue(-1);
+	this->ui->currentInstallProgressBar->setTextVisible(false);
 	this->ui->updateLabel->setText(tr("Waiting for the next component to finish downloading…"));
 }
 
 void UpdaterWindow::on_buttonBox_rejected()
 {
+	this->mainProgress->setBarState(QProgressGroup::Paused);
 	if(DialogMaster::warning(this,
 							 tr("Do you really want to abort the database update?\n"
 								"The unicode database will be in the state it was before the update was started"),
@@ -181,5 +206,6 @@ void UpdaterWindow::on_buttonBox_rejected()
 		this->ui->buttonBox->setEnabled(false);
 		this->setCursor(Qt::WaitCursor);
 		this->engine->abort();
-	}
+	} else
+		this->mainProgress->setBarState(QProgressGroup::Active);
 }

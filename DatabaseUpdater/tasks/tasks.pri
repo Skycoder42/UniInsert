@@ -5,7 +5,8 @@ HEADERS += \
     $$PWD/createsymbolstask.h \
     $$PWD/createblockstask.h \
     $$PWD/readnameindextask.h \
-    $$PWD/readaliasestask.h
+    $$PWD/readaliasestask.h \
+    $$PWD/transferrecenttask.h
 
 SOURCES += \
     $$PWD/emojigroupscantask.cpp \
@@ -14,4 +15,5 @@ SOURCES += \
     $$PWD/createsymbolstask.cpp \
     $$PWD/createblockstask.cpp \
     $$PWD/readnameindextask.cpp \
-    $$PWD/readaliasestask.cpp
+    $$PWD/readaliasestask.cpp \
+    $$PWD/transferrecenttask.cpp
