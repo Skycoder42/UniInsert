@@ -15,7 +15,8 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	updater(new DatabaseUpdater(this)),
 	installMax(0),
 	downloaderAborted(false),
-	installerAborted(false)
+	installerAborted(false),
+	softErrorList()
 {
 	ui->setupUi(this);
 	this->adjustSize();
@@ -32,6 +33,8 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 			this, &UpdaterWindow::updateDownloadProgress);
 	connect(this->downloader, &BaseDownloader::error,
 			this, &UpdaterWindow::error);
+	connect(this->downloader, &BaseDownloader::emojiCountLoaded,
+			this, &UpdaterWindow::emojiLoaded);
 	connect(this->downloader, &BaseDownloader::abortDone,
 			this, &UpdaterWindow::abortDownloaderDone);
 
@@ -85,11 +88,13 @@ void UpdaterWindow::initialize()
 
 void UpdaterWindow::error(const QString &error, bool critical)
 {
-	DialogMaster::msgBox(this,
-						 critical ? QMessageBox::Critical : QMessageBox::Warning,
-						 error);
-	if(critical)
+	if(critical) {
+		DialogMaster::msgBox(this,
+							 critical ? QMessageBox::Critical : QMessageBox::Warning,
+							 error);
 		qApp->exit(EXIT_FAILURE);
+	} else
+		this->softErrorList += error;
 }
 
 void UpdaterWindow::beginDownload(const QUrl &url)
@@ -109,6 +114,13 @@ void UpdaterWindow::updateDownloadProgress(qint64 value, qint64 max)
 {
 	this->ui->currentDownloadProgressBar->setMaximum(max);
 	this->ui->currentDownloadProgressBar->setValue(value);
+}
+
+void UpdaterWindow::emojiLoaded(int delta)
+{
+	this->ui->allDownloadProgressBar->setMaximum(this->ui->allDownloadProgressBar->maximum() + delta);
+	this->installMax += delta;
+	this->mainProgress->setMaximum(this->installMax);
 }
 
 void UpdaterWindow::abortDownloaderDone()
@@ -150,16 +162,19 @@ void UpdaterWindow::abortInstallDone()
 void UpdaterWindow::completeInstall()
 {
 	this->ui->downloadLabel->setText(tr("Database update completed!"));
-	QString path = ARG_LOCAL_DB_PATH;
-
-	if(!QFile::exists(path) || QFile::remove(path)) {
-		if(QFile::rename(path + QStringLiteral(".update"), path)) {
-			DialogMaster::information(this, tr("Database update completed!"));//TODO
-			qApp->quit();
-		} else
-			this->error(tr("Failed to rename update to real database!"), true);
-	} else
-		this->error(tr("Failed to delete old database!"), true);
+	bool checked = true;
+	DialogMaster::msgBox(this,
+						 QMessageBox::Information,
+						 tr("The Unicode database update to Version %1 finished successfully.\n"
+							"Open the details to check for errors while transferring data from the "
+							"old database."),
+						 tr("Database update completed!"),
+						 tr("Finished!"),
+						 this->softErrorList.join(QLatin1Char('\n')),
+						 &checked,
+						 tr("Start Unicode Utility"));
+	qDebug() << checked;
+	qApp->quit();
 }
 
 void UpdaterWindow::on_buttonBox_rejected()

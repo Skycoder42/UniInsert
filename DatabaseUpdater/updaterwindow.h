@@ -40,6 +40,7 @@ private slots:
 	void beginDownload(const QUrl &url);
 	void downloadReady(const QByteArray &);
 	void updateDownloadProgress(qint64 value, qint64 max);
+	void emojiLoaded(int delta);
 	void abortDownloaderDone();
 
 	void beginInstall(const QString &text, int max);
@@ -61,6 +62,8 @@ private:
 	int installMax;
 	bool downloaderAborted;
 	bool installerAborted;
+
+	QStringList softErrorList;
 };
 
 #endif // UPDATERWINDOW_H

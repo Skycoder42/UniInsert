@@ -42,6 +42,10 @@ private slots:
 
 	void installAliases(const QByteArray &downloadData);
 
+	void transferRecent();
+
+	void completeUpdate();
+
 	UniMatrix readDownload(const QByteArray &data, QChar seperator, int columns);
 	UniMatrix readDownload(const QByteArray &data, const QRegularExpression &regex);
 

@@ -91,6 +91,7 @@ void BaseDownloader::emoReplyReady()
 	if(this->currentReply && this->currentReply->error() == QNetworkReply::NoError) {
 		Q_ASSERT(this->currentReply);
 		QList<QUrl> emojiSubs = this->parseEmojiSide(this->currentReply->readAll());
+		emit downloadReady(QByteArray());
 		this->currentReply->deleteLater();
 		this->currentReply = Q_NULLPTR;
 		if(!emojiSubs.isEmpty()) {

@@ -8,13 +8,12 @@
 #include <QRegularExpressionMatch>
 #include "global.h"
 
-static QRegularExpression groupMatchRegex(QStringLiteral(R"__(^\<(.+),\s*(First|Last)\s*\>$)__"));
-
 #define TRY_EXEC(query)  \
 	if(!query.exec()) {\
 		emit error(query.lastError().text(), true);\
 		return;\
 	}
+
 #define COMMIT_FINISH \
 	if(this->newDB.commit())\
 		emit installReady();\
@@ -27,7 +26,7 @@ DatabaseUpdater::DatabaseUpdater(QObject *parent) :
 	QObject(Q_NULLPTR),
 	newDB(),
 	abortRequested(false),
-	nextFunc(0)
+	nextFunc(ARG_UPDATE_MODE.testFlag(UpdaterWindow::Emojis) ? 0 : 1)
 {
 	QThread *runThread = new QThread(parent);
 
@@ -53,7 +52,11 @@ DatabaseUpdater::~DatabaseUpdater()
 
 int DatabaseUpdater::getInstallCount() const
 {
-	return 5;
+	int count = 7;
+	UpdaterWindow::UpdateFlags flags = ARG_UPDATE_MODE;
+	if(flags.testFlag(UpdaterWindow::RecentlyUsed))
+		count += 1;
+	return count;
 }
 
 void DatabaseUpdater::startInstalling()
@@ -112,15 +115,17 @@ void DatabaseUpdater::handleDownload(const QByteArray &downloadData)
 	if(!this->abortRequested) {
 		switch (this->nextFunc++) {
 		case 0:
+			break;//emoji -> do nothing
+		case 1:
 			this->installCodeData(downloadData);
 			break;
-		case 1:
+		case 2:
 			this->installBlocks(downloadData);
 			break;
-		case 2:
+		case 3:
 			this->installNameIndex(downloadData);
 			break;
-		case 3:
+		case 4:
 			this->installAliases(downloadData);
 			break;
 		default:
@@ -340,9 +345,37 @@ void DatabaseUpdater::installAliases(const QByteArray &downloadData)
 
 	COMMIT_FINISH
 
-	this->newDB.close();
+	if(ARG_UPDATE_MODE.testFlag(UpdaterWindow::RecentlyUsed))
+		this->transferRecent();
+	else
+		this->completeUpdate();
+}
+
+void DatabaseUpdater::transferRecent()
+{
+	emit installReady();
+
+	this->completeUpdate();
+}
+
+void DatabaseUpdater::completeUpdate()
+{
+	emit beginInstall(tr("Completing update"), 0);
+
+	if(this->newDB.isOpen())
+		this->newDB.close();
 	this->newDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
+	QSqlDatabase::removeDatabase(QStringLiteral("oldDB"));
+	QString path = ARG_LOCAL_DB_PATH;
+
+	if(!QFile::exists(path) || QFile::remove(path)) {
+		if(QFile::rename(path + QStringLiteral(".update"), path))
+			emit installReady();
+		else
+			emit error(tr("Failed to rename update to real database!"), true);
+	} else
+		emit error(tr("Failed to delete old database!"), true);
 }
 
 DatabaseUpdater::UniMatrix DatabaseUpdater::readDownload(const QByteArray &data, QChar seperator, int columns)
@@ -374,11 +407,11 @@ DatabaseUpdater::UniMatrix DatabaseUpdater::readDownload(const QByteArray &data,
 
 void DatabaseUpdater::doAbort()
 {
-	if(this->newDB.isOpen()) {
+	if(this->newDB.isOpen())
 		this->newDB.close();
-		this->newDB = QSqlDatabase();
-		QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
-	}
+	this->newDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
+	QSqlDatabase::removeDatabase(QStringLiteral("oldDB"));
 	QFile::remove(ARG_LOCAL_DB_PATH + QStringLiteral(".update"));
 	emit abortDone();
 }
