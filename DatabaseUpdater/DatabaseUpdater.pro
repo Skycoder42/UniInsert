@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network
+QT       += core gui sql network concurrent
 CONFIG += C++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -36,14 +36,21 @@ include(C:/C++Libraries/Qt/DialogMaster/dialogmaster.pri)
 SOURCES += main.cpp\
         updaterwindow.cpp \
     basedownloader.cpp \
-    databaseupdater.cpp
+    databaseupdater.cpp \
+    updatetask.cpp \
+    updateengine.cpp
 
 HEADERS  += updaterwindow.h \
     global.h \
     basedownloader.h \
-    databaseupdater.h
+    databaseupdater.h \
+    updatetask.h \
+    updateengine.h \
+    updateenginecore.h
 
 FORMS    += updaterwindow.ui
 
 RESOURCES += \
     databaseupdater_res.qrc
+
+include(./tasks/tasks.pri)
