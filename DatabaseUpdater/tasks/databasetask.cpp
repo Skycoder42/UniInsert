@@ -7,6 +7,21 @@ void DatabaseTask::error(const QSqlQuery &query)
 	this->engine->failure(query.lastError().text());
 }
 
+uint DatabaseTask::symbolMax(QSqlDatabase &newDB)
+{
+	QSqlQuery query(newDB);
+	query.prepare(QStringLiteral("SELECT Code FROM Symbols ORDER BY Code DESC LIMIT 0, 1"));
+	if(query.exec()) {
+		if(query.first())
+			return query.value(0).toUInt();
+		else
+			return 0;
+	} else {
+		this->error(query);
+		return -1;
+	}
+}
+
 bool DatabaseTask::run()
 {
 	QSqlDatabase newDB = QSqlDatabase::database(UpdateEngineCore::newDB);
@@ -36,6 +51,21 @@ bool DatabaseTask::run()
 void DatabaseTransferTask::error(const QSqlQuery &query)
 {
 	this->engine->failure(query.lastError().text());
+}
+
+uint DatabaseTransferTask::symbolMax(QSqlDatabase &newDB)
+{
+	QSqlQuery query(newDB);
+	query.prepare(QStringLiteral("SELECT Code FROM Symbols ORDER BY Code DESC LIMIT 0, 1"));
+	if(query.exec()) {
+		if(query.first())
+			return query.value(0).toUInt();
+		else
+			return 0;
+	} else {
+		this->error(query);
+		return -1;
+	}
 }
 
 bool DatabaseTransferTask::run()

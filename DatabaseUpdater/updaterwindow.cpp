@@ -10,6 +10,7 @@
 #include "tasks/emojigroupscantask.h"
 #include "tasks/createdbstructuretask.h"
 #include "tasks/createsymbolstask.h"
+#include "tasks/createblockstask.h"
 
 UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	QWidget(parent, Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint | Qt::MSWindowsFixedSizeDialogHint),
@@ -83,6 +84,7 @@ void UpdaterWindow::initialize()
 	this->engine->addTask(new CreateDBStructureTask());
 	this->engine->addTask(new EmojiGroupScanTask());
 	this->engine->addTask(new CreateSymbolsTask());
+	this->engine->addTask(new CreateBlocksTask());
 }
 
 void UpdaterWindow::error(const QString &error)
@@ -128,7 +130,6 @@ void UpdaterWindow::beginDownload(const QString &text)
 
 void UpdaterWindow::updateDownloadProgress(qint64 value, qint64 max)
 {
-	//TODO
 	this->ui->currentDownloadProgressBar->setMaximum(max);
 	this->ui->currentDownloadProgressBar->setValue(value);
 }
@@ -147,14 +148,16 @@ void UpdaterWindow::installMaxChanged(int newMax)
 
 void UpdaterWindow::beginInstall(const QString &text)
 {
+	this->ui->currentInstallProgressBar->setRange(0, 0);
 	this->ui->currentInstallProgressBar->setValue(0);
-	this->ui->currentInstallProgressBar->setMaximum(0);
 	this->ui->updateLabel->setText(text + tr("…"));
 }
 
 void UpdaterWindow::installDone()
 {
 	this->mainProgress->setValue(this->mainProgress->value() + 1);
+	this->ui->currentInstallProgressBar->setRange(0, 1);
+	this->ui->currentInstallProgressBar->setValue(0);
 	this->ui->updateLabel->setText(tr("Waiting for the next component to finish downloading…"));
 }
 

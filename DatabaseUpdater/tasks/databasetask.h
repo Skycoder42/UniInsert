@@ -11,6 +11,7 @@ public:
 	virtual bool execute(QSqlDatabase &newDB) = 0;
 
 	void error(const QSqlQuery &query);
+	uint symbolMax(QSqlDatabase &newDB);
 
 	// UpdateTask interface
 	bool run() Q_DECL_OVERRIDE;
@@ -22,6 +23,7 @@ public:
 	virtual bool execute(QSqlDatabase &newDB, QSqlDatabase &oldDB) = 0;
 
 	void error(const QSqlQuery &query);
+	uint symbolMax(QSqlDatabase &newDB);
 
 	// UpdateTask interface
 	bool run() Q_DECL_OVERRIDE;
