@@ -8,6 +8,12 @@
 #include <QRegularExpressionMatch>
 #include "global.h"
 
+#define TRY_OPEN(db) \
+	if(!db.open() || !db.isValid()) {\
+		emit error(db.lastError().text(), true);\
+		return;\
+	}
+
 #define TRY_EXEC(query)  \
 	if(!query.exec()) {\
 		emit error(query.lastError().text(), true);\
@@ -72,13 +78,12 @@ void DatabaseUpdater::startInstalling()
 	QString path = ARG_LOCAL_DB_PATH + QStringLiteral(".update");
 	QFile::remove(path);
 
-	this->newDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"),
-											QStringLiteral("newDB"));
+	this->newDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), QStringLiteral("newDB"));
 	this->newDB.setDatabaseName(path);
-	if(!this->newDB.open() || !this->newDB.isValid()) {
-		emit error(this->newDB.lastError().text(), true);
-		return;
-	}
+	TRY_OPEN(this->newDB)
+
+	QSqlDatabase oldDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), QStringLiteral("oldDB"));
+	oldDB.setDatabaseName(ARG_LOCAL_DB_PATH);
 
 	this->newDB.exec(QStringLiteral("PRAGMA foreign_keys = ON"));
 	this->newDB.transaction();
@@ -353,9 +358,33 @@ void DatabaseUpdater::installAliases(const QByteArray &downloadData)
 
 void DatabaseUpdater::transferRecent()
 {
-	emit installReady();
+	emit beginInstall(tr("Transfering recently used elements from the old database"), 0);
+	this->newDB.transaction();
 
-	this->completeUpdate();
+	QSqlDatabase oldDB = QSqlDatabase::database(QStringLiteral("oldDB"));
+	TRY_OPEN(oldDB)
+
+	QSqlQuery recentQuery(oldDB);
+	recentQuery.prepare(QStringLiteral("SELECT Code, SymCount FROM Recent"));
+	TRY_EXEC(recentQuery)
+
+	while(recentQuery.next()) {
+		QSqlQuery transferQuery(this->newDB);
+		uint code = recentQuery.value(0).toUInt();
+		transferQuery.prepare(QStringLiteral("INSERT INTO Recent (Code, SymCount) VALUES(:code, :num)"));
+		transferQuery.bindValue(QStringLiteral(":code"), code);
+		transferQuery.bindValue(QStringLiteral(":num"), recentQuery.value(1).toInt());
+		if(!transferQuery.exec()) {
+			emit error(tr("Recently used Symbol U+%1 cannot be transfered!")
+					   .arg(code, 4, 16, QChar('0')),
+					   false);
+		}
+	}
+
+	oldDB.close();
+	COMMIT_FINISH
+
+	QMetaObject::invokeMethod(this, "completeUpdate", Qt::QueuedConnection);
 }
 
 void DatabaseUpdater::completeUpdate()
@@ -366,9 +395,14 @@ void DatabaseUpdater::completeUpdate()
 		this->newDB.close();
 	this->newDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(QStringLiteral("newDB"));
-	QSqlDatabase::removeDatabase(QStringLiteral("oldDB"));
-	QString path = ARG_LOCAL_DB_PATH;
 
+	QSqlDatabase oldDB = QSqlDatabase::database(QStringLiteral("oldDB"));
+	if(oldDB.isOpen())
+		oldDB.close();
+	oldDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(QStringLiteral("oldDB"));
+
+	QString path = ARG_LOCAL_DB_PATH;
 	if(!QFile::exists(path) || QFile::remove(path)) {
 		if(QFile::rename(path + QStringLiteral(".update"), path))
 			emit installReady();

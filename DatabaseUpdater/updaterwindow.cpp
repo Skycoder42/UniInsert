@@ -165,9 +165,9 @@ void UpdaterWindow::completeInstall()
 	bool checked = true;
 	DialogMaster::msgBox(this,
 						 QMessageBox::Information,
-						 tr("The Unicode database update to Version %1 finished successfully.\n"
+						 tr("The Unicode database update to Version %1 finished successfully.\n\n"
 							"Open the details to check for errors while transferring data from the "
-							"old database."),
+							"old database.").arg(ARG_UPDATE_VERSION),
 						 tr("Database update completed!"),
 						 tr("Finished!"),
 						 this->softErrorList.join(QLatin1Char('\n')),
