@@ -8,6 +8,10 @@
 #include <QRegularExpressionMatch>
 #include "global.h"
 
+#define CHECK_ABORT \
+	if(this->abortRequested)\
+		return;
+
 #define TRY_OPEN(db) \
 	if(!db.open() || !db.isValid()) {\
 		emit error(db.lastError().text(), true);\
@@ -21,11 +25,15 @@
 	}
 
 #define COMMIT_FINISH \
-	if(this->newDB.commit())\
-		emit installReady();\
-	else {\
-		emit error(this->newDB.lastError().text(), true);\
+	if(this->abortRequested)\
 		return;\
+	else {\
+		if(this->newDB.commit())\
+			emit installReady();\
+		else {\
+			emit error(this->newDB.lastError().text(), true);\
+			return;\
+		}\
 	}
 
 DatabaseUpdater::DatabaseUpdater(QObject *parent) :
@@ -63,7 +71,7 @@ int DatabaseUpdater::getInstallCount() const
 	if(flags.testFlag(UpdaterWindow::RecentlyUsed))
 		count += 1;
 	if(!flags.testFlag(UpdaterWindow::Emojis))
-		count += 2;//TODO
+		count += 2;
 	return count;
 }
 
@@ -161,8 +169,7 @@ void DatabaseUpdater::installCodeData(const QByteArray &downloadData)
 	uint counter = 0;
 	uint buffer = 0;
 	for(QStringList line : codeMatrix) {
-		if(this->abortRequested)
-			return;
+		CHECK_ABORT
 		uint code = line.first().toUInt(&ok, 16);
 		if(!ok) {
 			emit error(tr("Invalid UnicodeData.txt file! (Download corrupted?)"), true);
@@ -170,8 +177,7 @@ void DatabaseUpdater::installCodeData(const QByteArray &downloadData)
 		}
 
 		for(; counter < code; counter++) {
-			if(this->abortRequested)
-				return;
+			CHECK_ABORT
 			QSqlQuery insertUnnamedSymbolQuery(this->newDB);
 			insertUnnamedSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
 			insertUnnamedSymbolQuery.bindValue(QStringLiteral(":code"), counter);
@@ -248,6 +254,7 @@ void DatabaseUpdater::installBlocks(const QByteArray &downloadData)
 
 	uint buffer = 0;
 	for(uint i = 0, max = blockMatrix.size(); i < max; ++i) {
+		CHECK_ABORT
 		const QStringList &list = blockMatrix[i];
 		uint start = list[1].toUInt(Q_NULLPTR, 16);
 		uint end = list[2].toUInt(Q_NULLPTR, 16);
@@ -280,6 +287,7 @@ void DatabaseUpdater::adjustMax(uint newMax)
 		this->newDB.transaction();
 
 		for(uint i = 1; i <= delta; ++i) {
+			CHECK_ABORT
 			QSqlQuery insertUnnamedSymbolQuery(this->newDB);
 			insertUnnamedSymbolQuery.prepare(QStringLiteral("INSERT INTO Symbols (Code) VALUES(:code)"));
 			insertUnnamedSymbolQuery.bindValue(QStringLiteral(":code"), this->symbolMax + i);
@@ -304,6 +312,7 @@ void DatabaseUpdater::installNameIndex(const QByteArray &downloadData)
 
 	uint buffer = 0;
 	for(uint i = 0, max = nameMatrix.size(); i < max; ++i) {
+		CHECK_ABORT
 		const QStringList &list = nameMatrix[i];
 		bool ok = false;
 		uint code = list[1].toUInt(&ok, 16);
@@ -336,6 +345,7 @@ void DatabaseUpdater::installAliases(const QByteArray &downloadData)
 
 	uint buffer = 0;
 	for(uint i = 0, max = aliasMatrix.size(); i < max; ++i) {
+		CHECK_ABORT
 		const QStringList &list = aliasMatrix[i];
 		bool ok = false;
 		uint code = list[0].toUInt(&ok, 16);
@@ -355,7 +365,7 @@ void DatabaseUpdater::installAliases(const QByteArray &downloadData)
 	if(ARG_UPDATE_MODE.testFlag(UpdaterWindow::RecentlyUsed))
 		this->transferRecent();
 	else
-		this->completeUpdate();
+		this->transferEmojiGroups();
 }
 
 void DatabaseUpdater::transferRecent()
@@ -369,10 +379,9 @@ void DatabaseUpdater::transferRecent()
 	QSqlQuery recentQuery(oldDB);
 	recentQuery.prepare(QStringLiteral("SELECT Code, SymCount FROM Recent"));
 	TRY_EXEC(recentQuery)
-//TODO
-	emit error(tr("Recently used Symbol U+0042 could not be transfered!"), false);
 
 	while(recentQuery.next()) {
+		CHECK_ABORT
 		QSqlQuery transferQuery(this->newDB);
 		uint code = recentQuery.value(0).toUInt();
 		transferQuery.prepare(QStringLiteral("INSERT INTO Recent (Code, SymCount) VALUES(:code, :num)"));
@@ -410,6 +419,7 @@ void DatabaseUpdater::transferEmojiGroups()
 
 	QHash<int, int> groupIDMapping;
 	while(loadGroupsQuery.next()) {
+		CHECK_ABORT
 		QSqlQuery transferQuery(this->newDB);
 		transferQuery.prepare(QStringLiteral("INSERT INTO EmojiGroups (Name, SortHint) VALUES(:name, :hint)"));
 		transferQuery.bindValue(QStringLiteral(":name"), loadGroupsQuery.value(1));
@@ -435,6 +445,7 @@ void DatabaseUpdater::transferEmojiMapping(QSqlDatabase &oldDB, const QHash<int,
 	TRY_EXEC(mappingQuery)
 
 	while(mappingQuery.next()) {
+		CHECK_ABORT
 		QSqlQuery transferQuery(this->newDB);
 		uint code = mappingQuery.value(1).toUInt();
 		transferQuery.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID, SortHint) VALUES(:group, :emoji, :hint)"));
@@ -455,6 +466,7 @@ void DatabaseUpdater::transferEmojiMapping(QSqlDatabase &oldDB, const QHash<int,
 
 void DatabaseUpdater::completeUpdate()
 {
+	CHECK_ABORT
 	emit beginInstall(tr("Completing update"), 0);
 
 	if(this->newDB.isOpen())
