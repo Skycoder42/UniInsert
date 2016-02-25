@@ -7,10 +7,17 @@ QString TransferRecentTask::installText() const
 
 bool TransferRecentTask::execute(QSqlDatabase &newDB, QSqlDatabase &oldDB)
 {
+	QSqlQuery countRecentQuery(oldDB);
+	countRecentQuery.prepare(QStringLiteral("SELECT COUNT(*) FROM Recent"));
+	TRY_EXEC(countRecentQuery)
+	if(countRecentQuery.first())
+		this->engine->updateInstallMax(countRecentQuery.value(0).toInt());
+
 	QSqlQuery recentQuery(oldDB);
 	recentQuery.prepare(QStringLiteral("SELECT Code, SymCount FROM Recent"));
 	TRY_EXEC(recentQuery)
 
+	int prog = 0;
 	while(recentQuery.next()) {
 		CHECK_ABORT
 		QSqlQuery transferQuery(newDB);
@@ -23,6 +30,8 @@ bool TransferRecentTask::execute(QSqlDatabase &newDB, QSqlDatabase &oldDB)
 			this->engine->logError(UpdateEngineCore::tr("Recently used Symbol %1 could not be transfered!")
 								   .arg(symbolCode.toUpper()));
 		}
+
+		this->engine->updateInstallValue(++prog);
 	}
 
 	return true;
