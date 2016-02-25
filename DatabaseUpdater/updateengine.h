@@ -18,6 +18,8 @@ public:
 	void failure(const QString &error) Q_DECL_OVERRIDE;
 	void logError(const QString &error) Q_DECL_OVERRIDE;
 	bool testAbort() const Q_DECL_OVERRIDE;
+	void updateInstallMax(int max) Q_DECL_OVERRIDE;
+	void updateInstallValue(int value) Q_DECL_OVERRIDE;
 
 public slots:
 	void addTask(UpdateTask *task);
@@ -30,6 +32,7 @@ signals:
 	void log(const QString &error);
 
 	void abortDone();
+	void engineDone();
 
 	//download
 	void downloadMaxChanged(int newMax);
@@ -40,7 +43,7 @@ signals:
 	//install
 	void installMaxChanged(int newMax);
 	void beginInstall(const QString &text);
-	void beginInstallProgress();
+	void beginInstallProgress(int maximum);
 	void updateInstallProgress(int value);
 	void installDone();
 

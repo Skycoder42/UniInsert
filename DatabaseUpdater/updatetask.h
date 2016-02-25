@@ -10,6 +10,7 @@ class UpdateTask
 
 public:
 	UpdateTask();
+	virtual ~UpdateTask();
 
 	virtual QUrl downloadUrl() const;
 	virtual QString downloadText() const;

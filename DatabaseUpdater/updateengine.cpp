@@ -2,6 +2,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QtConcurrent>
+#include <QSqlDatabase>
 #include <QSqlError>
 #include "global.h"
 
@@ -24,6 +25,7 @@ public:
 
 UpdateEngine::UpdateEngine(QObject *parent) :
 	QObject(parent),
+	abortRequested(false),
 	downloadMax(0),
 	downloads(),
 	currentDownload(Q_NULLPTR),
@@ -57,6 +59,18 @@ void UpdateEngine::logError(const QString &error)
 bool UpdateEngine::testAbort() const
 {
 	return this->abortRequested;
+}
+
+void UpdateEngine::updateInstallMax(int max)
+{
+	QMetaObject::invokeMethod(this, "beginInstallProgress", Qt::QueuedConnection,
+							  Q_ARG(int, max));
+}
+
+void UpdateEngine::updateInstallValue(int value)
+{
+	QMetaObject::invokeMethod(this, "updateInstallProgress", Qt::QueuedConnection,
+							  Q_ARG(int, value));
 }
 
 void UpdateEngine::addTask(UpdateTask *task)
@@ -188,7 +202,26 @@ void UpdateEngine::watcherReady()
 
 void UpdateEngine::completeInstall()
 {
+	QSqlDatabase newDB = QSqlDatabase::database(UpdateEngineCore::newDB);
+	if(newDB.isOpen())
+		newDB.close();
+	newDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(UpdateEngineCore::newDB);
 
+	QSqlDatabase oldDB = QSqlDatabase::database(UpdateEngineCore::oldDB);
+	if(oldDB.isOpen())
+		oldDB.close();
+	oldDB = QSqlDatabase();
+	QSqlDatabase::removeDatabase(UpdateEngineCore::oldDB);
+
+	QString path = ARG_LOCAL_DB_PATH;
+	if(!QFile::exists(path) || QFile::remove(path)) {
+		if(QFile::rename(path + QStringLiteral(".update"), path))
+			emit engineDone();
+		else
+			emit error(tr("Failed to rename update to real database!"));
+	} else
+		emit error(tr("Failed to delete old database!"));
 }
 
 void UpdateEngine::tryAbortReady()

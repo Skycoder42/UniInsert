@@ -4,8 +4,7 @@
 #include <QWidget>
 #include <QWinTaskbarButton>
 #include <qprogressgroup.h>
-#include "basedownloader.h"
-#include "databaseupdater.h"
+#include "updateengine.h"
 
 namespace Ui {
 class UpdaterWindow;
@@ -35,20 +34,21 @@ protected:
 private slots:
 	void initialize();
 
-	void error(const QString &error, bool critical);
+	//general
+	void error(const QString &error);
+	void log(const QString &error);
 
-	void beginDownload(const QUrl &url);
-	void downloadReady(const QByteArray &);
+	void engineDone();
+
+	//download
+	void beginDownload(const QString &text);
 	void updateDownloadProgress(qint64 value, qint64 max);
-	void emojiLoaded(int delta);
-	void abortDownloaderDone();
+	void downloadDone();
 
-	void beginInstall(const QString &text, int max);
-	void installReady();
-	void updateInstallProgress(int value);
-	void abortInstallDone();
-
-	void completeInstall();
+	//install
+	void installMaxChanged(int newMax);
+	void beginInstall(const QString &text);
+	void installDone();
 
 	void on_buttonBox_rejected();
 
@@ -57,8 +57,8 @@ private:
 	QProgressGroup *mainProgress;
 	QWinTaskbarButton *taskButton;
 
-	BaseDownloader *downloader;
-	DatabaseUpdater *updater;
+	UpdateEngine *engine;
+
 	int installMax;
 	bool downloaderAborted;
 	bool installerAborted;

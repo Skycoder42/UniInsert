@@ -5,6 +5,9 @@ UpdateTask::UpdateTask() :
 	downloadData()
 {}
 
+UpdateTask::~UpdateTask()
+{}
+
 QUrl UpdateTask::downloadUrl() const
 {
 	return QUrl();
