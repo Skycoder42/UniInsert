@@ -375,7 +375,7 @@ void DatabaseUpdater::transferRecent()
 		transferQuery.bindValue(QStringLiteral(":code"), code);
 		transferQuery.bindValue(QStringLiteral(":num"), recentQuery.value(1).toInt());
 		if(!transferQuery.exec()) {
-			emit error(tr("Recently used Symbol U+%1 cannot be transfered!")
+			emit error(tr("Recently used Symbol U+%1 could not be transfered!")
 					   .arg(code, 4, 16, QChar('0')),
 					   false);
 		}

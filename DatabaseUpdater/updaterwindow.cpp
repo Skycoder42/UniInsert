@@ -16,7 +16,7 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	installMax(0),
 	downloaderAborted(false),
 	installerAborted(false),
-	softErrorList()
+	softErrorList("test test test test test test test test test test test test test test test test ")
 {
 	ui->setupUi(this);
 	this->adjustSize();
@@ -94,7 +94,7 @@ void UpdaterWindow::error(const QString &error, bool critical)
 							 error);
 		qApp->exit(EXIT_FAILURE);
 	} else
-		this->softErrorList += error;
+		this->softErrorList += QStringLiteral(" • ") + error;
 }
 
 void UpdaterWindow::beginDownload(const QUrl &url)
