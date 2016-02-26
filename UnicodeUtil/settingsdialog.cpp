@@ -38,19 +38,30 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::storeSize(QWidget *widget)
 {
-	QSettings settings;
-	settings.beginGroup(QStringLiteral("gui/%1").arg(widget->objectName()));
-	settings.setValue(QStringLiteral("size"), widget->size());
-	settings.endGroup();
+	SettingsDialog::storeValue(widget, QStringLiteral("size"), widget->size());
 }
 
 void SettingsDialog::loadSize(QWidget *widget)
 {
+	QSize size = SettingsDialog::loadValue(widget, QStringLiteral("size"), widget->size()).toSize();
+	widget->resize(size);
+}
+
+void SettingsDialog::storeValue(QWidget *widget, const QString &key, const QVariant &value)
+{
 	QSettings settings;
 	settings.beginGroup(QStringLiteral("gui/%1").arg(widget->objectName()));
-	QSize size = settings.value(QStringLiteral("size"), widget->size()).toSize();
-	widget->resize(size);
+	settings.setValue(key, value);
 	settings.endGroup();
+}
+
+QVariant SettingsDialog::loadValue(QWidget *widget, const QString &key, const QVariant &defaultValue)
+{
+	QSettings settings;
+	settings.beginGroup(QStringLiteral("gui/%1").arg(widget->objectName()));
+	QVariant value = settings.value(key, defaultValue);
+	settings.endGroup();
+	return value;
 }
 
 void SettingsDialog::showSettings()

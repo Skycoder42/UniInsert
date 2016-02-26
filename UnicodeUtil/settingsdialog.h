@@ -33,6 +33,8 @@ public:
 
 	static void storeSize(QWidget *widget);
 	static void loadSize(QWidget *widget);
+	static void storeValue(QWidget *widget, const QString &key, const QVariant &value);
+	static QVariant loadValue(QWidget *widget, const QString &key, const QVariant &defaultValue = QVariant());
 
 public slots:
 	void showSettings();
