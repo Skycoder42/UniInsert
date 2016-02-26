@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QIcon>
 #include <QThread>
+#include <QProcess>
 #include <qsingleinstance.h>
 #include <dialogmaster.h>
 #include <global.h>
@@ -44,6 +45,15 @@ int main(int argc, char *argv[])
 		});
 
 		w.show();
-		return a.exec();
+		int res = a.exec();
+
+		instance.closeInstance();
+		if(res == 0 && w.startUtil()) {
+			if(!QProcess::startDetached(QApplication::applicationDirPath() + QStringLiteral("/UnicodeUtil.exe"))) {
+				DialogMaster::critical(&w,
+									   QCoreApplication::translate("GLOBAL",
+																   "Failed to start the Unicode Utility!"));
+			}
+		}
 	}
 }

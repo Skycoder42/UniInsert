@@ -10,6 +10,7 @@
 QModelIndex AdvancedSearchDialog::searchBlock(QWidget *parent, QAbstractItemModel *model)
 {
 	AdvancedSearchDialog dialog(model, parent);
+	dialog.ui->findAliasCheckBox->setVisible(false);
 	if(dialog.exec() == QDialog::Accepted)
 		return dialog.selectedIndex;
 	else
@@ -57,7 +58,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
 	ui(new Ui::AdvancedSearchDialog),
 	proxyModel(new QSortFilterProxyModel(this)),
-	symbolModel(Unicoder::databaseLoader()->createSearchModel(this)),
+	symbolModel(Unicoder::databaseLoader()->createSearchModel(this, true)),
 	mode(DatabaseLoader::Contains)
 {
 	ui->setupUi(this);
@@ -84,18 +85,24 @@ AdvancedSearchDialog::~AdvancedSearchDialog()
 
 void AdvancedSearchDialog::on_nameFilterLineEdit_textChanged(const QString &text)
 {
-	this->updateSearch(text, false);
+	this->updateSearch(text,
+					   false,
+					   this->ui->findAliasCheckBox->isChecked());
 }
 
 void AdvancedSearchDialog::on_nameFilterLineEdit_returnPressed()
 {
-	this->updateSearch(this->ui->nameFilterLineEdit->text(), true);
+	this->updateSearch(this->ui->nameFilterLineEdit->text(),
+					   true,
+					   this->ui->findAliasCheckBox->isChecked());
 }
 
 void AdvancedSearchDialog::on_filterModeComboBox_currentIndexChanged(int index)
 {
 	this->mode = (DatabaseLoader::SearchFlag)index;
-	this->on_nameFilterLineEdit_textChanged(this->ui->nameFilterLineEdit->text());
+	this->updateSearch(this->ui->nameFilterLineEdit->text(),
+					   false,
+					   this->ui->findAliasCheckBox->isChecked());
 }
 
 void AdvancedSearchDialog::on_treeView_activated(const QModelIndex &index)
@@ -108,16 +115,23 @@ void AdvancedSearchDialog::on_treeView_activated(const QModelIndex &index)
 	this->accept();
 }
 
-void AdvancedSearchDialog::updateSearch(const QString &text, bool force)
+void AdvancedSearchDialog::on_findAliasCheckBox_clicked(bool checked)
+{
+	this->updateSearch(this->ui->nameFilterLineEdit->text(),
+					   false,
+					   checked);
+}
+
+void AdvancedSearchDialog::updateSearch(const QString &text, bool force, bool aliases)
 {
 	if(this->symbolModel) {
 		if(!force && text.size() < 3)
-			Unicoder::databaseLoader()->clearSearchModel(this->symbolModel);
+			Unicoder::databaseLoader()->clearSearchModel(this->symbolModel, aliases);
 		else {
 			QString pattern = text;
 			pattern.replace(QLatin1Char('*'), QLatin1Char('%'));
 			pattern.replace(QLatin1Char('?'), QLatin1Char('_'));
-			Unicoder::databaseLoader()->searchName(pattern, this->mode, this->symbolModel);
+			Unicoder::databaseLoader()->searchName(pattern, this->mode, aliases, this->symbolModel);
 		}
 	} else {
 		QString pattern = QRegExp::escape(text);

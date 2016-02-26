@@ -42,9 +42,9 @@ public:
 	inline QString nameForSymbol(Unicoder::SurrogatePair code) const;
 	QString nameForSymbol(uint code) const;
 	QStringList symbolAliases(uint code) const;
-	QSqlQueryModel *createSearchModel(QObject *modelParent) const;
-	bool searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const;
-	void clearSearchModel(QSqlQueryModel *model) const;
+	QSqlQueryModel *createSearchModel(QObject *modelParent, bool aliases) const;
+	bool searchName(const QString &nameTerm, SearchFlags mode, bool aliases, QSqlQueryModel *model) const;
+	void clearSearchModel(QSqlQueryModel *model, bool aliases) const;
 
 	//per block
 	SymbolListModel *createBlock(int blockID, QObject *modelParent) const;

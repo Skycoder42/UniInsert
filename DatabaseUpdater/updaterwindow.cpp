@@ -28,7 +28,8 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	installMax(0),
 	downloaderAborted(false),
 	installerAborted(false),
-	softErrorList()
+	softErrorList(),
+	doStart(true)
 {
 	ui->setupUi(this);
 	this->adjustSize();
@@ -73,6 +74,11 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 UpdaterWindow::~UpdaterWindow()
 {
 	delete ui;
+}
+
+bool UpdaterWindow::startUtil() const
+{
+	return this->doStart;
 }
 
 void UpdaterWindow::showEvent(QShowEvent *ev)
@@ -146,7 +152,6 @@ void UpdaterWindow::engineDone()
 	this->ui->currentInstallProgressBar->setRange(0, 1);
 	this->ui->currentInstallProgressBar->setValue(1);
 
-	bool checked = true;
 	if(this->softErrorList.isEmpty()) {
 		DialogMaster::msgBox(this,
 							 QMessageBox::Information,
@@ -155,7 +160,7 @@ void UpdaterWindow::engineDone()
 							 tr("Database update completed!"),
 							 tr("Finished!"),
 							 QString(),
-							 &checked,
+							 &this->doStart,
 							 tr("Start Unicode Utility"));
 	} else {
 		this->mainProgress->setBarState(QProgressGroup::Paused);
@@ -168,10 +173,9 @@ void UpdaterWindow::engineDone()
 							 tr("Database update completed (with errors)!"),
 							 tr("Finished!"),
 							 this->softErrorList.join(QLatin1Char('\n')),
-							 &checked,
+							 &this->doStart,
 							 tr("Start Unicode Utility"));
 	}
-	qDebug() << checked;//TODO start util
 	qApp->quit();
 }
 

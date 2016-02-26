@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>550</width>
     <height>450</height>
    </rect>
   </property>
@@ -19,7 +19,10 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Search Term:</string>
+        <string>Search &amp;Term:</string>
+       </property>
+       <property name="buddy">
+        <cstring>nameFilterLineEdit</cstring>
        </property>
       </widget>
      </item>
@@ -36,7 +39,10 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Filter Mode:</string>
+        <string>Filter &amp;Mode:</string>
+       </property>
+       <property name="buddy">
+        <cstring>filterModeComboBox</cstring>
        </property>
       </widget>
      </item>
@@ -65,6 +71,16 @@
          <string>Exact Match</string>
         </property>
        </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="findAliasCheckBox">
+       <property name="text">
+        <string>Find &amp;Aliases</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>

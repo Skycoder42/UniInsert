@@ -77,35 +77,38 @@ QStringList DatabaseLoader::symbolAliases(uint code) const
 		return QStringList();
 }
 
-QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent) const
+QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent, bool aliases) const
 {
 	QSqlQueryModel *model = new QSqlQueryModel(modelParent);
-	this->clearSearchModel(model);
+	this->clearSearchModel(model, aliases);
 	return model;
 }
 
-bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const
+bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, bool aliases, QSqlQueryModel *model) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE NameAlias LIKE :term"));
+	if(aliases)
+		query.prepare(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE NameAlias LIKE :term"));
+	else
+		query.prepare(QStringLiteral("SELECT Code, Code, Name FROM Symbols WHERE Name LIKE :term"));
 	query.bindValue(QStringLiteral(":term"),
 					DatabaseLoader::prepareSearch(nameTerm, mode));
 	if(query.exec()){
 		model->setQuery(query);
 		model->setHeaderData(0, Qt::Horizontal, tr("Preview"));
 		model->setHeaderData(1, Qt::Horizontal, tr("Code"));
-		model->setHeaderData(2, Qt::Horizontal, tr("Name/Alias"));
+		model->setHeaderData(2, Qt::Horizontal, aliases ? tr("Name/Alias") : tr("Name"));
 		return true;
 	} else
 		return false;
 }
 
-void DatabaseLoader::clearSearchModel(QSqlQueryModel *model) const
+void DatabaseLoader::clearSearchModel(QSqlQueryModel *model, bool aliases) const
 {
-	model->setQuery(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
+	model->setQuery(QStringLiteral("SELECT Code, Code, Name FROM Symbols WHERE 1 = 0 LIMIT 0, 1"), this->mainDB);
 	model->setHeaderData(0, Qt::Horizontal, tr("Preview"));
 	model->setHeaderData(1, Qt::Horizontal, tr("Code"));
-	model->setHeaderData(2, Qt::Horizontal, tr("Name/Alias"));
+	model->setHeaderData(2, Qt::Horizontal, aliases ? tr("Name/Alias") : tr("Name"));
 }
 
 SymbolListModel *DatabaseLoader::createBlock(int blockID, QObject *modelParent) const

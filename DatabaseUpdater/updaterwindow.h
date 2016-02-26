@@ -28,6 +28,8 @@ public:
 	explicit UpdaterWindow(QWidget *parent = Q_NULLPTR);
 	~UpdaterWindow();
 
+	bool startUtil() const;
+
 protected:
 	void showEvent(QShowEvent *ev) Q_DECL_OVERRIDE;
 	void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
@@ -68,6 +70,7 @@ private:
 	bool installerAborted;
 
 	QStringList softErrorList;
+	bool doStart;
 };
 
 #endif // UPDATERWINDOW_H

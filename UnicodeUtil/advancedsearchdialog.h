@@ -23,7 +23,7 @@ private slots:
 	void on_nameFilterLineEdit_returnPressed();
 	void on_filterModeComboBox_currentIndexChanged(int index);
 	void on_treeView_activated(const QModelIndex &index);
-
+	void on_findAliasCheckBox_clicked(bool checked);
 
 private:
 	Ui::AdvancedSearchDialog *ui;
@@ -37,7 +37,7 @@ private:
 	explicit AdvancedSearchDialog(QWidget *parent = Q_NULLPTR);
 	~AdvancedSearchDialog();
 
-	void updateSearch(const QString &text, bool force);
+	void updateSearch(const QString &text, bool force, bool aliases);
 };
 
 #endif // ADVANCEDSEARCHDIALOG_H
