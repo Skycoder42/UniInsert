@@ -39,16 +39,16 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::storeSize(QWidget *widget)
 {
 	QSettings settings;
-	settings.beginGroup(QStringLiteral("gui"));
-	settings.setValue(widget->objectName(), widget->size());
+	settings.beginGroup(QStringLiteral("gui/%1").arg(widget->objectName()));
+	settings.setValue(QStringLiteral("size"), widget->size());
 	settings.endGroup();
 }
 
 void SettingsDialog::loadSize(QWidget *widget)
 {
 	QSettings settings;
-	settings.beginGroup(QStringLiteral("gui"));
-	QSize size = settings.value(widget->objectName(), widget->size()).toSize();
+	settings.beginGroup(QStringLiteral("gui/%1").arg(widget->objectName()));
+	QSize size = settings.value(QStringLiteral("size"), widget->size()).toSize();
 	widget->resize(size);
 	settings.endGroup();
 }

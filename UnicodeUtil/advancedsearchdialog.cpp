@@ -66,6 +66,10 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	DialogMaster::masterDialog(this);
 	this->setWindowTitle(tr("Advanced Symbol Search"));
 
+	this->ui->findAliasCheckBox->setChecked(QSettings().value(QStringLiteral("gui/%1/findAlias")
+															  .arg(this->objectName()),
+															  true).toBool());
+
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
 	this->proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -115,8 +119,11 @@ void AdvancedSearchDialog::on_treeView_activated(const QModelIndex &index)
 	this->accept();
 }
 
-void AdvancedSearchDialog::on_findAliasCheckBox_clicked(bool checked)
+void AdvancedSearchDialog::on_findAliasCheckBox_toggled(bool checked)
 {
+	QSettings().setValue(QStringLiteral("gui/%1/findAlias")
+						 .arg(this->objectName()),
+						 checked);
 	this->updateSearch(this->ui->nameFilterLineEdit->text(),
 					   false,
 					   checked);

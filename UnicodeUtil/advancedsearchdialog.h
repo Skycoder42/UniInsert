@@ -23,7 +23,7 @@ private slots:
 	void on_nameFilterLineEdit_returnPressed();
 	void on_filterModeComboBox_currentIndexChanged(int index);
 	void on_treeView_activated(const QModelIndex &index);
-	void on_findAliasCheckBox_clicked(bool checked);
+	void on_findAliasCheckBox_toggled(bool checked);
 
 private:
 	Ui::AdvancedSearchDialog *ui;
