@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="unicode.db">tables/uniDatabase.sqlite</file>
+    </qresource>
+</RCC>

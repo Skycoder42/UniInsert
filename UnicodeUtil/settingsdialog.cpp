@@ -4,6 +4,7 @@
 #include <QDir>
 #include "dialogmaster.h"
 #include "databaseloader.h"
+#include "resetdatabasedialog.h"
 
 #define SETTINGS_CODE(code, defaultValue) \
 	const QString SettingsDialog::code = QStringLiteral(#code);\
@@ -25,6 +26,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
 	DialogMaster::masterDialog(this, true);
+
+	this->ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Reset Database"));
 
 	//make shure autostart is set as expected
 	this->updateAutostart(SETTINGS_VALUE(SettingsDialog::autoStart).toBool());
@@ -111,19 +114,9 @@ void SettingsDialog::showAboutDialog()
 
 void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 {
-	if(this->ui->buttonBox->standardButton(button) == QDialogButtonBox::RestoreDefaults) {
-		if(DialogMaster::warning(this,
-								 tr("Do you really want to reset all settings and the database?\n"
-								   "This will include custom emoji settings and recently used!\n\n"
-								   "The application will be shut down!"),
-								 QString(),
-								 QString(),
-								 QMessageBox::Yes,
-								 QMessageBox::No)
-		   == QMessageBox::Yes) {
-			QSettings().setValue(SettingsDialog::reset, true);
+	if(this->ui->buttonBox->standardButton(button) == QDialogButtonBox::Reset) {
+		if(ResetDatabaseDialog::tryReset(this))
 			qApp->quit();
-		}
 	}
 }
 

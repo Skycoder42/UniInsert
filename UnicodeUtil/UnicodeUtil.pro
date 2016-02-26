@@ -44,7 +44,8 @@ SOURCES += main.cpp\
 	advancedsearchdialog.cpp \
 	emojidialog.cpp \
 	databaseloader.cpp \
-	unicodermodels.cpp
+	unicodermodels.cpp \
+    resetdatabasedialog.cpp
 
 HEADERS  += symbolselectdialog.h \
 	getcodedialog.h \
@@ -56,14 +57,19 @@ HEADERS  += symbolselectdialog.h \
 	advancedsearchdialog.h \
 	emojidialog.h \
 	databaseloader.h \
-	unicodermodels.h
+	unicodermodels.h \
+    resetdatabasedialog.h
 
 FORMS	+= symbolselectdialog.ui \
 	getcodedialog.ui \
 	blockselectdialog.ui \
 	settingsdialog.ui \
 	advancedsearchdialog.ui \
-	emojidialog.ui
+	emojidialog.ui \
+    resetdatabasedialog.ui
 
 RESOURCES += \
 	unicodeutil_res.qrc
+
+DISTFILES += \
+	unicodeutil_defaultdb.qrc
