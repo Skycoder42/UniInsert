@@ -18,9 +18,9 @@ public:
 	enum UpdateFlag {
 		Database = 0x00,
 		RecentlyUsed = 0x01,
-		Emojis = 0x02,
+		CustomEmojis = 0x02,
 
-		All = (RecentlyUsed | Emojis | Database)
+		All = (RecentlyUsed | CustomEmojis | Database)
 	};
 	Q_DECLARE_FLAGS(UpdateFlags, UpdateFlag)
 	Q_FLAG(UpdateFlags)

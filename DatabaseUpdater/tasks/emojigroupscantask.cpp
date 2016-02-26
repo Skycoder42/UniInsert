@@ -1,5 +1,6 @@
 #include "emojigroupscantask.h"
 #include "global.h"
+#include "parseemojigrouptask.h"
 
 #define EMOJI_ERROR(var) if(var == -1) {\
 		this->engine->failure(emojiPediaError());\
@@ -23,8 +24,6 @@ QString EmojiGroupScanTask::installText() const
 
 bool EmojiGroupScanTask::run()
 {
-	QList<QUrl> emojiSubs;
-
 	// Parse the file!!!
 	int start = this->downloadData.indexOf("Categories");
 	EMOJI_ERROR(start);
@@ -35,6 +34,7 @@ bool EmojiGroupScanTask::run()
 
 	int nextStart = start;
 	while (nextStart < finish && nextStart != -1) {
+		CHECK_ABORT
 		int begin = this->downloadData.indexOf("<li><a href=\"", nextStart);
 		EMOJI_ERROR(begin);
 		begin += 13;
@@ -53,8 +53,7 @@ bool EmojiGroupScanTask::run()
 QList<UpdateTask *> EmojiGroupScanTask::newTasks() const
 {
 	QList<UpdateTask *> tasks;
-	for(QUrl url : this->downloadUrls) {
-		//TODO add new tasks;
-	}
+	for(QUrl url : this->downloadUrls)
+		tasks += new ParseEmojiGroupTask(url);
 	return tasks;
 }

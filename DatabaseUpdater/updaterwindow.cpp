@@ -97,7 +97,7 @@ void UpdaterWindow::initialize()
 	UpdateFlags flags = ARG_UPDATE_MODE;
 
 	this->engine->addTask(new CreateDBStructureTask());
-	if(flags.testFlag(Emojis))
+	if(!flags.testFlag(CustomEmojis))
 		this->engine->addTask(new EmojiGroupScanTask());
 	this->engine->addTask(new CreateSymbolsTask());
 	this->engine->addTask(new CreateBlocksTask());
@@ -105,7 +105,7 @@ void UpdaterWindow::initialize()
 	this->engine->addTask(new ReadAliasesTask());
 	if(flags.testFlag(RecentlyUsed))
 		this->engine->addTask(new TransferRecentTask());
-	if(!flags.testFlag(Emojis))
+	if(flags.testFlag(CustomEmojis))
 		this->engine->addTask(new TransferEmojisTask());
 }
 

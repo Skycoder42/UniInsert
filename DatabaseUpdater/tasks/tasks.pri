@@ -7,7 +7,8 @@ HEADERS += \
     $$PWD/readnameindextask.h \
     $$PWD/readaliasestask.h \
     $$PWD/transferrecenttask.h \
-    $$PWD/transferemojistask.h
+    $$PWD/transferemojistask.h \
+    $$PWD/parseemojigrouptask.h
 
 SOURCES += \
     $$PWD/emojigroupscantask.cpp \
@@ -18,4 +19,5 @@ SOURCES += \
     $$PWD/readnameindextask.cpp \
     $$PWD/readaliasestask.cpp \
     $$PWD/transferrecenttask.cpp \
-    $$PWD/transferemojistask.cpp
+    $$PWD/transferemojistask.cpp \
+    $$PWD/parseemojigrouptask.cpp
