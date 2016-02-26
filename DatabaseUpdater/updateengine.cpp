@@ -298,11 +298,13 @@ bool SetupTask::run()
 	}
 	newDB.exec(QStringLiteral("PRAGMA foreign_keys = ON"));
 
-	QSqlDatabase oldDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), UpdateEngineCore::oldDB);
-	oldDB.setDatabaseName(ARG_LOCAL_DB_PATH);
-	if(!oldDB.isValid()) {
-		this->engine->failure(oldDB.lastError().text());
-		return false;
+	if(QFile::exists(ARG_LOCAL_DB_PATH)) {
+		QSqlDatabase oldDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), UpdateEngineCore::oldDB);
+		oldDB.setDatabaseName(ARG_LOCAL_DB_PATH);
+		if(!oldDB.isValid()) {
+			this->engine->failure(oldDB.lastError().text());
+			return false;
+		}
 	}
 
 	return true;

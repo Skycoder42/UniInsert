@@ -82,14 +82,23 @@ bool DatabaseTransferTask::run()
 	}
 
 	QSqlDatabase oldDB = QSqlDatabase::database(UpdateEngineCore::oldDB);
-	if(!oldDB.open() || !oldDB.isValid()) {
+	if(oldDB.isValid()) {
+		if(!oldDB.open()) {
+			newDB.rollback();
+			this->engine->failure(oldDB.lastError().text());
+			return false;
+		}
+	} else {
 		newDB.rollback();
-		this->engine->failure(oldDB.lastError().text());
-		return false;
+		this->engine->logError(UpdateEngineCore::tr("Old Database does not exists! "
+													"Transfer task \"%1\" cannot be executed")
+							   .arg(this->installText()));
+		return true;
 	}
 
 	if(this->execute(newDB, oldDB)) {
-		oldDB.close();
+		if(oldDB.isOpen())
+			oldDB.close();
 		if(newDB.commit())
 			return true;
 		else {
@@ -97,7 +106,8 @@ bool DatabaseTransferTask::run()
 			return false;
 		}
 	} else {
-		oldDB.close();
+		if(oldDB.isOpen())
+			oldDB.close();
 		newDB.rollback();
 		return false;
 	}
