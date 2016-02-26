@@ -21,7 +21,4 @@ inline QString emojiPediaError() {
 												 "Please retry without emoji updates and contact me to update the parser!");
 }
 
-//TODO
-#include <QDebug>
-
 #endif // GLOBAL_H

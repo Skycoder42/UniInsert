@@ -87,7 +87,7 @@ QSqlQueryModel *DatabaseLoader::createSearchModel(QObject *modelParent) const
 bool DatabaseLoader::searchName(const QString &nameTerm, SearchFlags mode, QSqlQueryModel *model) const
 {
 	QSqlQuery query(this->mainDB);
-	query.prepare(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE NameAlias Like :term"));
+	query.prepare(QStringLiteral("SELECT Code, Code, NameAlias FROM Aliases WHERE NameAlias LIKE :term"));
 	query.bindValue(QStringLiteral(":term"),
 					DatabaseLoader::prepareSearch(nameTerm, mode));
 	if(query.exec()){

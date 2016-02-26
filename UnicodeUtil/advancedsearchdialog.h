@@ -16,7 +16,7 @@ class AdvancedSearchDialog : public QDialog
 
 public:
 	static QModelIndex searchBlock(QWidget *parent, QAbstractItemModel *model);
-	static uint searchSymbol(QWidget *parent);
+	static uint searchSymbol(QWidget *parent);//TODO switch between name/aliases
 
 private slots:
 	void on_nameFilterLineEdit_textChanged(const QString &text);

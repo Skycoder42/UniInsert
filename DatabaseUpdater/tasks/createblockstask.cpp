@@ -26,7 +26,15 @@ bool CreateBlocksTask::execute(QSqlDatabase &newDB)
 	uint newMax = 0;
 	if(!blockMatrix.isEmpty())
 		newMax = blockMatrix.last()[2].toUInt(Q_NULLPTR, 16);
-	this->engine->updateInstallMax(blockMatrix.size() + qMax<uint>(newMax - oldMax, 0));
+	this->engine->updateInstallMax(blockMatrix.size() + qMax<uint>(newMax - oldMax, 0) + 1);
+
+	QSqlQuery createRecentBlockQuery(newDB);
+	createRecentBlockQuery.prepare(QStringLiteral("INSERT INTO Blocks (ID, Name) VALUES(:id, :name)"));
+	createRecentBlockQuery.bindValue(":id", 0);
+	createRecentBlockQuery.bindValue(":name", UpdateEngineCore::tr("Recently Used"));
+	TRY_EXEC(createRecentBlockQuery);
+
+	this->engine->updateInstallValue(1);
 
 	for(int i = 0, max = blockMatrix.size(); i < max; ++i) {
 		CHECK_ABORT
@@ -43,12 +51,12 @@ bool CreateBlocksTask::execute(QSqlDatabase &newDB)
 		createBlockQuery.bindValue(":end", end);
 		TRY_EXEC(createBlockQuery);
 
-		this->engine->updateInstallValue(i + 1);
+		this->engine->updateInstallValue(i + 2);
 	}
 
 	if(newMax > oldMax) {
 		int delta = newMax - oldMax;
-		int rMax = blockMatrix.size();
+		int rMax = blockMatrix.size() + 1;
 
 		for(int i = 1; i <= delta; ++i) {
 			CHECK_ABORT

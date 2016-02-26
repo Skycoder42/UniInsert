@@ -171,7 +171,7 @@ void UpdaterWindow::engineDone()
 							 &checked,
 							 tr("Start Unicode Utility"));
 	}
-	qDebug() << checked;//TODO
+	qDebug() << checked;//TODO start util
 	qApp->quit();
 }
 
