@@ -38,6 +38,9 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	DialogMaster::masterDialog(this);
 	this->setWindowTitle(tr("Advanced Block Search"));
 
+	QSettings settings;
+	settings.beginGroup(QStringLiteral("gui/%1").arg(this->objectName()));
+
 	this->proxyModel->setSourceModel(model);
 	this->proxyModel->setSortLocaleAware(true);
 	this->proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -49,9 +52,14 @@ AdvancedSearchDialog::AdvancedSearchDialog(QAbstractItemModel *model, QWidget *p
 	this->ui->treeView->setItemDelegateForColumn(1, new UnicodeDelegate(false, this->ui->treeView));
 	this->ui->treeView->setItemDelegateForColumn(2, new UnicodeDelegate(false, this->ui->treeView));
 	this->ui->treeView->setColumnHidden(3, true);
-	this->ui->treeView->resizeColumnToContents(0);
-	this->ui->treeView->resizeColumnToContents(1);
-	this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
+
+	if(!this->ui->treeView->header()->restoreState(settings.value(QStringLiteral("blockHeaderState")).toByteArray())) {
+		this->ui->treeView->resizeColumnToContents(0);
+		this->ui->treeView->resizeColumnToContents(1);
+		this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
+	}
+
+	settings.endGroup();
 }
 
 AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
@@ -66,9 +74,9 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 	DialogMaster::masterDialog(this);
 	this->setWindowTitle(tr("Advanced Symbol Search"));
 
-	this->ui->findAliasCheckBox->setChecked(QSettings().value(QStringLiteral("gui/%1/findAlias")
-															  .arg(this->objectName()),
-															  true).toBool());
+	QSettings settings;
+	settings.beginGroup(QStringLiteral("gui/%1").arg(this->objectName()));
+	this->ui->findAliasCheckBox->setChecked(settings.value(QStringLiteral("findAlias"), true).toBool());
 
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
@@ -77,13 +85,28 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget *parent) :
 
 	this->ui->treeView->setItemDelegateForColumn(0, new UnicodeDelegate(true, this->ui->treeView));
 	this->ui->treeView->setItemDelegateForColumn(1, new UnicodeDelegate(false, this->ui->treeView));
-	this->ui->treeView->resizeColumnToContents(0);
-	this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
+
+	if(!this->ui->treeView->header()->restoreState(settings.value(QStringLiteral("symbolHeaderState")).toByteArray())) {
+		this->ui->treeView->resizeColumnToContents(0);
+		this->ui->treeView->sortByColumn(-1, Qt::AscendingOrder);
+	}
+
+	settings.endGroup();
 }
 
 AdvancedSearchDialog::~AdvancedSearchDialog()
 {
 	SettingsDialog::storeSize(this);
+	QSettings settings;
+	settings.beginGroup(QStringLiteral("gui/%1").arg(this->objectName()));
+	if(this->symbolModel) {
+		settings.setValue(QStringLiteral("symbolHeaderState"),
+						  this->ui->treeView->header()->saveState());
+	} else {
+		settings.setValue(QStringLiteral("blockHeaderState"),
+						  this->ui->treeView->header()->saveState());
+	}
+	settings.endGroup();
 	delete ui;
 }
 
