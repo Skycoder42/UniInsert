@@ -38,6 +38,7 @@ private slots:
 	void error(const QString &error);
 	void log(const QString &error);
 
+	void abortDone();
 	void engineDone();
 
 	//download
@@ -58,6 +59,8 @@ private:
 	QWinTaskbarButton *taskButton;
 
 	UpdateEngine *engine;
+	bool didAbort;
+	bool errorClosed;
 
 	int installMax;
 	bool downloaderAborted;

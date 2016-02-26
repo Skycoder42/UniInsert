@@ -22,6 +22,8 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 	mainProgress(new QProgressGroup(this)),
 	taskButton(new QWinTaskbarButton(this)),
 	engine(new UpdateEngine(this)),
+	didAbort(false),
+	errorClosed(false),
 	installMax(0),
 	downloaderAborted(false),
 	installerAborted(false),
@@ -40,7 +42,7 @@ UpdaterWindow::UpdaterWindow(QWidget *parent) :
 			this, &UpdaterWindow::log);
 
 	connect(this->engine, &UpdateEngine::abortDone,
-			qApp, &QApplication::quit);
+			this, &UpdaterWindow::abortDone);
 	connect(this->engine, &UpdateEngine::engineDone,
 			this, &UpdaterWindow::engineDone);
 
@@ -104,12 +106,27 @@ void UpdaterWindow::error(const QString &error)
 {
 	this->mainProgress->setBarState(QProgressGroup::Stopped);
 	DialogMaster::critical(this, error);
-	qApp->exit(EXIT_FAILURE);
+	if(this->errorClosed)
+		qApp->exit(EXIT_FAILURE);
+	else
+		this->errorClosed = true;
 }
 
 void UpdaterWindow::log(const QString &error)
 {
 	this->softErrorList += tr(" • ") + error;
+}
+
+void UpdaterWindow::abortDone()
+{
+	if(this->didAbort)
+		qApp->exit(EXIT_FAILURE);
+	else {
+		if(this->errorClosed)
+			qApp->exit(EXIT_FAILURE);
+		else
+			this->errorClosed = true;
+	}
 }
 
 void UpdaterWindow::engineDone()
@@ -205,6 +222,7 @@ void UpdaterWindow::on_buttonBox_rejected()
 		this->ui->groupBox_2->setEnabled(false);
 		this->ui->buttonBox->setEnabled(false);
 		this->setCursor(Qt::WaitCursor);
+		this->didAbort = true;
 		this->engine->abort();
 	} else
 		this->mainProgress->setBarState(QProgressGroup::Active);

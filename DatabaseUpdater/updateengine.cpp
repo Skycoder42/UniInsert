@@ -31,18 +31,22 @@ UpdateEngine::UpdateEngine(QObject *parent) :
 	downloads(),
 	currentDownload(Q_NULLPTR),
 	isDownloadCompleted(false),
+	didAbortDownload(false),
 	nam(new QNetworkAccessManager(this)),
 	currentReply(Q_NULLPTR),
 	installMax(1),
 	installs(),
 	currentInstall(Q_NULLPTR),
 	isInstallCompleted(false),
+	didAbortInstall(false),
 	watcher(new QFutureWatcher<bool>(this)),
 	installProgressMax(0),
 	installProgressBuffer(0)
 {
 	connect(this->watcher, &QFutureWatcherBase::finished,
 			this, &UpdateEngine::watcherReady);
+	connect(this, &UpdateEngine::error,
+			this, &UpdateEngine::abort);
 
 	this->installs.enqueue(new SetupTask(this));
 }
@@ -265,7 +269,6 @@ void UpdateEngine::tryAbortReady()
 	if(this->didAbortDownload && this->didAbortInstall)
 		emit abortDone();
 }
-
 
 
 SetupTask::SetupTask(UpdateEngineCore *engine) :
