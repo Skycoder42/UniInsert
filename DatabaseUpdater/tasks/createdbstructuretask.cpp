@@ -1,5 +1,6 @@
 #include "createdbstructuretask.h"
 #include <QFile>
+#include <QVersionNumber>
 #include "global.h"
 
 QString CreateDBStructureTask::installText() const
@@ -18,9 +19,6 @@ bool CreateDBStructureTask::execute(QSqlDatabase &newDB)
 
 	this->engine->updateInstallMax(queries.size());
 
-	QString path = ARG_LOCAL_DB_PATH + QStringLiteral(".update");
-	QFile::remove(path);
-
 	for(int i = 0, max = queries.size() - 1; i < max; ++i) {//skip last -> empty because of ';'
 		QSqlQuery setupQuery(newDB);
 		if(!setupQuery.exec(queries[i])) {
@@ -32,7 +30,7 @@ bool CreateDBStructureTask::execute(QSqlDatabase &newDB)
 
 	QSqlQuery versionQuery(newDB);
 	versionQuery.prepare(QStringLiteral("INSERT INTO Meta (UnicodeVersion) VALUES(:version)"));
-	versionQuery.bindValue(QStringLiteral(":version"), ARG_UPDATE_VERSION);
+	versionQuery.bindValue(QStringLiteral(":version"), QVersionNumber::fromString(ARG_UPDATE_VERSION).toString());
 	if(versionQuery.exec())
 		this->engine->updateInstallValue(queries.size());
 	else {

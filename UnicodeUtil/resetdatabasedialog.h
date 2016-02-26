@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QButtonGroup>
+#include <QNetworkAccessManager>
 
 namespace Ui {
 	class ResetDatabaseDialog;
@@ -18,9 +19,16 @@ public:
 
 	static bool tryReset(QWidget *parent);
 
+	void accept() Q_DECL_OVERRIDE;
+
+private slots:
+	void ftpListingReady(QNetworkReply *reply);
+
 private:
 	Ui::ResetDatabaseDialog *ui;
 	QButtonGroup *modeGroup;
+
+	QNetworkAccessManager *nam;
 };
 
 #endif // RESETDATABASEDIALOG_H

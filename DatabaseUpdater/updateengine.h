@@ -5,6 +5,7 @@
 #include <QQueue>
 #include <QNetworkAccessManager>
 #include <QFutureWatcher>
+#include <QTemporaryFile>
 #include "updatetask.h"
 #include "updateenginecore.h"
 
@@ -13,6 +14,7 @@ class UpdateEngine : public QObject, public UpdateEngineCore
 	Q_OBJECT
 public:
 	explicit UpdateEngine(QObject *parent = Q_NULLPTR);
+	~UpdateEngine();
 
 	// UpdateEngineCore interface
 	void failure(const QString &error) Q_DECL_OVERRIDE;
@@ -65,10 +67,12 @@ private slots:
 
 	//general
 	void tryAbortReady();
+	void closeDBs();
 
 private:
 	//general
 	bool abortRequested;
+	QTemporaryFile *newDBFile;
 
 	//download
 	int downloadMax;

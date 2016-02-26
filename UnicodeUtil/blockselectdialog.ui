@@ -38,7 +38,7 @@
         <string>Show advanced search dialog</string>
        </property>
        <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
+        <iconset resource="unicodeutil_res.qrc">
          <normaloff>:/icons/detailedSearch.ico</normaloff>:/icons/detailedSearch.ico</iconset>
        </property>
       </widget>
@@ -90,7 +90,7 @@
   </layout>
   <action name="actionRemove_from_list">
    <property name="icon">
-    <iconset resource="uniinsert_res.qrc">
+    <iconset resource="unicodeutil_res.qrc">
      <normaloff>:/icons/delete.ico</normaloff>:/icons/delete.ico</iconset>
    </property>
    <property name="text">
@@ -105,7 +105,7 @@
   </action>
  </widget>
  <resources>
-  <include location="uniinsert_res.qrc"/>
+  <include location="unicodeutil_res.qrc"/>
  </resources>
  <connections/>
 </ui>

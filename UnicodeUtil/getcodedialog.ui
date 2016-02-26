@@ -45,7 +45,7 @@
         <string>Paste a symbol from the clipboard</string>
        </property>
        <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
+        <iconset resource="unicodeutil_res.qrc">
          <normaloff>:/icons/paste.ico</normaloff>:/icons/paste.ico</iconset>
        </property>
       </widget>
@@ -59,7 +59,7 @@
         <string>Add the symbol to recently used list</string>
        </property>
        <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
+        <iconset resource="unicodeutil_res.qrc">
          <normaloff>:/icons/add.ico</normaloff>:/icons/add.ico</iconset>
        </property>
       </widget>
@@ -198,7 +198,7 @@
         <string>Show all other names (aliases) of the symbol</string>
        </property>
        <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
+        <iconset resource="unicodeutil_res.qrc">
          <normaloff>:/icons/detailedSearch.ico</normaloff>:/icons/detailedSearch.ico</iconset>
        </property>
        <property name="popupMode">
@@ -242,7 +242,7 @@
         <string>Show all symbols of this group</string>
        </property>
        <property name="icon">
-        <iconset resource="uniinsert_res.qrc">
+        <iconset resource="unicodeutil_res.qrc">
          <normaloff>:/icons/details.ico</normaloff>:/icons/details.ico</iconset>
        </property>
       </widget>
@@ -252,7 +252,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="uniinsert_res.qrc"/>
+  <include location="unicodeutil_res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -30,7 +30,7 @@
   </layout>
   <action name="actionAdd_Emoji_Group">
    <property name="icon">
-    <iconset resource="uniinsert_res.qrc">
+    <iconset resource="unicodeutil_res.qrc">
      <normaloff>:/icons/addTab.ico</normaloff>:/icons/addTab.ico</iconset>
    </property>
    <property name="text">
@@ -39,7 +39,7 @@
   </action>
   <action name="actionRemove_Emoji_Group">
    <property name="icon">
-    <iconset resource="uniinsert_res.qrc">
+    <iconset resource="unicodeutil_res.qrc">
      <normaloff>:/icons/deleteTab.ico</normaloff>:/icons/deleteTab.ico</iconset>
    </property>
    <property name="text">
@@ -48,7 +48,7 @@
   </action>
  </widget>
  <resources>
-  <include location="uniinsert_res.qrc"/>
+  <include location="unicodeutil_res.qrc"/>
  </resources>
  <connections/>
 </ui>

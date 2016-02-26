@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>280</width>
-    <height>111</height>
+    <height>107</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -149,7 +149,7 @@
   </layout>
   <action name="actionCopy_Symbol">
    <property name="icon">
-    <iconset resource="uniinsert_res.qrc">
+    <iconset resource="unicodeutil_res.qrc">
      <normaloff>:/icons/copy.ico</normaloff>:/icons/copy.ico</iconset>
    </property>
    <property name="text">
@@ -164,7 +164,7 @@
   </action>
   <action name="actionSearch_symbol_name">
    <property name="icon">
-    <iconset resource="uniinsert_res.qrc">
+    <iconset resource="unicodeutil_res.qrc">
      <normaloff>:/icons/search.ico</normaloff>:/icons/search.ico</iconset>
    </property>
    <property name="text">
@@ -194,7 +194,7 @@
   <tabstop>insertButton</tabstop>
  </tabstops>
  <resources>
-  <include location="uniinsert_res.qrc"/>
+  <include location="unicodeutil_res.qrc"/>
  </resources>
  <connections/>
 </ui>

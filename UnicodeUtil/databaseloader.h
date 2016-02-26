@@ -5,6 +5,7 @@
 #include <QSqlDatabase>
 #include <QMap>
 #include <QSqlQueryModel>
+#include <QVersionNumber>
 #include "unicoder.h"
 class SymbolListModel;
 
@@ -34,6 +35,8 @@ public:
 
 	explicit DatabaseLoader(QObject *parent = 0);
 	~DatabaseLoader();
+
+	QString dbPath() const;
 
 	static void reset();
 
@@ -76,6 +79,9 @@ public:
 	int createEmojiGroup(const QString &name);
 	bool deleteEmojiGroup(int groupID);
 	void updateEmojiGroupOrder(const QList<int> &idOrder);
+
+	//system
+	QVersionNumber currentVersion() const;
 
 private:/*functions*/
 	static QString prepareSearch(QString term, SearchFlags flags);

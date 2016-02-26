@@ -2,6 +2,7 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QHotkey>
+#include <QResource>
 #include <qsingleinstance.h>
 
 #include "settingsdialog.h"
@@ -41,6 +42,8 @@ int main(int argc, char *argv[])
 			QSettings().clear();
 		}
 
+		QResource::registerResource(QApplication::applicationDirPath() + QStringLiteral("/defaultDatabase.rcc"));
+
 		trayIco = new QSystemTrayIcon(QApplication::windowIcon());
 		trayIco->setToolTip(QApplication::applicationDisplayName());
 
@@ -51,6 +54,7 @@ int main(int argc, char *argv[])
 		blockDiag = new BlockSelectDialog();
 
 		QObject::connect(codeDiag, &GetCodeDialog::showBlock, blockDiag, &BlockSelectDialog::showBlock);
+		settingsDiag->setProperty("instanceKey", instance.instanceID());
 
 		QMenu *trayMenu = new QMenu();
 		trayIco->setContextMenu(trayMenu);

@@ -23,7 +23,7 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
 	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
-	if(!QFile::exists(file)) {
+	if(!QFile::exists(file)) {//TODO remove/change
 		QFile::copy(QStringLiteral(":/data/mainDB.sqlite"), file);
 		QFile::setPermissions(file, QFileDevice::ReadUser | QFileDevice::WriteUser);
 	}
@@ -42,6 +42,11 @@ DatabaseLoader::~DatabaseLoader()
 	this->mainDB.close();
 	this->mainDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(DatabaseLoader::DBName);
+}
+
+QString DatabaseLoader::dbPath() const
+{
+	return this->mainDB.databaseName();
 }
 
 void DatabaseLoader::reset()
@@ -381,6 +386,16 @@ void DatabaseLoader::updateEmojiGroupOrder(const QList<int> &idOrder)
 		}
 	}
 	this->mainDB.commit();
+}
+
+QVersionNumber DatabaseLoader::currentVersion() const
+{
+	QSqlQuery versionQuery(this->mainDB);
+	versionQuery.prepare("SELECT UnicodeVersion FROM Meta");
+	if(versionQuery.exec() && versionQuery.first())
+		return QVersionNumber::fromString(versionQuery.value(0).toString());
+	else
+		return QVersionNumber();
 }
 
 QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)

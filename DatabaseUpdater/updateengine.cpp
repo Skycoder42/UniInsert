@@ -15,11 +15,14 @@ const QString UpdateEngineCore::oldDB = QStringLiteral("oldDB");
 class SetupTask : public UpdateTask
 {
 public:
-	SetupTask(UpdateEngineCore *engine);
+	SetupTask(QTemporaryFile *tempFile, UpdateEngineCore *engine);
 
 	// UpdateTask interface
 	QString installText() const Q_DECL_OVERRIDE;
 	bool run() Q_DECL_OVERRIDE;
+
+private:
+	QTemporaryFile *tempFile;
 };
 
 
@@ -27,6 +30,7 @@ public:
 UpdateEngine::UpdateEngine(QObject *parent) :
 	QObject(parent),
 	abortRequested(false),
+	newDBFile(new QTemporaryFile(this)),
 	downloadMax(0),
 	downloads(),
 	currentDownload(Q_NULLPTR),
@@ -48,7 +52,18 @@ UpdateEngine::UpdateEngine(QObject *parent) :
 	connect(this, &UpdateEngine::error,
 			this, &UpdateEngine::abort);
 
-	this->installs.enqueue(new SetupTask(this));
+	this->newDBFile->open();
+	this->newDBFile->close();
+	this->installs.enqueue(new SetupTask(this->newDBFile, this));
+}
+
+UpdateEngine::~UpdateEngine()
+{
+	qDeleteAll(this->downloads);
+	delete this->currentDownload;
+	qDeleteAll(this->installs);
+	delete this->currentInstall;
+	delete this->currentReply;
 }
 
 void UpdateEngine::failure(const QString &error)
@@ -155,7 +170,9 @@ void UpdateEngine::nextDownload()
 			this->currentDownload = this->downloads.dequeue();
 			emit beginDownload(this->currentDownload->downloadText());
 
-			this->currentReply = this->nam->get(QNetworkRequest(downloadUrl));
+			QNetworkRequest request(downloadUrl);
+			request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+			this->currentReply = this->nam->get(request);
 			connect(this->currentReply, &QNetworkReply::downloadProgress,
 					this, &UpdateEngine::updateDownloadProgress);
 			connect(this->currentReply, &QNetworkReply::finished,
@@ -245,6 +262,31 @@ void UpdateEngine::watcherReady()
 
 void UpdateEngine::completeInstall()
 {
+	this->closeDBs();
+
+	QString path = ARG_LOCAL_DB_PATH;
+	if(!QFile::exists(path) || QFile::remove(path)) {
+		QString tempPath = this->newDBFile->fileName();
+		this->newDBFile->setAutoRemove(false);
+		delete this->newDBFile;
+		if(QFile::rename(tempPath, path))
+			emit engineDone();
+		else
+			emit error(tr("Failed to rename update to real database!"));
+	} else
+		emit error(tr("Failed to delete old database!"));
+}
+
+void UpdateEngine::tryAbortReady()
+{
+	if(this->didAbortDownload && this->didAbortInstall) {
+		this->closeDBs();
+		emit abortDone();
+	}
+}
+
+void UpdateEngine::closeDBs()
+{
 	QSqlDatabase newDB = QSqlDatabase::database(UpdateEngineCore::newDB);
 	if(newDB.isOpen())
 		newDB.close();
@@ -256,26 +298,12 @@ void UpdateEngine::completeInstall()
 		oldDB.close();
 	oldDB = QSqlDatabase();
 	QSqlDatabase::removeDatabase(UpdateEngineCore::oldDB);
-
-	QString path = ARG_LOCAL_DB_PATH;
-	if(!QFile::exists(path) || QFile::remove(path)) {
-		if(QFile::rename(path + QStringLiteral(".update"), path))
-			emit engineDone();
-		else
-			emit error(tr("Failed to rename update to real database!"));
-	} else
-		emit error(tr("Failed to delete old database!"));
-}
-
-void UpdateEngine::tryAbortReady()
-{
-	if(this->didAbortDownload && this->didAbortInstall)
-		emit abortDone();
 }
 
 
-SetupTask::SetupTask(UpdateEngineCore *engine) :
-	UpdateTask()
+SetupTask::SetupTask(QTemporaryFile *tempFile, UpdateEngineCore *engine) :
+	UpdateTask(),
+	tempFile(tempFile)
 {
 	this->engine = engine;
 }
@@ -287,8 +315,7 @@ QString SetupTask::installText() const
 
 bool SetupTask::run()
 {
-	//create the databases
-	QString path = ARG_LOCAL_DB_PATH + QStringLiteral(".update");
+	QString path = this->tempFile->fileName();
 	QFile::remove(path);
 	QSqlDatabase newDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), UpdateEngineCore::newDB);
 	newDB.setDatabaseName(path);
