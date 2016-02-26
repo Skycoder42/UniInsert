@@ -138,6 +138,9 @@ void UpdateEngine::abort()
 		this->currentReply->abort();
 	else
 		this->didAbortDownload = true;
+	if(!this->currentInstall)
+		this->didAbortInstall = true;
+	this->tryAbortReady();
 }
 
 void UpdateEngine::nextDownload()

@@ -1,6 +1,7 @@
 #include "updaterwindow.h"
 #include "ui_updaterwindow.h"
 #include <QFile>
+#include <QCloseEvent>
 #include <progressbaradapter.h>
 #include <wintaskbarprogressadapter.h>
 #include <dialogmaster.h>
@@ -83,6 +84,12 @@ void UpdaterWindow::showEvent(QShowEvent *ev)
 	this->QWidget::showEvent(ev);
 }
 
+void UpdaterWindow::closeEvent(QCloseEvent *ev)
+{
+	ev->ignore();
+	this->on_buttonBox_rejected();
+}
+
 void UpdaterWindow::initialize()
 {
 	this->ui->titleLabel->setText(this->ui->titleLabel->text().arg(ARG_UPDATE_VERSION));
@@ -119,6 +126,7 @@ void UpdaterWindow::log(const QString &error)
 
 void UpdaterWindow::abortDone()
 {
+	qDebug() << this->didAbort;
 	if(this->didAbort)
 		qApp->exit(EXIT_FAILURE);
 	else {

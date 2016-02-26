@@ -30,6 +30,7 @@ public:
 
 protected:
 	void showEvent(QShowEvent *ev) Q_DECL_OVERRIDE;
+	void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 
 private slots:
 	void initialize();
