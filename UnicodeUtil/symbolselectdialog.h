@@ -3,11 +3,10 @@
 
 #include "popupdialog.h"
 #include <QRegularExpression>
-#include <QRegularExpressionValidator>
-#include <QWidgetAction>
-#include <QPointer>
 #include <QLabel>
-#include <QLineEdit>
+#include <QSortFilterProxyModel>
+#include <QSqlQueryModel>
+#include "databaseloader.h"
 
 namespace Ui {
 	class SymbolSelectDialog;
@@ -16,12 +15,13 @@ namespace Ui {
 class DragLabel : public QLabel
 {
 public:
-	DragLabel(QWidget *parent = Q_NULLPTR);
+	DragLabel(QDialog *parent = Q_NULLPTR);
 protected:
 	// QWidget interface
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
 	QPoint dragStartPosition;
 };
@@ -29,6 +29,7 @@ private:
 class SymbolSelectDialog : public PopupDialog
 {
 	Q_OBJECT
+	friend class DragLabel;
 
 public:
 	static const QRegularExpression unicodeRegex;
@@ -42,19 +43,32 @@ protected:
 	void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
-	void on_unicodeLineEdit_textChanged(const QString &text);
-	void on_insertButton_clicked();
+	void on_unicodeLineEdit_textEdited(const QString &text);
+	void on_unicodeLineEdit_returnPressed();
+	void on_filterModeComboBox_currentIndexChanged(int index);
+	void on_findAliasCheckBox_toggled(bool);
+	void on_searchTreeView_activated(const QModelIndex &index);
+	void searchIndexChanged(const QModelIndex &current, const QModelIndex &);
+
 	void on_actionCopy_Symbol_triggered();
-	void on_actionSearch_symbol_name_triggered();
-	void on_actionShow_symbol_information_triggered();
+	void on_actionShow_Symbol_Info_triggered();
+	void on_actionCopy_Symbol_Name_triggered();
+	void on_actionCopy_symbol_unicode_codepoint_triggered();
+	void on_actionCopy_symbol_HTML_code_triggered();
 
 private:/*functions*/
 	uint calcUnicode(const QString &code);
+	void updateSearch(const QString &text, bool force);
 
 private:
 	Ui::SymbolSelectDialog *ui;
-	QRegularExpressionValidator *validator;	
+	uint currentCode;
 	bool doInsert;
+
+	bool isSearchMode;
+	QSortFilterProxyModel *proxyModel;
+	QSqlQueryModel *symbolModel;
+	DatabaseLoader::SearchFlags mode;
 };
 
 #endif // SYMBOLSELECTDIALOG_H

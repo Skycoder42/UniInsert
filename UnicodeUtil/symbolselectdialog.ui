@@ -6,90 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>107</height>
+    <width>409</width>
+    <height>336</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Enter Code</string>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="previewLayout">
      <item>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLineEdit" name="previewLineEdit">
-           <property name="cursor">
-            <cursorShape>IBeamCursor</cursorShape>
-           </property>
-           <property name="contextMenuPolicy">
-            <enum>Qt::ActionsContextMenu</enum>
-           </property>
-           <property name="dragEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="placeholderText">
-            <string>No valid symbol</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="copyButton"/>
-         </item>
-         <item>
-          <widget class="QToolButton" name="symbolHelpButton"/>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="previewTagLabel">
-         <property name="text">
-          <string>Preview:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLineEdit" name="unicodeLineEdit">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The code can be entered as &lt;span style=&quot; font-weight:600;&quot;&gt;unicode codepoint&lt;/span&gt; or as &lt;span style=&quot; font-weight:600;&quot;&gt;html code&lt;/span&gt;:&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;U+0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;\u0024&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;amp;#66;&lt;/p&gt;&lt;p&gt;If you don't know the code, you can search a symbol by it's name by using the button on the right or pressing &lt;span style=&quot; font-style:italic;&quot;&gt;CTRL+F&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="placeholderText">
-            <string>Enter Unicode Number</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="searchButton"/>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="unicodeLabel">
-         <property name="text">
-          <string>Unicode:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
       <widget class="DragLabel" name="previewLabel">
        <property name="cursor">
         <cursorShape>ForbiddenCursor</cursorShape>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::ActionsContextMenu</enum>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -111,43 +47,127 @@
        </property>
       </widget>
      </item>
+     <item>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Filter &amp;Mode:</string>
+         </property>
+         <property name="buddy">
+          <cstring>filterModeComboBox</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="unicodeLabel">
+         <property name="text">
+          <string>Search &amp;Term:</string>
+         </property>
+         <property name="buddy">
+          <cstring>unicodeLineEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QComboBox" name="filterModeComboBox">
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>Contains</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Starts with</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ends with</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Exact Match</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="findAliasCheckBox">
+           <property name="text">
+            <string>Find &amp;Aliases</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="unicodeLineEdit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The code can be entered as &lt;span style=&quot; font-weight:600;&quot;&gt;unicode codepoint&lt;/span&gt; or as &lt;span style=&quot; font-weight:600;&quot;&gt;html code&lt;/span&gt;:&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;U+0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;\u0024&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;amp;#66;&lt;/p&gt;&lt;p&gt;If you don't know the code, you can search a symbol by it's name by using the button on the right or pressing &lt;span style=&quot; font-style:italic;&quot;&gt;CTRL+F&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="placeholderText">
+            <string>Enter a search term or a symbol code</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="copyButton">
+           <property name="popupMode">
+            <enum>QToolButton::MenuButtonPopup</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="symbolInfoButton"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="insertButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string>Closes the dialog and inserts the symbol from where you opened it</string>
-       </property>
-       <property name="text">
-        <string>Insert</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-       <property name="default">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QTreeView" name="searchTreeView">
+     <property name="contextMenuPolicy">
+      <enum>Qt::ActionsContextMenu</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="itemsExpandable">
+      <bool>false</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="animated">
+      <bool>true</bool>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
   </layout>
   <action name="actionCopy_Symbol">
@@ -162,25 +182,13 @@
     <string>Copy symbol</string>
    </property>
    <property name="toolTip">
-    <string>Copy the symbol to the clipboard</string>
+    <string>Copy the current symbol to the clipboard</string>
    </property>
-   <property name="priority">
-    <enum>QAction::HighPriority</enum>
-   </property>
-  </action>
-  <action name="actionSearch_symbol_name">
-   <property name="icon">
-    <iconset resource="unicodeutil_res.qrc">
-     <normaloff>:/icons/search.ico</normaloff>:/icons/search.ico</iconset>
-   </property>
-   <property name="text">
-    <string>Search symbol name</string>
-   </property>
-   <property name="toolTip">
-    <string>Searches for a specific symbol by it's name</string>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
    </property>
   </action>
-  <action name="actionShow_symbol_information">
+  <action name="actionShow_Symbol_Info">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -189,10 +197,46 @@
      <normaloff>:/icons/help.ico</normaloff>:/icons/help.ico</iconset>
    </property>
    <property name="text">
-    <string>Show symbol information</string>
+    <string>Show symbol info</string>
    </property>
    <property name="toolTip">
-    <string>Shows detailed information about the symbol</string>
+    <string>Shows detailed information about the current symbol</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionCopy_Symbol_Name">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Copy symbol name</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionCopy_symbol_unicode_codepoint">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Copy symbol unicode codepoint</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionCopy_symbol_HTML_code">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Copy symbol HTML code</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
    </property>
   </action>
  </widget>
@@ -205,11 +249,12 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>previewLineEdit</tabstop>
-  <tabstop>copyButton</tabstop>
   <tabstop>unicodeLineEdit</tabstop>
-  <tabstop>searchButton</tabstop>
-  <tabstop>insertButton</tabstop>
+  <tabstop>searchTreeView</tabstop>
+  <tabstop>filterModeComboBox</tabstop>
+  <tabstop>findAliasCheckBox</tabstop>
+  <tabstop>copyButton</tabstop>
+  <tabstop>symbolInfoButton</tabstop>
  </tabstops>
  <resources>
   <include location="unicodeutil_res.qrc"/>
