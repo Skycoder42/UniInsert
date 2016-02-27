@@ -60,7 +60,7 @@ ResetDatabaseDialog::ResetDatabaseDialog(QWidget *parent) :
 
 	connect(this->nam, &QNetworkAccessManager::finished,
 			this, &ResetDatabaseDialog::ftpListingReady);
-	QNetworkRequest request(QStringLiteral("http://ftp.unicode.org/Public"));
+	QNetworkRequest request(QStringLiteral("http://ftp.unicode.org/Public/zipped"));//trick to only get "valid" versions
 	request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
 	this->nam->get(request);
 }

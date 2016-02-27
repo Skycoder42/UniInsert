@@ -17,13 +17,19 @@ int main(int argc, char *argv[])
 	QApplication::setApplicationDisplayName(DISPLAY_NAME);
 	QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/main.ico")));
 
-	if(QApplication::arguments().size() != 5) {
+	if(QApplication::arguments().size() != 5 ||
+	   QApplication::arguments()[4].toInt() < 0 ||
+	   QApplication::arguments()[4].toInt() > 3) {
 		DialogMaster::critical(Q_NULLPTR,
 							   QApplication::translate("GLOBAL", "The program requires the command line arguments:\n"
 																 "   •  Path to the local unicode database\n"
 																 "   •  Unicode version to update to\n"
 																 "   •  The key of the Unicode Utility single instance\n"
-																 "   •  The updater mode flags (0-3)"),
+																 "   •  The updater mode flags (0-3):\n"
+																 "\t◦  0: Transfer no data\n"
+																 "\t◦  1: Transfer recently used symbols\n"
+																 "\t◦  2: Transfer custom emojis\n"
+																 "\t◦  3: Transfer both, 1 and 2"),
 							   QApplication::translate("GLOBAL", "Invalid commandline arguments!"));
 		return EXIT_FAILURE;
 	} else {
