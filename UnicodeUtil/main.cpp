@@ -37,10 +37,10 @@ int main(int argc, char *argv[])
 
 	instance.setStartupFunction([&]() -> int {
 		//check if reset was requested
-		if(SETTINGS_VALUE(SettingsDialog::reset).toBool()) {
+		if(SETTINGS_VALUE(SettingsDialog::resetDatabase).toBool())
 			DatabaseLoader::reset();
+		if(SETTINGS_VALUE(SettingsDialog::reset).toBool())
 			QSettings().clear();
-		}
 
 		QResource::registerResource(QApplication::applicationDirPath() + QStringLiteral("/defaultDatabase.rcc"));
 

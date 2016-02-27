@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/database">
+        <file alias="unicode.udb">uniDatabase.sqlite</file>
+        <file alias="version.txt">dbversion.txt</file>
+    </qresource>
+</RCC>

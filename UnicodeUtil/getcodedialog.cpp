@@ -126,7 +126,7 @@ QWidget *AliasAction::createWidget(QWidget *parent)
 	view->setModel(model);
 	view->setMinimumWidth(view->sizeHintForColumn(0) + view->style()->pixelMetric(QStyle::PM_ScrollBarExtent) + 5);
 
-	QAction *copyAction = new QAction(QIcon(QStringLiteral(":/icons/copy.ico")), tr("Copy Name"), view);
+	QAction *copyAction = new QAction(QIcon(QStringLiteral(":/icons/copy.ico")), GetCodeDialog::tr("Copy Name"), view);
 	copyAction->setShortcut(QKeySequence::Copy);
 	copyAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	connect(copyAction, &QAction::triggered, view, [=](){

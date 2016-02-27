@@ -22,7 +22,7 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	//load the database
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
-	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
+	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.udb"));
 	if(!QFile::exists(file)) {//TODO remove/change
 		QFile::copy(QStringLiteral(":/data/mainDB.sqlite"), file);
 		QFile::setPermissions(file, QFileDevice::ReadUser | QFileDevice::WriteUser);
@@ -53,7 +53,7 @@ void DatabaseLoader::reset()
 {
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
-	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.db"));
+	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.udb"));
 	QFile::remove(file);
 }
 

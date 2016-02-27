@@ -49,8 +49,14 @@ ResetDatabaseDialog::ResetDatabaseDialog(QWidget *parent) :
 
 	this->ui->installedDatabaseVersionLineEdit->setText(Unicoder::databaseLoader()->currentVersion().toString());
 
-	bool hashPath = QFile::exists(QStringLiteral(":/database/unicode.db"));
-	this->ui->restoreWidget->setEnabled(hashPath);
+	QFile versionFile(QStringLiteral(":/database/version.txt"));
+	if(versionFile.open(QIODevice::ReadOnly)) {
+		QVersionNumber version = QVersionNumber::fromString(QString::fromUtf8(versionFile.readAll()));
+		if(!version.isNull()) {
+			this->ui->restoreVersionLineEdit->setText(version.toString());
+			this->ui->restoreWidget->setEnabled(true);
+		}
+	}
 
 	connect(this->nam, &QNetworkAccessManager::finished,
 			this, &ResetDatabaseDialog::ftpListingReady);

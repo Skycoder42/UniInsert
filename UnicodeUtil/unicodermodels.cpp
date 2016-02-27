@@ -13,7 +13,7 @@ SymbolListModel::SymbolListModel(QObject *parent, bool canDrop) :
 QAction *SymbolListModel::createCopyAction(QAbstractItemView *view) const
 {
 	QAction *action = new QAction(QIcon(QStringLiteral(":/icons/copy.ico")),
-								  tr("Copy Symbol"),
+								  Unicoder::tr("Copy Symbol"),
 								  view);
 	action->setToolTip("Copies the selected symbol into the clipboard");
 	action->setShortcut(QKeySequence::Copy);
@@ -159,6 +159,6 @@ QString UnicodeDelegate::displayText(const QVariant &value, const QLocale &local
 	if(ok)
 		return text;
 	else
-		return this->isPreview ? QString() : tr("-/-");
+		return this->isPreview ? QString() : Unicoder::tr("-/-");
 }
 

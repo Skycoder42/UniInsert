@@ -3,10 +3,13 @@
 
 #include <QString>
 #include <QPair>
+#include <QApplication>
 class DatabaseLoader;
 
 class Unicoder
 {
+	Q_DECLARE_TR_FUNCTIONS(Unicoder)
+
 public:
 	struct SurrogatePair
 	{

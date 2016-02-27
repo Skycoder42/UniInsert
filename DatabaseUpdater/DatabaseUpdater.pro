@@ -13,6 +13,11 @@ TARGET = DatabaseUpdater
 VERSION = 1.1.0
 TEMPLATE = app
 
+translate.target = translate
+translate.commands += lupdate.exe -locations relative -recursive $$_PRO_FILE_ $$escape_expand(\n\t)
+translate.commands += lrelease.exe -compress -nounfinished $$_PRO_FILE_
+QMAKE_EXTRA_TARGETS += translate
+
 DEFINES += "TARGET=\\\"$$TARGET\\\""
 DEFINES += "VERSION=\\\"$$VERSION\\\""
 DEFINES += QT_USE_STRINGBUILDER

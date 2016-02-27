@@ -18,6 +18,7 @@ SETTINGS_CODE(transparency, 0.5)
 SETTINGS_CODE(maxRecent, 42)
 SETTINGS_CODE(autoStart, true)
 SETTINGS_CODE(reset, false)
+SETTINGS_CODE(resetDatabase, false)
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
@@ -114,9 +115,22 @@ void SettingsDialog::showAboutDialog()
 
 void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 {
-	if(this->ui->buttonBox->standardButton(button) == QDialogButtonBox::Reset) {
+	switch(this->ui->buttonBox->standardButton(button)) {
+	case QDialogButtonBox::Reset:
 		if(ResetDatabaseDialog::tryReset(this))
 			qApp->quit();
+		break;
+	case QDialogButtonBox::RestoreDefaults:
+		if(DialogMaster::question(this,
+								  tr("Only the settings will be resetted. The database, "
+									 "recently used symbols and emojis will stay unchanged.\n\n"
+									 "The application will quit if you accept."),
+								  tr("Reset Settings?"))
+		   == QMessageBox::Yes) {
+			QSettings().setValue(SettingsDialog::reset, true);
+			qApp->quit();
+		}
+		break;
 	}
 }
 

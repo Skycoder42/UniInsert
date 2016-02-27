@@ -27,6 +27,7 @@ public:
 	DECL_SETTINGS_CODE(maxRecent)
 	DECL_SETTINGS_CODE(autoStart)
 	DECL_SETTINGS_CODE(reset)
+	DECL_SETTINGS_CODE(resetDatabase)
 
 	explicit SettingsDialog(QWidget *parent = 0);
 	~SettingsDialog();
