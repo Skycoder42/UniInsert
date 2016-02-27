@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QProcess>
 #include <dialogmaster.h>
+#include <qsingleinstance.h>
 #include "settingsdialog.h"
 #include "databaseloader.h"
 
@@ -96,7 +97,7 @@ void ResetDatabaseDialog::accept()
 		QStringList arguments;
 		arguments += DatabaseLoader::dbPath();
 		arguments += this->ui->downloadVersionListView->currentIndex().data().toString();
-		arguments += Unicoder::singleInstanceKey();
+		arguments += Unicoder::singleInstance()->instanceID();
 		int flags = 0;
 		if(this->ui->keepRecentlyUsedCheckBox->isChecked())
 			flags |= 1;
@@ -117,6 +118,8 @@ void ResetDatabaseDialog::accept()
 #endif
 	} else {
 		QSettings().setValue(SettingsDialog::resetDatabase, true);
+		Unicoder::singleInstance()->closeInstance();
+		QProcess::startDetached(QApplication::applicationFilePath());
 		this->done(Accepted);
 	}
 }

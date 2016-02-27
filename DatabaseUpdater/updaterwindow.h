@@ -38,7 +38,7 @@ private slots:
 	void initialize();
 
 	//general
-	void error(const QString &error);
+	void error(const QString &error, bool isNetwork);
 	void log(const QString &error);
 
 	void abortDone();

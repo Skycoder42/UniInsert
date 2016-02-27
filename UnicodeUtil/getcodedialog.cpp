@@ -6,6 +6,7 @@
 #include <QListView>
 #include <QApplication>
 #include <QClipboard>
+#include <dialogmaster.h>
 #include "unicoder.h"
 #include "databaseloader.h"
 
@@ -25,7 +26,8 @@ private:
 GetCodeDialog::GetCodeDialog() :
 	PopupDialog(true),
 	ui(new Ui::GetCodeDialog),
-	aliasAction(new AliasAction(this))
+	aliasAction(new AliasAction(this)),
+	infoShow(false)
 {
 	ui->setupUi(this);
 	connect(this->ui->pasteButton, &QToolButton::clicked,
@@ -39,10 +41,26 @@ GetCodeDialog::~GetCodeDialog()
 	delete ui;
 }
 
+void GetCodeDialog::showCodeInfo(uint code, QWidget *parent, bool allowGroups)
+{
+	GetCodeDialog dialog;
+	dialog.setParent(parent);
+	DialogMaster::masterDialog(&dialog, true);
+	dialog.infoShow = true;
+	dialog.ui->symbolLineEdit->setText(Unicoder::code32ToSymbol(code));
+	dialog.ui->symbolLineEdit->setEnabled(false);
+	dialog.ui->pasteButton->setEnabled(false);
+	if(!allowGroups)
+		dialog.ui->exploreGroupButton->setEnabled(false);
+	dialog.exec();
+}
+
 void GetCodeDialog::showEvent(QShowEvent *event)
 {
-	this->ui->symbolLineEdit->clear();
-	this->ui->symbolLineEdit->setFocus();
+	if(!this->infoShow) {
+		this->ui->symbolLineEdit->clear();
+		this->ui->symbolLineEdit->setFocus();
+	}
 	event->accept();
 }
 
@@ -91,7 +109,7 @@ void GetCodeDialog::on_exploreGroupButton_clicked()
 {
 	int blockID = Unicoder::databaseLoader()->findBlock(this->ui->symbolLineEdit->text());
 	if(blockID > -1)
-		emit showBlock(blockID);
+		emit showBlock(blockID);//TODO
 }
 
 void GetCodeDialog::on_addRecentButton_clicked()

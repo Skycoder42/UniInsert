@@ -5,6 +5,7 @@
 #include <QPair>
 #include <QApplication>
 class DatabaseLoader;
+class QSingleInstance;
 
 class Unicoder
 {
@@ -37,7 +38,7 @@ public:
 
 	static DatabaseLoader *databaseLoader();
 
-	static QString singleInstanceKey();
+	static QSingleInstance *singleInstance();
 
 private:
 	Unicoder() = delete;

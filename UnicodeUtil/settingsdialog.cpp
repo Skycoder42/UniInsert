@@ -2,6 +2,8 @@
 #include "ui_settingsdialog.h"
 #include <QSettings>
 #include <QDir>
+#include <qsingleinstance.h>
+#include <QProcess>
 #include "dialogmaster.h"
 #include "databaseloader.h"
 #include "resetdatabasedialog.h"
@@ -123,11 +125,12 @@ void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 	case QDialogButtonBox::RestoreDefaults:
 		if(DialogMaster::question(this,
 								  tr("Only the settings will be resetted. The database, "
-									 "recently used symbols and emojis will stay unchanged.\n\n"
-									 "The application will quit if you accept."),
+									 "recently used symbols and emojis will stay unchanged."),
 								  tr("Reset Settings?"))
 		   == QMessageBox::Yes) {
 			QSettings().setValue(SettingsDialog::reset, true);
+			Unicoder::singleInstance()->closeInstance();
+			QProcess::startDetached(QApplication::applicationFilePath());
 			qApp->quit();
 		}
 		break;

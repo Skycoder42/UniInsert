@@ -12,5 +12,6 @@
         <file alias="addTab.ico">icons/Fatcow-Farm-Fresh-Tab-add.ico</file>
         <file alias="deleteTab.ico">icons/Fatcow-Farm-Fresh-Tab-delete.ico</file>
         <file alias="loading.gif">icons/ajax-loader.gif</file>
+        <file alias="help.ico">icons/Fatcow-Farm-Fresh-Ask-and-answer.ico</file>
     </qresource>
 </RCC>

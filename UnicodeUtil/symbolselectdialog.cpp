@@ -7,13 +7,16 @@
 #include <QDrag>
 #include <QWindow>
 #include <QScreen>
+#include <QKeyEvent>
 #include "unicoder.h"
 #include "advancedsearchdialog.h"
 #include "unicodermodels.h"
 #include "dialogmaster.h"
+#include "getcodedialog.h"
 
-const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(?:U\+?|\\u)?((?:10|[\dA-F])?[\dA-F]{4})$)__"),
-														  QRegularExpression::CaseInsensitiveOption);
+const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(?:(?:U\+?|\\u)?((?:10|[\dA-F])?[\dA-F]{4}))|(?:&#(\d+);)$)__"),
+														  QRegularExpression::CaseInsensitiveOption |
+														  QRegularExpression::OptimizeOnFirstUsageOption);
 
 SymbolSelectDialog::SymbolSelectDialog() :
 	PopupDialog(true),
@@ -29,7 +32,11 @@ SymbolSelectDialog::SymbolSelectDialog() :
 	this->ui->previewLabel->setFixedHeight(this->ui->previewLayout->sizeHint().height());
 	this->ui->previewLabel->setFixedWidth(this->ui->previewLayout->sizeHint().height());
 
-	this->ui->actionCopy_Symbol->setShortcut(QKeySequence::Copy);
+	this->ui->actionShow_symbol_information->setShortcut(QKeySequence::HelpContents);
+	this->ui->symbolHelpButton->setDefaultAction(this->ui->actionShow_symbol_information);
+	this->ui->previewLineEdit->addAction(this->ui->actionShow_symbol_information);
+
+	this->ui->actionCopy_Symbol->setShortcuts({Qt::Key_F2, QKeySequence::Copy});
 	this->ui->copyButton->setDefaultAction(this->ui->actionCopy_Symbol);
 	this->ui->previewLineEdit->addAction(this->ui->actionCopy_Symbol);
 
@@ -82,12 +89,16 @@ void SymbolSelectDialog::on_unicodeLineEdit_textChanged(const QString &text)
 		this->ui->previewLabel->setText(symbol);
 		this->ui->previewLabel->setToolTip(name);
 		this->ui->previewLabel->setCursor(Qt::OpenHandCursor);
+		this->ui->actionCopy_Symbol->setEnabled(true);
+		this->ui->actionShow_symbol_information->setEnabled(true);
 	} else {
 		this->ui->previewLineEdit->clear();
 		this->ui->previewLineEdit->setToolTip(QString());
 		this->ui->previewLabel->clear();
 		this->ui->previewLabel->setToolTip(QString());
 		this->ui->previewLabel->setCursor(Qt::ForbiddenCursor);
+		this->ui->actionCopy_Symbol->setEnabled(false);
+		this->ui->actionShow_symbol_information->setEnabled(false);
 	}
 }
 
@@ -113,6 +124,14 @@ void SymbolSelectDialog::on_actionSearch_symbol_name_triggered()
 	this->setAutoHide(outHideOld);
 }
 
+void SymbolSelectDialog::on_actionShow_symbol_information_triggered()
+{
+	bool outHideOld = this->doesAutoHide();
+	this->setAutoHide(false);
+	GetCodeDialog::showCodeInfo(Unicoder::symbolToCode32(this->ui->previewLineEdit->text()), this);
+	this->setAutoHide(outHideOld);
+}
+
 uint SymbolSelectDialog::calcUnicode(const QString &code)
 {
 	QRegularExpressionMatch match = SymbolSelectDialog::unicodeRegex.match(code);
@@ -121,6 +140,11 @@ uint SymbolSelectDialog::calcUnicode(const QString &code)
 		uint symbol = match.captured(1).toUInt(&ok, 16);
 		if(ok)
 			return symbol;
+		else {
+			symbol = match.captured(2).toUInt(&ok);
+			if(ok)
+				return symbol;
+		}
 	}
 
 	return UINT_MAX;

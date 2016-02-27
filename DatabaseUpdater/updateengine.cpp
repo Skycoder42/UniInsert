@@ -69,7 +69,8 @@ UpdateEngine::~UpdateEngine()
 void UpdateEngine::failure(const QString &error)
 {
 	QMetaObject::invokeMethod(this, "error", Qt::QueuedConnection,
-							  Q_ARG(QString, error));
+							  Q_ARG(QString, error),
+							  Q_ARG(bool, false));
 }
 
 void UpdateEngine::logError(const QString &error)
@@ -221,7 +222,7 @@ void UpdateEngine::downloadError()
 		QString errorString = this->currentReply->errorString();
 		this->currentReply->deleteLater();
 		this->currentReply = Q_NULLPTR;
-		emit error(errorString);
+		emit error(errorString, true);
 	}
 }
 
@@ -273,9 +274,9 @@ void UpdateEngine::completeInstall()
 		if(QFile::rename(tempPath, path))
 			emit engineDone();
 		else
-			emit error(tr("Failed to rename update to real database!"));
+			emit error(tr("Failed to rename update to real database!"), false);
 	} else
-		emit error(tr("Failed to delete old database!"));
+		emit error(tr("Failed to delete old database!"), false);
 }
 
 void UpdateEngine::tryAbortReady()

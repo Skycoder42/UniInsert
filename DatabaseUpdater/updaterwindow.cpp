@@ -115,10 +115,14 @@ void UpdaterWindow::initialize()
 		this->engine->addTask(new TransferEmojisTask());
 }
 
-void UpdaterWindow::error(const QString &error)
+void UpdaterWindow::error(const QString &error, bool isNetwork)
 {
 	this->mainProgress->setBarState(QProgressGroup::Stopped);
-	DialogMaster::critical(this, error);
+	DialogMaster::critical(this,
+						   error,
+						   isNetwork ?
+							   tr("A network error occured!") :
+							   tr("A database error occured!"));
 	if(this->errorClosed)
 		qApp->exit(EXIT_FAILURE);
 	else

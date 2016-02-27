@@ -142,6 +142,9 @@
        <property name="text">
         <string>Inactive Window &amp;Transparency:</string>
        </property>
+       <property name="buddy">
+        <cstring>inactiveWindowTransparencySlider</cstring>
+       </property>
       </widget>
      </item>
      <item row="3" column="1">

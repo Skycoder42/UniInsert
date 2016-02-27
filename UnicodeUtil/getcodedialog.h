@@ -16,6 +16,8 @@ public:
 	explicit GetCodeDialog();
 	~GetCodeDialog();
 
+	static void showCodeInfo(uint code, QWidget *parent, bool allowGroups = true);
+
 signals:
 	void showBlock(int blockID);
 
@@ -31,6 +33,7 @@ private slots:
 private:
 	Ui::GetCodeDialog *ui;
 	AliasAction *aliasAction;
+	bool infoShow;
 };
 
 #endif // GETCODEDIALOG_H

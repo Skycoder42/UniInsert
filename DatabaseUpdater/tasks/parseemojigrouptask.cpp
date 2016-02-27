@@ -1,6 +1,7 @@
 #include "parseemojigrouptask.h"
 #include "global.h"
 #include <QTextDocument>
+#include <QSqlError>
 
 #define EMOJI_ERROR(var) if(var == -1) {\
 		this->engine->failure(emojiPediaError());\
@@ -77,19 +78,20 @@ bool ParseEmojiGroupTask::execute(QSqlDatabase &newDB)
 		createGroupQuery.bindValue(QStringLiteral(":name"), groupName);
 		TRY_EXEC(createGroupQuery)
 
-				int groupID = createGroupQuery.lastInsertId().toInt();
+		int groupID = createGroupQuery.lastInsertId().toInt();
 		this->engine->updateInstallValue(1);
 
 		for(int i = 0, max = emojis.size(); i < max; ++i) {
 			CHECK_ABORT
-					QSqlQuery insertSymbolQuery(newDB);
+			QSqlQuery insertSymbolQuery(newDB);
 			insertSymbolQuery.prepare(QStringLiteral("INSERT INTO EmojiMapping (GroupID, EmojiID, SortHint) VALUES(:group, :emoji, :hint)"));
 			insertSymbolQuery.bindValue(QStringLiteral(":group"), groupID);
 			insertSymbolQuery.bindValue(QStringLiteral(":emoji"), emojis[i]);
 			insertSymbolQuery.bindValue(QStringLiteral(":hint"), i + 1);
-			TRY_EXEC(insertSymbolQuery)
+			if(!insertSymbolQuery.exec())
+				this->engine->logError(insertSymbolQuery.lastError().text());
 
-					this->engine->updateInstallValue(i + 2);
+			this->engine->updateInstallValue(i + 2);
 		}
 	}
 

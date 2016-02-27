@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
+    <width>300</width>
     <height>107</height>
    </rect>
   </property>
@@ -44,6 +44,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="copyButton"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="symbolHelpButton"/>
          </item>
         </layout>
        </item>
@@ -148,18 +151,21 @@
    </item>
   </layout>
   <action name="actionCopy_Symbol">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="unicodeutil_res.qrc">
      <normaloff>:/icons/copy.ico</normaloff>:/icons/copy.ico</iconset>
    </property>
    <property name="text">
-    <string>Copy Symbol</string>
+    <string>Copy symbol</string>
    </property>
    <property name="toolTip">
     <string>Copy the symbol to the clipboard</string>
    </property>
-   <property name="shortcutContext">
-    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   <property name="priority">
+    <enum>QAction::HighPriority</enum>
    </property>
   </action>
   <action name="actionSearch_symbol_name">
@@ -173,8 +179,20 @@
    <property name="toolTip">
     <string>Searches for a specific symbol by it's name</string>
    </property>
-   <property name="shortcutContext">
-    <enum>Qt::WidgetWithChildrenShortcut</enum>
+  </action>
+  <action name="actionShow_symbol_information">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="unicodeutil_res.qrc">
+     <normaloff>:/icons/help.ico</normaloff>:/icons/help.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Show symbol information</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows detailed information about the symbol</string>
    </property>
   </action>
  </widget>

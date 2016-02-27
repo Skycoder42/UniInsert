@@ -7,6 +7,7 @@
 #include <QWidgetAction>
 #include <QPointer>
 #include <QLabel>
+#include <QLineEdit>
 
 namespace Ui {
 	class SymbolSelectDialog;
@@ -45,6 +46,7 @@ private slots:
 	void on_insertButton_clicked();
 	void on_actionCopy_Symbol_triggered();
 	void on_actionSearch_symbol_name_triggered();
+	void on_actionShow_symbol_information_triggered();
 
 private:/*functions*/
 	uint calcUnicode(const QString &code);

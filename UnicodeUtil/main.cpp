@@ -15,7 +15,7 @@ class Global {
 	Q_DECLARE_TR_FUNCTIONS(Global)
 };
 
-static QString singleInstanceKey;
+static QSingleInstance *singleInstance;
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	BlockSelectDialog *blockDiag = Q_NULLPTR;
 
 	instance.setStartupFunction([&]() -> int {
-		::singleInstanceKey = instance.instanceID();
+		::singleInstance = &instance;
 		//check if reset was requested
 		if(SETTINGS_VALUE(SettingsDialog::resetDatabase).toBool()){
 			DatabaseLoader::reset();
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 	return instance.singleExec();
 }
 
-QString Unicoder::singleInstanceKey()
+QSingleInstance *Unicoder::singleInstance()
 {
-	return ::singleInstanceKey;
+	return ::singleInstance;
 }
