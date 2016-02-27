@@ -218,9 +218,10 @@ void UpdateEngine::downloadError()
 		this->currentReply = Q_NULLPTR;
 		this->tryAbortReady();
 	} else {
-		emit error(this->currentReply->errorString());
+		QString errorString = this->currentReply->errorString();
 		this->currentReply->deleteLater();
 		this->currentReply = Q_NULLPTR;
+		emit error(errorString);
 	}
 }
 
