@@ -36,8 +36,7 @@ public:
 	explicit DatabaseLoader(QObject *parent = 0);
 	~DatabaseLoader();
 
-	QString dbPath() const;
-
+	static QString dbPath();
 	static void reset();
 
 	//per symbol
@@ -83,8 +82,11 @@ public:
 	//system
 	QVersionNumber currentVersion() const;
 
-private:/*functions*/
+private slots:
 	static QString prepareSearch(QString term, SearchFlags flags);
+
+	bool createDBFromData();
+	void loadDBInfo();
 
 private:
 	QSqlDatabase mainDB;

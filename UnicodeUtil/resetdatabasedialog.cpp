@@ -70,9 +70,17 @@ ResetDatabaseDialog::~ResetDatabaseDialog()
 	delete ui;
 }
 
-bool ResetDatabaseDialog::tryReset(QWidget *parent)
+bool ResetDatabaseDialog::tryReset(QWidget *parent, bool installOnly)
 {
 	ResetDatabaseDialog dialog(parent);
+	if(installOnly) {
+		dialog.ui->keepRecentlyUsedCheckBox->setChecked(false);
+		dialog.ui->keepRecentlyUsedCheckBox->setEnabled(false);
+		dialog.ui->keepEmojisButton->setChecked(false);
+		dialog.ui->keepEmojisButton->setEnabled(false);
+		dialog.ui->loadEmojisButton->setChecked(true);
+		dialog.ui->loadEmojisButton->setEnabled(false);
+	}
 	if(dialog.exec() == QDialog::Accepted)
 		return true;
 	else
@@ -81,11 +89,14 @@ bool ResetDatabaseDialog::tryReset(QWidget *parent)
 
 void ResetDatabaseDialog::accept()
 {
+	if(DialogMaster::question(this, tr("Do you really want to reset/update the database?")) != QMessageBox::Yes)
+	   return;
+
 	if(this->modeGroup->checkedId() == 0) {
 		QStringList arguments;
-		arguments += Unicoder::databaseLoader()->dbPath();
+		arguments += DatabaseLoader::dbPath();
 		arguments += this->ui->downloadVersionListView->currentIndex().data().toString();
-		arguments += this->parent()->property("instanceKey").toString();
+		arguments += Unicoder::singleInstanceKey();
 		int flags = 0;
 		if(this->ui->keepRecentlyUsedCheckBox->isChecked())
 			flags |= 1;
@@ -105,7 +116,8 @@ void ResetDatabaseDialog::accept()
 		this->done(Accepted);
 #endif
 	} else {
-
+		QSettings().setValue(SettingsDialog::resetDatabase, true);
+		this->done(Accepted);
 	}
 }
 

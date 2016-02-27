@@ -37,6 +37,8 @@ public:
 
 	static DatabaseLoader *databaseLoader();
 
+	static QString singleInstanceKey();
+
 private:
 	Unicoder() = delete;
 	Unicoder(const Unicoder& other) = delete;

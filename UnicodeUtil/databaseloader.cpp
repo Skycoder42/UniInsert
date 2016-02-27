@@ -4,8 +4,11 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QStandardItemModel>
+#include <dialogmaster.h>
+#include <QProgressDialog>
 #include "unicodermodels.h"
 #include "settingsdialog.h"
+#include "resetdatabasedialog.h"
 
 const QString DatabaseLoader::DBName = QStringLiteral("UnicodeDB");
 const DatabaseLoader::Range DatabaseLoader::InvalidRange(UINT_MAX, 0);
@@ -20,12 +23,10 @@ DatabaseLoader::DatabaseLoader(QObject *parent) :
 	mainDB()
 {
 	//load the database
-	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-	sDir.mkpath(QStringLiteral("."));
-	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.udb"));
-	if(!QFile::exists(file)) {//TODO remove/change
-		QFile::copy(QStringLiteral(":/data/mainDB.sqlite"), file);
-		QFile::setPermissions(file, QFileDevice::ReadUser | QFileDevice::WriteUser);
+	QString file = DatabaseLoader::dbPath();
+	if(!QFile::exists(file)) {
+		if(!this->createDBFromData())
+			return;
 	}
 
 	this->mainDB = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"),
@@ -44,17 +45,20 @@ DatabaseLoader::~DatabaseLoader()
 	QSqlDatabase::removeDatabase(DatabaseLoader::DBName);
 }
 
-QString DatabaseLoader::dbPath() const
+QString DatabaseLoader::dbPath()
 {
-	return this->mainDB.databaseName();
+	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+	sDir.mkpath(QStringLiteral("."));
+	return sDir.absoluteFilePath(QStringLiteral("unicode.udb"));
 }
 
 void DatabaseLoader::reset()
 {
 	QDir sDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 	sDir.mkpath(QStringLiteral("."));
-	QString file = sDir.absoluteFilePath(QStringLiteral("unicode.udb"));
-	QFile::remove(file);
+	QString file = DatabaseLoader::dbPath();
+	if(!QFile::remove(file))
+		DialogMaster::critical(Q_NULLPTR, tr("Failed to remove old database!"));
 }
 
 QString DatabaseLoader::nameForSymbol(uint code) const
@@ -405,4 +409,52 @@ QString DatabaseLoader::prepareSearch(QString term, SearchFlags flags)
 	if(!flags.testFlag(EndsWith))
 		term.append(QLatin1Char('%'));
 	return term;
+}
+
+bool DatabaseLoader::createDBFromData()
+{
+	QFile resource(QStringLiteral(":/database/unicode.udb"));
+	if(!resource.exists()) {
+		QMetaObject::invokeMethod(this, "loadDBInfo", Qt::QueuedConnection);
+		return false;
+	}
+
+	QFile out(DatabaseLoader::dbPath());
+	if(!resource.open(QIODevice::ReadOnly) ||
+	   !out.open(QIODevice::WriteOnly)) {
+		DialogMaster::critical(Q_NULLPTR, tr("Failed to extract default database!"));
+		return false;
+	}
+
+	const int BufferSize = 1024;
+	QProgressDialog *progress = DialogMaster::createProgress(Q_NULLPTR,
+															 tr("Extracting default database…"),
+															 qCeil(resource.size() / (double)BufferSize),
+															 0,
+															 false);
+	char *buffer = new char[BufferSize];
+	int count = 0;
+	while(resource.bytesAvailable() > 0) {
+		const int read = resource.read(buffer, BufferSize);
+		out.write(buffer, read);
+		progress->setValue(++count);
+	}
+
+	resource.close();
+	out.close();
+	delete progress;
+
+	return true;
+}
+
+void DatabaseLoader::loadDBInfo()
+{
+	DialogMaster::warning(Q_NULLPTR,
+						  tr("You don't have installed a default database. "
+							 "Please choose one to download. A dialog will open "
+							 "to choose a version."),
+						  tr("No default database installed!"));
+	if(ResetDatabaseDialog::tryReset(Q_NULLPTR, true))
+		qApp->quit();
+	return;
 }

@@ -17,7 +17,7 @@ public:
 	explicit ResetDatabaseDialog(QWidget *parent = Q_NULLPTR);
 	~ResetDatabaseDialog();
 
-	static bool tryReset(QWidget *parent);
+	static bool tryReset(QWidget *parent, bool installOnly = false);
 
 	void accept() Q_DECL_OVERRIDE;
 
