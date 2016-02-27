@@ -40,8 +40,10 @@ int main(int argc, char *argv[])
 	instance.setStartupFunction([&]() -> int {
 		::singleInstanceKey = instance.instanceID();
 		//check if reset was requested
-		if(SETTINGS_VALUE(SettingsDialog::resetDatabase).toBool())
+		if(SETTINGS_VALUE(SettingsDialog::resetDatabase).toBool()){
 			DatabaseLoader::reset();
+			QSettings().setValue(SettingsDialog::resetDatabase, false);
+		}
 		if(SETTINGS_VALUE(SettingsDialog::reset).toBool())
 			QSettings().clear();
 
