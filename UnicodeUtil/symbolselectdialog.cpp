@@ -8,6 +8,8 @@
 #include <QWindow>
 #include <QScreen>
 #include <QClipboard>
+#include <QContextMenuEvent>
+#include <QMenu>
 #include "unicoder.h"
 #include "unicodermodels.h"
 #include "dialogmaster.h"
@@ -18,7 +20,7 @@ const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(
 														  QRegularExpression::OptimizeOnFirstUsageOption);
 
 SymbolSelectDialog::SymbolSelectDialog() :
-	PopupDialog(true),
+	PopupDialog(false),
 	ui(new Ui::SymbolSelectDialog),
 	currentCode(UINT_MAX),
 	doInsert(true),
@@ -29,7 +31,11 @@ SymbolSelectDialog::SymbolSelectDialog() :
 {
 	this->ui->setupUi(this);
 	SettingsDialog::loadSize(this);
-	DialogMaster::masterDialog(this);
+
+	this->ui->unicodeLineEdit->addActions({
+											  this->ui->actionEnter_unicode_codepoint,
+											  this->ui->actionEnter_HTML_code
+										  });
 
 	QFont font = this->ui->previewLabel->font();
 	font.setPixelSize(32);
@@ -64,8 +70,6 @@ SymbolSelectDialog::SymbolSelectDialog() :
 										   this->ui->actionShow_Symbol_Info
 									   });
 
-	this->ui->findAliasCheckBox->setChecked(SettingsDialog::loadValue(this, QStringLiteral("findAlias"), true).toBool());
-
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
 	this->proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -84,6 +88,8 @@ SymbolSelectDialog::SymbolSelectDialog() :
 		this->ui->searchTreeView->resizeColumnToContents(0);
 		this->ui->searchTreeView->sortByColumn(-1, Qt::AscendingOrder);
 	}
+
+	this->ui->findAliasCheckBox->setChecked(SettingsDialog::loadValue(this, QStringLiteral("findAlias"), true).toBool());
 }
 
 SymbolSelectDialog::~SymbolSelectDialog()
@@ -114,6 +120,7 @@ uint SymbolSelectDialog::getSymbol(QWidget *parent)
 void SymbolSelectDialog::showEvent(QShowEvent *event)
 {
 	this->currentCode = UINT_MAX;
+	this->updateSymbol();
 	this->ui->unicodeLineEdit->clear();
 	this->ui->unicodeLineEdit->setFocus();
 	this->on_unicodeLineEdit_textEdited(QString());
@@ -151,28 +158,11 @@ void SymbolSelectDialog::on_searchTreeView_activated(const QModelIndex &index)
 
 void SymbolSelectDialog::searchIndexChanged(const QModelIndex &current, const QModelIndex &)
 {
-	if(current.isValid()) {
+	if(current.isValid())
 		this->currentCode = current.sibling(current.row(), 1).data().toUInt();
-		QString symbol = Unicoder::code32ToSymbol(this->currentCode);
-		QString name = Unicoder::databaseLoader()->nameForSymbol(this->currentCode);
-		this->ui->previewLabel->setText(symbol);
-		this->ui->previewLabel->setToolTip(name);
-		this->ui->previewLabel->setCursor(Qt::OpenHandCursor);
-		this->ui->actionCopy_Symbol->setEnabled(true);
-		this->ui->actionCopy_Symbol_Name->setEnabled(!name.isEmpty());
-		this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(true);
-		this->ui->actionCopy_symbol_HTML_code->setEnabled(true);
-		this->ui->actionShow_Symbol_Info->setEnabled(true);
-	} else {
-		this->ui->previewLabel->clear();
-		this->ui->previewLabel->setToolTip(QString());
-		this->ui->previewLabel->setCursor(Qt::ForbiddenCursor);
-		this->ui->actionCopy_Symbol->setEnabled(false);
-		this->ui->actionCopy_Symbol_Name->setEnabled(false);
-		this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(false);
-		this->ui->actionCopy_symbol_HTML_code->setEnabled(false);
-		this->ui->actionShow_Symbol_Info->setEnabled(false);
-	}
+	else
+		this->currentCode = UINT_MAX;
+	this->updateSymbol();
 }
 
 void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
@@ -198,6 +188,24 @@ void SymbolSelectDialog::on_actionCopy_symbol_unicode_codepoint_triggered()
 void SymbolSelectDialog::on_actionCopy_symbol_HTML_code_triggered()
 {
 	QApplication::clipboard()->setText(QStringLiteral("&#%1;").arg(this->currentCode));
+}
+
+void SymbolSelectDialog::on_actionEnter_unicode_codepoint_triggered()
+{
+	QString text = QStringLiteral("U+");
+	this->ui->unicodeLineEdit->selectAll();
+	this->ui->unicodeLineEdit->insert(text);
+	this->updateSearch(text, false);
+	this->ui->unicodeLineEdit->setCursorPosition(2);
+}
+
+void SymbolSelectDialog::on_actionEnter_HTML_code_triggered()
+{
+	QString text = QStringLiteral("&#;");
+	this->ui->unicodeLineEdit->selectAll();
+	this->ui->unicodeLineEdit->insert(text);
+	this->updateSearch(text, false);
+	this->ui->unicodeLineEdit->setCursorPosition(2);
 }
 
 uint SymbolSelectDialog::calcUnicode(const QString &code)
@@ -228,23 +236,21 @@ void SymbolSelectDialog::updateSearch(const QString &text, bool force)
 	else
 		newMode = true;
 
-	QItemSelectionModel *sm = this->ui->searchTreeView->selectionModel();
 	if(newMode != this->isSearchMode) {
 		this->isSearchMode = newMode;
 		this->currentCode = UINT_MAX;
-		if(newMode) {
+		this->updateSymbol();
+
+		if(this->isSearchMode) {
 			this->ui->searchTreeView->setEnabled(true);
 		} else {
 			Unicoder::databaseLoader()->clearSearchModel(this->symbolModel, this->ui->findAliasCheckBox->isChecked());
 			this->ui->searchTreeView->setEnabled(false);
-			if(sm)
-				sm->clear();
 		}
 	}
 
 	if(this->isSearchMode) {
-		if(sm)
-			sm->clear();
+		this->ui->searchTreeView->selectionModel()->clear();
 
 		if(!force && text.size() < 3)
 			Unicoder::databaseLoader()->clearSearchModel(this->symbolModel, this->ui->findAliasCheckBox->isChecked());
@@ -259,28 +265,48 @@ void SymbolSelectDialog::updateSearch(const QString &text, bool force)
 		}
 	} else {
 		this->currentCode = this->calcUnicode(text);
-		if(this->currentCode != UINT_MAX) {
-			QString symbol = Unicoder::code32ToSymbol(this->currentCode);
-			QString name = Unicoder::databaseLoader()->nameForSymbol(this->currentCode);
-			this->ui->previewLabel->setText(symbol);
-			this->ui->previewLabel->setToolTip(name);
-			this->ui->previewLabel->setCursor(Qt::OpenHandCursor);
-			this->ui->actionCopy_Symbol->setEnabled(true);
-			this->ui->actionCopy_Symbol_Name->setEnabled(!name.isEmpty());
-			this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(true);
-			this->ui->actionCopy_symbol_HTML_code->setEnabled(true);
-			this->ui->actionShow_Symbol_Info->setEnabled(true);
-		} else {
-			this->ui->previewLabel->clear();
-			this->ui->previewLabel->setToolTip(QString());
-			this->ui->previewLabel->setCursor(Qt::ForbiddenCursor);
-			this->ui->actionCopy_Symbol->setEnabled(false);
-			this->ui->actionCopy_Symbol_Name->setEnabled(false);
-			this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(false);
-			this->ui->actionCopy_symbol_HTML_code->setEnabled(false);
-			this->ui->actionShow_Symbol_Info->setEnabled(false);
-		}
+		this->updateSymbol();
 	}
+}
+
+void SymbolSelectDialog::updateSymbol()
+{
+	if(this->currentCode != UINT_MAX) {
+		QString symbol = Unicoder::code32ToSymbol(this->currentCode);
+		QString name = Unicoder::databaseLoader()->nameForSymbol(this->currentCode);
+		this->ui->previewLabel->setText(symbol);
+		this->ui->previewLabel->setToolTip(name);
+		this->ui->previewLabel->setCursor(Qt::OpenHandCursor);
+		this->ui->actionCopy_Symbol->setEnabled(true);
+		this->ui->actionCopy_Symbol_Name->setEnabled(!name.isEmpty());
+		this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(true);
+		this->ui->actionCopy_symbol_HTML_code->setEnabled(true);
+		this->ui->actionShow_Symbol_Info->setEnabled(true);
+	} else {
+		this->ui->previewLabel->clear();
+		this->ui->previewLabel->setToolTip(QString());
+		this->ui->previewLabel->setCursor(Qt::ForbiddenCursor);
+		this->ui->actionCopy_Symbol->setEnabled(false);
+		this->ui->actionCopy_Symbol_Name->setEnabled(false);
+		this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(false);
+		this->ui->actionCopy_symbol_HTML_code->setEnabled(false);
+		this->ui->actionShow_Symbol_Info->setEnabled(false);
+	}
+}
+
+
+
+ExtendedMenuLineEdit::ExtendedMenuLineEdit(QWidget *parent) :
+	QLineEdit(parent)
+{}
+
+void ExtendedMenuLineEdit::contextMenuEvent(QContextMenuEvent *ev)
+{
+	QMenu *menu = this->createStandardContextMenu();
+	menu->addSeparator();
+	menu->addActions(this->actions());
+	menu->exec(ev->globalPos());
+	menu->deleteLater();
 }
 
 

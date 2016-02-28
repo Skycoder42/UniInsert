@@ -116,12 +116,15 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLineEdit" name="unicodeLineEdit">
+          <widget class="ExtendedMenuLineEdit" name="unicodeLineEdit">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The code can be entered as &lt;span style=&quot; font-weight:600;&quot;&gt;unicode codepoint&lt;/span&gt; or as &lt;span style=&quot; font-weight:600;&quot;&gt;html code&lt;/span&gt;:&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;U+0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;0042&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;\u0024&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;amp;#66;&lt;/p&gt;&lt;p&gt;If you don't know the code, you can search a symbol by it's name by using the button on the right or pressing &lt;span style=&quot; font-style:italic;&quot;&gt;CTRL+F&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="placeholderText">
             <string>Enter a search term or a symbol code</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -239,12 +242,39 @@
     <enum>Qt::WidgetWithChildrenShortcut</enum>
    </property>
   </action>
+  <action name="actionEnter_unicode_codepoint">
+   <property name="text">
+    <string>Enter unicode codepoint</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionEnter_HTML_code">
+   <property name="text">
+    <string>Enter HTML code</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>DragLabel</class>
    <extends>QLabel</extends>
+   <header>symbolselectdialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ExtendedMenuLineEdit</class>
+   <extends>QLineEdit</extends>
    <header>symbolselectdialog.h</header>
   </customwidget>
  </customwidgets>

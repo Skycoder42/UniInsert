@@ -6,11 +6,20 @@
 #include <QLabel>
 #include <QSortFilterProxyModel>
 #include <QSqlQueryModel>
+#include <QLineEdit>
 #include "databaseloader.h"
 
 namespace Ui {
 	class SymbolSelectDialog;
 }
+
+class ExtendedMenuLineEdit : public QLineEdit
+{
+public:
+	ExtendedMenuLineEdit(QWidget *parent = Q_NULLPTR);
+protected:
+	void contextMenuEvent(QContextMenuEvent *ev) Q_DECL_OVERRIDE;
+};
 
 class DragLabel : public QLabel
 {
@@ -55,10 +64,14 @@ private slots:
 	void on_actionCopy_Symbol_Name_triggered();
 	void on_actionCopy_symbol_unicode_codepoint_triggered();
 	void on_actionCopy_symbol_HTML_code_triggered();
+	void on_actionEnter_unicode_codepoint_triggered();
+	void on_actionEnter_HTML_code_triggered();
 
 private:/*functions*/
 	uint calcUnicode(const QString &code);
 	void updateSearch(const QString &text, bool force);
+
+	void updateSymbol();
 
 private:
 	Ui::SymbolSelectDialog *ui;
