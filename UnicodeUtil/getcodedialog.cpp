@@ -9,6 +9,7 @@
 #include <dialogmaster.h>
 #include "unicoder.h"
 #include "databaseloader.h"
+#include "symbolselectdialog.h"
 
 class AliasAction : public QWidgetAction
 {
@@ -30,10 +31,11 @@ GetCodeDialog::GetCodeDialog(PopupController *controller) :
 	infoShow(false)
 {
 	ui->setupUi(this);
-	connect(this->ui->pasteButton, &QToolButton::clicked,
-			this->ui->symbolLineEdit, &QLineEdit::paste);
-
 	this->ui->showAliasesButton->addAction(this->aliasAction);
+
+	this->ui->actionSearch_Symbol->setShortcut(QKeySequence::Find);
+	this->ui->searchButton->setDefaultAction(this->ui->actionSearch_Symbol);
+	this->ui->symbolLineEdit->addAction(this->ui->actionSearch_Symbol);
 }
 
 GetCodeDialog::~GetCodeDialog()
@@ -41,15 +43,20 @@ GetCodeDialog::~GetCodeDialog()
 	delete ui;
 }
 
-void GetCodeDialog::showSymbolInfo(uint code, bool allowGroups)
+void GetCodeDialog::showSymbolInfo(uint code, QWidget *parent)
 {
-	this->infoShow = true;
-	this->ui->symbolLineEdit->setText(Unicoder::code32ToSymbol(code));
-	this->ui->symbolLineEdit->setEnabled(false);
-	this->ui->pasteButton->setEnabled(false);
-	if(!allowGroups)
-		this->ui->exploreGroupButton->setEnabled(false);
-	this->popup();
+	if(code == UINT_MAX)
+		return;
+	GetCodeDialog dialog(Q_NULLPTR);
+	dialog.setAutoHide(false);
+	dialog.setParent(parent);
+	DialogMaster::masterDialog(&dialog, true);
+	dialog.infoShow = true;
+	dialog.ui->symbolLineEdit->setText(Unicoder::code32ToSymbol(code));
+	dialog.ui->symbolLineEdit->setEnabled(false);
+	dialog.ui->actionSearch_Symbol->setEnabled(false);
+	dialog.ui->exploreGroupButton->setEnabled(false);
+	dialog.exec();
 }
 
 void GetCodeDialog::showEvent(QShowEvent *event)
@@ -57,8 +64,7 @@ void GetCodeDialog::showEvent(QShowEvent *event)
 	if(!this->infoShow) {
 		this->ui->symbolLineEdit->clear();
 		this->ui->symbolLineEdit->setFocus();
-	} else
-		this->infoShow = false;
+	}
 	event->accept();
 }
 
@@ -108,6 +114,15 @@ void GetCodeDialog::on_exploreGroupButton_clicked()
 	int blockID = Unicoder::databaseLoader()->findBlock(this->ui->symbolLineEdit->text());
 	if(blockID > -1)
 		emit showBlock(blockID);//TODO
+}
+
+void GetCodeDialog::on_actionSearch_Symbol_triggered()
+{
+	this->setAutoHide(false);
+	uint code = SymbolSelectDialog::getSymbol(this);
+	if(code != UINT_MAX)
+		this->ui->symbolLineEdit->setText(Unicoder::code32ToSymbol(code));
+	this->setAutoHide(true);
 }
 
 void GetCodeDialog::on_addRecentButton_clicked()

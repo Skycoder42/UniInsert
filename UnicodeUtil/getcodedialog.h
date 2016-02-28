@@ -13,8 +13,8 @@ class GetCodeDialog : public PopupDialog
 	Q_OBJECT
 	friend class GetCodeController;
 
-public slots:
-	void showSymbolInfo(uint code, bool allowGroups);
+public:
+	static void showSymbolInfo(uint code, QWidget *parent);
 
 signals:
 	void showBlock(int blockID);
@@ -26,6 +26,7 @@ private slots:
 	void on_symbolLineEdit_textChanged(const QString &text);
 	void on_exploreGroupButton_clicked();
 
+	void on_actionSearch_Symbol_triggered();
 	void on_addRecentButton_clicked();
 
 private:

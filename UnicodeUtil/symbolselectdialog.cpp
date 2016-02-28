@@ -15,6 +15,7 @@
 #include "unicodermodels.h"
 #include "dialogmaster.h"
 #include "settingsdialog.h"
+#include "getcodedialog.h"
 
 const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(?:(?:U\+?|\\u)?((?:10|[\dA-F])?[\dA-F]{4}))|(?:&#(\d+);)$)__"),
 														  QRegularExpression::CaseInsensitiveOption |
@@ -177,7 +178,10 @@ void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
 
 void SymbolSelectDialog::on_actionShow_Symbol_Info_triggered()
 {
-	emit showInfo(this->currentCode, true);
+	bool aHide = this->doesAutoHide();
+	this->setAutoHide(false);
+	GetCodeDialog::showSymbolInfo(this->currentCode, this);
+	this->setAutoHide(aHide);
 }
 
 void SymbolSelectDialog::on_actionCopy_Symbol_Name_triggered()

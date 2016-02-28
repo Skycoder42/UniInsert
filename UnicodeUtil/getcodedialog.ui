@@ -40,13 +40,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="pasteButton">
+      <widget class="QToolButton" name="searchButton">
        <property name="toolTip">
-        <string>Paste a symbol from the clipboard</string>
-       </property>
-       <property name="icon">
-        <iconset resource="unicodeutil_res.qrc">
-         <normaloff>:/icons/paste.ico</normaloff>:/icons/paste.ico</iconset>
+        <string>Look for a specific symbol to show information of</string>
        </property>
       </widget>
      </item>
@@ -250,6 +246,21 @@
     </layout>
    </item>
   </layout>
+  <action name="actionSearch_Symbol">
+   <property name="icon">
+    <iconset resource="unicodeutil_res.qrc">
+     <normaloff>:/icons/search.ico</normaloff>:/icons/search.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Search Symbol</string>
+   </property>
+   <property name="toolTip">
+    <string>Look for a specific symbol to show information of</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="unicodeutil_res.qrc"/>

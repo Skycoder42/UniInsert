@@ -189,7 +189,6 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	view->setDragDropOverwriteMode(false);
 	view->setDefaultDropAction(Qt::MoveAction);
 
-	model->createCopyAction(view);
 	connect(view, &QListView::activated, this, &EmojiDialog::accept);
 	connect(view, &QListView::activated, model, &SymbolListModel::activateItem);
 	view->setModel(model);
@@ -202,8 +201,10 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	connect(pasteAction, SIGNAL(triggered()), this->pasteMapper, SLOT(map()));
 	connect(this, &EmojiDialog::updatePasteEnabled, pasteAction, &QAction::setEnabled);
 
-	QAction *seperator = new QAction(view);
-	seperator->setSeparator(true);
+	QAction *seperator1 = new QAction(view);
+	seperator1->setSeparator(true);
+	QAction *seperator2 = new QAction(view);
+	seperator2->setSeparator(true);
 
 	QAction *addAction = new QAction(QIcon(QStringLiteral(":/icons/add.ico")), tr("Add Emoji"), view);
 	addAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Insert));
@@ -217,9 +218,14 @@ void EmojiDialog::createTab(int groupID, const QString &groupName)
 	this->deleteMapper->setMapping(removeAction, model);
 	connect(removeAction, SIGNAL(triggered()), this->deleteMapper, SLOT(map()));
 
+	model->createCopyAction(view);
 	view->addActions({
 						 pasteAction,
-						 seperator,
+						 seperator1
+					 });
+	model->createHelpAction(view, this);
+	view->addActions({
+						 seperator2,
 						 addAction,
 						 removeAction
 					 });

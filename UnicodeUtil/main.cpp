@@ -77,12 +77,6 @@ int main(int argc, char *argv[])
 
 		QObject::connect(codeController->getDialog(), SIGNAL(showBlock(int)),
 						 blockController->getDialog(), SLOT(showBlock(int)));
-		QObject::connect(symbController->getDialog(), SIGNAL(showInfo(uint,bool)),
-						 codeController->getDialog(), SLOT(showSymbolInfo(uint,bool)));
-		QObject::connect(emojiController->getDialog(), SIGNAL(showInfo(uint,bool)),
-						 codeController->getDialog(), SLOT(showSymbolInfo(uint,bool)));
-		QObject::connect(blockController->getDialog(), SIGNAL(showInfo(uint,bool)),
-						 codeController->getDialog(), SLOT(showSymbolInfo(uint,bool)));
 
 		QObject::connect(qApp, &QApplication::aboutToQuit, [&](){
 			trayIco->hide();

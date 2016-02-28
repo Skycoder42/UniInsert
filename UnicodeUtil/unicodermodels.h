@@ -7,6 +7,7 @@
 #include <QStyledItemDelegate>
 #include "unicoder.h"
 #include "databaseloader.h"
+class PopupDialog;
 
 class SymbolListModel : public QSqlQueryModel
 {
@@ -16,6 +17,7 @@ public:
 	SymbolListModel(QObject *parent = Q_NULLPTR, bool isEmoji = false);
 
 	QAction *createCopyAction(QAbstractItemView *view) const;
+	QAction *createHelpAction(QAbstractItemView *view, PopupDialog *dialog) const;
 
 	void refresh();
 	QString getSymbol(const QModelIndex &index) const;
@@ -32,6 +34,7 @@ public:
 public slots:
 	void activateItem(const QModelIndex &index) const;
 	void copyItem(const QModelIndex &index) const;
+	void helpItem(const QModelIndex &index, PopupDialog *dialog) const;
 	void removeRecentItem(const QModelIndex &index);
 
 private:

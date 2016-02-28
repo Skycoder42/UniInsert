@@ -1,8 +1,6 @@
 <RCC>
     <qresource prefix="/icons">
         <file alias="copy.ico">icons/Fatcow-Farm-Fresh-Page-white-copy.ico</file>
-        <file alias="paste.ico">icons/Fatcow-Farm-Fresh-Page-white-paste.ico</file>
-        <file alias="zoom.ico">icons/Fatcow-Farm-Fresh-Zoom-in.ico</file>
         <file alias="main.ico">icons/UNI.Logo.ico</file>
         <file alias="detailedSearch.ico">icons/Fatcow-Farm-Fresh-Advanced-data-grid.ico</file>
         <file alias="search.ico">icons/Fatcow-Farm-Fresh-Search-field.ico</file>

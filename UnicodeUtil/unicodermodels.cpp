@@ -2,6 +2,7 @@
 #include <QAbstractItemModel>
 #include <QMimeData>
 #include <QSqlQuery>
+#include "getcodedialog.h"
 
 const QString SymbolListModel::IndexMimeType = QStringLiteral("uniinsert/listindex");
 
@@ -15,12 +16,29 @@ QAction *SymbolListModel::createCopyAction(QAbstractItemView *view) const
 	QAction *action = new QAction(QIcon(QStringLiteral(":/icons/copy.ico")),
 								  Unicoder::tr("Copy Symbol"),
 								  view);
-	action->setToolTip("Copies the selected symbol into the clipboard");
+	action->setToolTip(Unicoder::tr("Copies the selected symbol into the clipboard"));
 	action->setShortcut(QKeySequence::Copy);
 	action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 
 	connect(action, &QAction::triggered, this, [this, view](){
 		this->copyItem(view->currentIndex());
+	});
+
+	view->addAction(action);
+	return action;
+}
+
+QAction *SymbolListModel::createHelpAction(QAbstractItemView *view, PopupDialog *dialog) const
+{
+	QAction *action = new QAction(QIcon(QStringLiteral(":/icons/help.ico")),
+								  Unicoder::tr("Show symbol info"),
+								  view);
+	action->setToolTip(Unicoder::tr("Shows detailed information about the selected symbol"));
+	action->setShortcut(QKeySequence::HelpContents);
+	action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+
+	connect(action, &QAction::triggered, this, [this, view, dialog](){
+		this->helpItem(view->currentIndex(), dialog);
 	});
 
 	view->addAction(action);
@@ -124,6 +142,16 @@ void SymbolListModel::copyItem(const QModelIndex &index) const
 {
 	if(index.isValid())
 		Unicoder::copySymbol(this->getSymbol(index));
+}
+
+void SymbolListModel::helpItem(const QModelIndex &index, PopupDialog *dialog) const
+{
+	if(index.isValid()) {
+		bool dHide = dialog->doesAutoHide();
+		dialog->setAutoHide(false);
+		GetCodeDialog::showSymbolInfo(Unicoder::symbolToCode32(this->getSymbol(index)), dialog);
+		dialog->setAutoHide(dHide);
+	}
 }
 
 void SymbolListModel::removeRecentItem(const QModelIndex &index)

@@ -20,6 +20,7 @@ BlockSelectDialog::BlockSelectDialog(PopupController *controller) :
 	SettingsDialog::loadSize(this);
 
 	this->displayModel->createCopyAction(this->ui->listView);
+	this->displayModel->createHelpAction(this->ui->listView, this);
 	QAction *seperator = new QAction(this);
 	seperator->setSeparator(true);
 	this->ui->listView->addActions({

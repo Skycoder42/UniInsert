@@ -20,9 +20,6 @@ public:
 public slots:
 	void popup();
 
-signals:
-	void showInfo(uint code, bool allowGroups);
-
 protected:
 	void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	bool event(QEvent *ev) Q_DECL_OVERRIDE;
