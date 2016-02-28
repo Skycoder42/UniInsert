@@ -102,10 +102,8 @@ void SettingsDialog::accept()
 
 void SettingsDialog::showAboutDialog()
 {
-	QImage img = QApplication::windowIcon().pixmap(64, 64).toImage();
-	img.invertPixels();
 	DialogMaster::msgBox(Q_NULLPTR,
-						 QPixmap::fromImage(img),
+						 QIcon(QStringLiteral(":/icons/mainBlack.ico")),
 						 tr("<p>An application to easily insert unicode characters EVERYWHERE.</p>"
 							"<p>Author: Sykcoder Soft (<a href=\"https://github.com/Skycoder42\">Skycoder42</a>)</p>"
 							"<p>For Updates and further Information, check <a href=\"https://github.com/Skycoder42/UniInsert\">https://github.com/Skycoder42/UniInsert</a></p>"),

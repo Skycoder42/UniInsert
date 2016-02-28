@@ -11,5 +11,6 @@
         <file alias="deleteTab.ico">icons/Fatcow-Farm-Fresh-Tab-delete.ico</file>
         <file alias="loading.gif">icons/ajax-loader.gif</file>
         <file alias="help.ico">icons/Fatcow-Farm-Fresh-Ask-and-answer.ico</file>
+        <file alias="mainBlack.ico">icons/UNI.Logo.Black.ico</file>
     </qresource>
 </RCC>
