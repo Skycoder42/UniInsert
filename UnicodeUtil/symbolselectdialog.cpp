@@ -10,6 +10,7 @@
 #include <QClipboard>
 #include <QContextMenuEvent>
 #include <QMenu>
+#include <QWhatsThis>
 #include "unicoder.h"
 #include "unicodermodels.h"
 #include "dialogmaster.h"
@@ -44,8 +45,11 @@ SymbolSelectDialog::SymbolSelectDialog() :
 											  this->ui->actionEnter_HTML_code,
 											  seperator1,
 											  this->ui->actionCopy_Symbol_2,
-											  this->ui->actionShow_Symbol_Info
+											  this->ui->actionShow_Symbol_Info,
+											  seperator2
 										  });
+	this->ui->actionShow_searchterm_help->setIcon(this->style()->standardIcon(QStyle::SP_TitleBarContextHelpButton));
+	this->ui->unicodeLineEdit->addAction(this->ui->actionShow_searchterm_help, QLineEdit::TrailingPosition);
 
 	QFont font = this->ui->previewLabel->font();
 	font.setPixelSize(32);
@@ -208,6 +212,17 @@ void SymbolSelectDialog::on_actionEnter_HTML_code_triggered()
 	this->updateSearch(text, false);
 	this->ui->unicodeLineEdit->setCursorPosition(2);
 }
+
+void SymbolSelectDialog::on_actionShow_searchterm_help_triggered()
+{
+	QPoint point;
+	point.setY(this->ui->unicodeLineEdit->geometry().bottom());
+	point.setX(this->ui->unicodeLineEdit->geometry().center().x());
+	QWhatsThis::showText(this->mapToGlobal(point),
+						 this->ui->unicodeLineEdit->whatsThis(),
+						 this);
+}
+
 
 uint SymbolSelectDialog::calcUnicode(const QString &code)
 {

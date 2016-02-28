@@ -66,6 +66,7 @@ private slots:
 	void on_actionCopy_symbol_HTML_code_triggered();
 	void on_actionEnter_unicode_codepoint_triggered();
 	void on_actionEnter_HTML_code_triggered();
+	void on_actionShow_searchterm_help_triggered();
 
 private:/*functions*/
 	uint calcUnicode(const QString &code);
