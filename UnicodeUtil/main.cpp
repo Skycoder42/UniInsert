@@ -64,10 +64,10 @@ int main(int argc, char *argv[])
 			delete trayMenu;
 		}, Qt::DirectConnection);
 
-		trayMenu->addAction(symbController->createAction(trayMenu));
-		trayMenu->addAction(codeController->createAction(trayMenu));
-		trayMenu->addAction(emojiController->createAction(trayMenu));
-		trayMenu->addAction(blockController->createAction(trayMenu));
+		trayMenu->addAction(symbController->createAction());
+		trayMenu->addAction(codeController->createAction());
+		trayMenu->addAction(emojiController->createAction());
+		trayMenu->addAction(blockController->createAction());
 		trayMenu->addSeparator();
 		trayMenu->addAction(Global::tr("Settings"), settingsDiag, SLOT(showSettings()));
 		trayMenu->addAction(Global::tr("About"), settingsDiag, SLOT(showAboutDialog()));

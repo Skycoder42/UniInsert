@@ -35,7 +35,7 @@ class PopupController : public QWidget
 {
 public:
 	PopupController();
-	QAction *createAction(QObject *parent);
+	QAction *createAction();
 	QAction *getAction();
 	PopupDialog *getDialog();
 

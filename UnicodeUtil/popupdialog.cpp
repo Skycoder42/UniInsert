@@ -61,10 +61,10 @@ PopupController::PopupController() :
 	QWidget(Q_NULLPTR),
 	hotkey(new QHotkey(this)),
 	dialog(Q_NULLPTR),
-	action(Q_NULLPTR)
+	action(new QAction(this))
 {}
 
-QAction *PopupController::createAction(QObject *parent)
+QAction *PopupController::createAction()
 {
 	Q_ASSERT(!this->dialog);
 	this->dialog = this->createDialog();
@@ -79,7 +79,6 @@ QAction *PopupController::createAction(QObject *parent)
 	connect(this->hotkey, &QHotkey::activated,
 			this->dialog, &PopupDialog::popup);
 
-	this->action = new QAction(parent);
 	this->action->setText(this->actionName());
 	connect(this->action, &QAction::triggered,
 			this->dialog, &PopupDialog::popup);
