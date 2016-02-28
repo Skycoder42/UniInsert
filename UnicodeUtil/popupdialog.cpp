@@ -122,8 +122,13 @@ void PopupController::setHotkeyActive(bool active)
 void PopupController::updateHotkey(const QKeySequence &keySequence)
 {
 	Q_ASSERT(!this->hotkey->isRegistered());
-	this->action->setShortcut(keySequence);
+	this->hotkey->setShortcut(keySequence);
 	SettingsDialog::storeValue(this->dialog,
 							   QStringLiteral("hotkey"),
 							   keySequence.toString(QKeySequence::PortableText));
+}
+
+QKeySequence PopupController::getHotkey() const
+{
+	return this->hotkey->shortcut();
 }

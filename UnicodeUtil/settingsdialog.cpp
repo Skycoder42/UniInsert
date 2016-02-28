@@ -4,6 +4,7 @@
 #include <QDir>
 #include <qsingleinstance.h>
 #include <QProcess>
+#include <QKeySequenceEdit>
 #include "dialogmaster.h"
 #include "databaseloader.h"
 #include "resetdatabasedialog.h"
@@ -22,9 +23,10 @@ SETTINGS_CODE(autoStart, true)
 SETTINGS_CODE(reset, false)
 SETTINGS_CODE(resetDatabase, false)
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
+SettingsDialog::SettingsDialog(QList<PopupController*> controllers, QWidget *parent) :
 	QDialog(parent, Qt::WindowCloseButtonHint),
-	ui(new Ui::SettingsDialog)
+	ui(new Ui::SettingsDialog),
+	controllers(controllers)
 {
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
@@ -82,7 +84,7 @@ void SettingsDialog::showSettings()
 		this->ui->inactiveWindowTransparencySlider->setValue(settings.value(SettingsDialog::transparency, SettingsDialog::transparencyDefault).toDouble() * 100);
 		this->ui->maximumRecentlyUsedItemsSpinBox->setValue(settings.value(SettingsDialog::maxRecent, SettingsDialog::maxRecentDefault).toInt());
 		this->ui->startWithWindowsCheckBox->setChecked(settings.value(SettingsDialog::autoStart, SettingsDialog::autoStartDefault).toBool());
-		this->exec();
+		this->open();
 	}
 }
 
@@ -132,6 +134,43 @@ void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 			qApp->quit();
 		}
 		break;
+	}
+}
+
+void SettingsDialog::on_editHotKeysButton_clicked()
+{
+	QDialog hotkeyDialog(this);
+	DialogMaster::masterDialog(&hotkeyDialog, true);
+
+	QFormLayout *layout = new QFormLayout(&hotkeyDialog);
+	hotkeyDialog.setLayout(layout);
+
+	QHash<PopupController*, QKeySequenceEdit*> ctrMap;
+	for(PopupController *controller : this->controllers) {
+		controller->setHotkeyActive(false);
+		QKeySequenceEdit *edit = new QKeySequenceEdit(controller->getHotkey(), &hotkeyDialog);
+		connect(edit, &QKeySequenceEdit::editingFinished, edit, [edit](){
+			QKeySequence sq = edit->keySequence();
+			if(sq.count() > 0)
+				edit->setKeySequence(sq[0]);
+		});
+		layout->addRow(controller->actionName() + QLatin1Char(':'), edit);
+		ctrMap.insert(controller, edit);
+	}
+
+	QDialogButtonBox *btx = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &hotkeyDialog);
+	layout->addRow(QString(), btx);
+	connect(btx, &QDialogButtonBox::accepted, &hotkeyDialog, &QDialog::accept);
+	connect(btx, &QDialogButtonBox::rejected, &hotkeyDialog, &QDialog::reject);
+
+	bool update = (hotkeyDialog.exec() == QDialog::Accepted);
+
+	for(PopupController *controller : this->controllers) {
+		if(update) {
+			QKeySequenceEdit *edit = ctrMap.value(controller);
+			controller->updateHotkey(edit->keySequence());
+		}
+		controller->setHotkeyActive(true);
 	}
 }
 

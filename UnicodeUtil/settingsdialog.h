@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QVariant>
 #include <QSettings>
+#include "popupdialog.h"
 class QAbstractButton;
 
 #define DECL_SETTINGS_CODE(code) \
@@ -29,7 +30,7 @@ public:
 	DECL_SETTINGS_CODE(reset)
 	DECL_SETTINGS_CODE(resetDatabase)
 
-	explicit SettingsDialog(QWidget *parent = 0);
+	explicit SettingsDialog(QList<PopupController*> controllers, QWidget *parent = 0);
 	~SettingsDialog();
 
 	static void storeSize(QWidget *widget);
@@ -48,11 +49,14 @@ signals:
 
 private slots:
 	void on_buttonBox_clicked(QAbstractButton *button);
+	void on_editHotKeysButton_clicked();
 	void on_resetRecentButton_clicked();
 
 	void updateAutostart(bool on);
+
 private:
 	Ui::SettingsDialog *ui;
+	QList<PopupController*> controllers;
 };
 
 #endif // SETTINGSDIALOG_H

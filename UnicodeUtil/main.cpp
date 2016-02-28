@@ -56,7 +56,12 @@ int main(int argc, char *argv[])
 		codeController = new GetCodeController();
 		emojiController = new EmojiController();
 		blockController = new BlockSelectController();
-		settingsDiag = new SettingsDialog();
+		settingsDiag = new SettingsDialog({
+											   symbController,
+											   codeController,
+											   emojiController,
+											   blockController
+										  });
 
 		QMenu *trayMenu = new QMenu();
 		trayIco->setContextMenu(trayMenu);

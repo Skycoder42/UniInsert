@@ -38,9 +38,11 @@ public:
 
 	void setHotkeyActive(bool active);
 	void updateHotkey(const QKeySequence &keySequence);
+	QKeySequence getHotkey() const;
+
+	virtual QString actionName() const = 0;
 
 protected:
-	virtual QString actionName() const = 0;
 	virtual QKeySequence defaultKeySequence() const = 0;
 	virtual PopupDialog *createDialog() = 0;
 

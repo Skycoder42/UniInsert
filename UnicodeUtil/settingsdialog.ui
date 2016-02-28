@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>507</width>
-    <height>196</height>
+    <height>227</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,76 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="inactiveWindowTransparencyLabel">
+       <property name="text">
+        <string>Inactive Window &amp;Transparency:</string>
+       </property>
+       <property name="buddy">
+        <cstring>inactiveWindowTransparencySlider</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSlider" name="inactiveWindowTransparencySlider">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+       <property name="tickInterval">
+        <number>5</number>
+       </property>
+      </widget>
+     </item>
      <item row="4" column="0">
+      <widget class="QLabel" name="editHotKeysLabel">
+       <property name="text">
+        <string>Edit Hot&amp;keys:</string>
+       </property>
+       <property name="buddy">
+        <cstring>editHotKeysButton</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="editHotKeysButton">
+         <property name="text">
+          <string>Edit</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="5" column="0">
       <widget class="QLabel" name="maximumRecentlyUsedItemsLabel">
        <property name="text">
         <string>Maximum &amp;Recently Used Items:</string>
@@ -84,7 +153,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
        <item>
         <widget class="QSpinBox" name="maximumRecentlyUsedItemsSpinBox">
@@ -120,7 +189,7 @@
        </item>
       </layout>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="startWithWindowsLabel">
        <property name="text">
         <string>&amp;Start with Windows:</string>
@@ -130,42 +199,10 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QCheckBox" name="startWithWindowsCheckBox">
        <property name="checked">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="inactiveWindowTransparencyLabel">
-       <property name="text">
-        <string>Inactive Window &amp;Transparency:</string>
-       </property>
-       <property name="buddy">
-        <cstring>inactiveWindowTransparencySlider</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSlider" name="inactiveWindowTransparencySlider">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>50</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="tickPosition">
-        <enum>QSlider::TicksBelow</enum>
-       </property>
-       <property name="tickInterval">
-        <number>5</number>
        </property>
       </widget>
      </item>
