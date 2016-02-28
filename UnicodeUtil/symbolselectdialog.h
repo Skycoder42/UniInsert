@@ -13,38 +13,14 @@ namespace Ui {
 	class SymbolSelectDialog;
 }
 
-class ExtendedMenuLineEdit : public QLineEdit
-{
-public:
-	ExtendedMenuLineEdit(QWidget *parent = Q_NULLPTR);
-protected:
-	void contextMenuEvent(QContextMenuEvent *ev) Q_DECL_OVERRIDE;
-};
-
-class DragLabel : public QLabel
-{
-public:
-	DragLabel(QDialog *parent = Q_NULLPTR);
-protected:
-	// QWidget interface
-	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-private:
-	QPoint dragStartPosition;
-};
-
 class SymbolSelectDialog : public PopupDialog
 {
 	Q_OBJECT
 	friend class DragLabel;
+	friend class SymbolSelectController;
 
 public:
 	static const QRegularExpression unicodeRegex;
-
-	explicit SymbolSelectDialog();
-	~SymbolSelectDialog();
 
 	static uint getSymbol(QWidget *parent);
 
@@ -69,6 +45,9 @@ private slots:
 	void on_actionShow_searchterm_help_triggered();
 
 private:/*functions*/
+	explicit SymbolSelectDialog(PopupController *controller);
+	~SymbolSelectDialog();
+
 	uint calcUnicode(const QString &code);
 	void updateSearch(const QString &text, bool force);
 
@@ -83,6 +62,37 @@ private:
 	QSortFilterProxyModel *proxyModel;
 	QSqlQueryModel *symbolModel;
 	DatabaseLoader::SearchFlags mode;
+};
+
+class SymbolSelectController : public PopupController
+{
+protected:
+	// PopupController interface
+	QString actionName() const Q_DECL_OVERRIDE;
+	QKeySequence defaultKeySequence() const Q_DECL_OVERRIDE;
+	PopupDialog *createDialog() Q_DECL_OVERRIDE;
+};
+
+class ExtendedMenuLineEdit : public QLineEdit
+{
+public:
+	ExtendedMenuLineEdit(QWidget *parent = Q_NULLPTR);
+protected:
+	void contextMenuEvent(QContextMenuEvent *ev) Q_DECL_OVERRIDE;
+};
+
+class DragLabel : public QLabel
+{
+public:
+	DragLabel(QDialog *parent = Q_NULLPTR);
+protected:
+	// QWidget interface
+	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+private:
+	QPoint dragStartPosition;
 };
 
 #endif // SYMBOLSELECTDIALOG_H

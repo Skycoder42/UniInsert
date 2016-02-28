@@ -2,6 +2,8 @@
 #define POPUPDIALOG_H
 
 #include <QDialog>
+class PopupController;
+class QHotkey;
 
 class PopupDialog : public QDialog
 {
@@ -10,7 +12,7 @@ class PopupDialog : public QDialog
 	Q_PROPERTY(bool autoHide READ doesAutoHide WRITE setAutoHide)
 
 public:
-	explicit PopupDialog(bool isFixedSize);
+	explicit PopupDialog(PopupController *controller, bool isFixedSize);
 
 	bool doesAutoHide() const;
 	void setAutoHide(bool autoHide);
@@ -19,7 +21,7 @@ public slots:
 	void popup();
 
 signals:
-	void didClose();
+	void showInfo(uint code, bool allowGroups);
 
 protected:
 	void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
@@ -27,6 +29,28 @@ protected:
 
 private:
 	bool autoHide;
+};
+
+class PopupController : public QWidget
+{
+public:
+	PopupController();
+	QAction *createAction(QObject *parent);
+	QAction *getAction();
+	PopupDialog *getDialog();
+
+	void setHotkeyActive(bool active);
+	void updateHotkey(const QKeySequence &keySequence);
+
+protected:
+	virtual QString actionName() const = 0;
+	virtual QKeySequence defaultKeySequence() const = 0;
+	virtual PopupDialog *createDialog() = 0;
+
+private:
+	QHotkey *hotkey;
+	PopupDialog *dialog;
+	QAction *action;
 };
 
 #endif // POPUPDIALOG_H

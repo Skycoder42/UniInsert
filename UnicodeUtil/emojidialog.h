@@ -12,11 +12,9 @@ namespace Ui {
 class EmojiDialog : public PopupDialog
 {
 	Q_OBJECT
+	friend class EmojiController;
 
 public:
-	explicit EmojiDialog(QWidget *parent = 0);
-	~EmojiDialog();
-
 	bool eventFilter(QObject *, QEvent *event) Q_DECL_OVERRIDE;
 
 signals:
@@ -37,6 +35,9 @@ private slots:
 	void clipChange();
 
 private:
+	explicit EmojiDialog(PopupController *controller);
+	~EmojiDialog();
+
 	Ui::EmojiDialog *ui;
 	QSignalMapper *addMapper;
 	QSignalMapper *deleteMapper;
@@ -44,6 +45,15 @@ private:
 
 	QWidget* tabContextWidget;
 	QHash<QWidget*, SymbolListModel*> tabModels;
+};
+
+class EmojiController : public PopupController
+{
+protected:
+	// PopupController interface
+	QString actionName() const Q_DECL_OVERRIDE;
+	QKeySequence defaultKeySequence() const Q_DECL_OVERRIDE;
+	PopupDialog *createDialog() Q_DECL_OVERRIDE;
 };
 
 #endif // EMOJIDIALOG_H

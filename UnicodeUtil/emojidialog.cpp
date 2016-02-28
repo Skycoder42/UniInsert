@@ -11,8 +11,8 @@
 #include "settingsdialog.h"
 #include "dialogmaster.h"
 
-EmojiDialog::EmojiDialog(QWidget *parent) :
-	PopupDialog(parent),
+EmojiDialog::EmojiDialog(PopupController *controller) :
+	PopupDialog(controller, false),
 	ui(new Ui::EmojiDialog),
 	addMapper(new QSignalMapper(this)),
 	deleteMapper(new QSignalMapper(this)),
@@ -236,4 +236,21 @@ void EmojiDialog::clipChange()
 {
 	uint code = Unicoder::symbolToCode32(QApplication::clipboard()->text());
 	emit updatePasteEnabled(code != UINT_MAX, QPrivateSignal());
+}
+
+
+
+QString EmojiController::actionName() const
+{
+	return EmojiDialog::tr("Emojis");
+}
+
+QKeySequence EmojiController::defaultKeySequence() const
+{
+	return QKeySequence(Qt::CTRL | Qt::META | Qt::Key_Insert);
+}
+
+PopupDialog *EmojiController::createDialog()
+{
+	return new EmojiDialog(this);
 }

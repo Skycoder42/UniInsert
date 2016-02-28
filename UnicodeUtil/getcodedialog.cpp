@@ -23,8 +23,8 @@ private:
 
 
 
-GetCodeDialog::GetCodeDialog() :
-	PopupDialog(true),
+GetCodeDialog::GetCodeDialog(PopupController *controller) :
+	PopupDialog(controller, true),
 	ui(new Ui::GetCodeDialog),
 	aliasAction(new AliasAction(this)),
 	infoShow(false)
@@ -41,18 +41,15 @@ GetCodeDialog::~GetCodeDialog()
 	delete ui;
 }
 
-void GetCodeDialog::showCodeInfo(uint code, QWidget *parent, bool allowGroups)
+void GetCodeDialog::showSymbolInfo(uint code, bool allowGroups)
 {
-	GetCodeDialog dialog;
-	dialog.setParent(parent);
-	DialogMaster::masterDialog(&dialog, true);
-	dialog.infoShow = true;
-	dialog.ui->symbolLineEdit->setText(Unicoder::code32ToSymbol(code));
-	dialog.ui->symbolLineEdit->setEnabled(false);
-	dialog.ui->pasteButton->setEnabled(false);
+	this->infoShow = true;
+	this->ui->symbolLineEdit->setText(Unicoder::code32ToSymbol(code));
+	this->ui->symbolLineEdit->setEnabled(false);
+	this->ui->pasteButton->setEnabled(false);
 	if(!allowGroups)
-		dialog.ui->exploreGroupButton->setEnabled(false);
-	dialog.exec();
+		this->ui->exploreGroupButton->setEnabled(false);
+	this->popup();
 }
 
 void GetCodeDialog::showEvent(QShowEvent *event)
@@ -60,7 +57,8 @@ void GetCodeDialog::showEvent(QShowEvent *event)
 	if(!this->infoShow) {
 		this->ui->symbolLineEdit->clear();
 		this->ui->symbolLineEdit->setFocus();
-	}
+	} else
+		this->infoShow = false;
 	event->accept();
 }
 
@@ -115,6 +113,23 @@ void GetCodeDialog::on_exploreGroupButton_clicked()
 void GetCodeDialog::on_addRecentButton_clicked()
 {
 	Unicoder::databaseLoader()->updateRecent(this->ui->symbolLineEdit->text());
+}
+
+
+
+QString GetCodeController::actionName() const
+{
+	return GetCodeDialog::tr("Show symbol information");
+}
+
+QKeySequence GetCodeController::defaultKeySequence() const
+{
+	return QKeySequence(Qt::CTRL | Qt::META | Qt::Key_Asterisk);
+}
+
+PopupDialog *GetCodeController::createDialog()
+{
+	return new GetCodeDialog(this);
 }
 
 

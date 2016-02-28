@@ -31,11 +31,11 @@ int main(int argc, char *argv[])
 
 	QSystemTrayIcon *trayIco = Q_NULLPTR;
 
+	SymbolSelectController *symbController = Q_NULLPTR;
+	GetCodeController *codeController = Q_NULLPTR;
+	EmojiController *emojiController = Q_NULLPTR;
+	BlockSelectController *blockController = Q_NULLPTR;
 	SettingsDialog *settingsDiag = Q_NULLPTR;
-	SymbolSelectDialog *symbDiag = Q_NULLPTR;
-	GetCodeDialog *codeDiag = Q_NULLPTR;
-	EmojiDialog *emojiDialog = Q_NULLPTR;
-	BlockSelectDialog *blockDiag = Q_NULLPTR;
 
 	instance.setStartupFunction([&]() -> int {
 		::singleInstance = &instance;
@@ -52,14 +52,11 @@ int main(int argc, char *argv[])
 		trayIco = new QSystemTrayIcon(QApplication::windowIcon());
 		trayIco->setToolTip(QApplication::applicationDisplayName());
 
+		symbController = new SymbolSelectController();
+		codeController = new GetCodeController();
+		emojiController = new EmojiController();
+		blockController = new BlockSelectController();
 		settingsDiag = new SettingsDialog();
-		symbDiag = new SymbolSelectDialog();
-		codeDiag = new GetCodeDialog();
-		emojiDialog = new EmojiDialog();
-		blockDiag = new BlockSelectDialog();
-
-		QObject::connect(codeDiag, &GetCodeDialog::showBlock, blockDiag, &BlockSelectDialog::showBlock);
-		settingsDiag->setProperty("instanceKey", instance.instanceID());
 
 		QMenu *trayMenu = new QMenu();
 		trayIco->setContextMenu(trayMenu);
@@ -67,22 +64,10 @@ int main(int argc, char *argv[])
 			delete trayMenu;
 		}, Qt::DirectConnection);
 
-		QAction *codeAction = trayMenu->addAction(Global::tr("Enter Code"), symbDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+#"));
-		QHotkey *codeHotkey = new QHotkey(codeAction->shortcut(), true, codeAction);
-		QObject::connect(codeHotkey, &QHotkey::activated, codeAction, &QAction::trigger);
-
-		QAction *symbolAction = trayMenu->addAction(Global::tr("Show symbol data"), codeDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+*"));
-		QHotkey *symbolHotkey = new QHotkey(symbolAction->shortcut(), true, symbolAction);
-		QObject::connect(symbolHotkey, &QHotkey::activated, symbolAction, &QAction::trigger);
-
-		QAction *emojiAction = trayMenu->addAction(Global::tr("Emojis"), emojiDialog, SLOT(popup()), QKeySequence("Ctrl+Meta+Ins"));
-		QHotkey *emojiHotkey = new QHotkey(emojiAction->shortcut(), true, emojiAction);
-		QObject::connect(emojiHotkey, &QHotkey::activated, emojiAction, &QAction::trigger);
-
-		QAction *blockAction = trayMenu->addAction(Global::tr("Blocklist/Recently used"), blockDiag, SLOT(popup()), QKeySequence("Ctrl+Meta+Del"));
-		QHotkey *blockHotkey = new QHotkey(blockAction->shortcut(), true, blockAction);
-		QObject::connect(blockHotkey, &QHotkey::activated, blockAction, &QAction::trigger);
-
+		trayMenu->addAction(symbController->createAction(trayMenu));
+		trayMenu->addAction(codeController->createAction(trayMenu));
+		trayMenu->addAction(emojiController->createAction(trayMenu));
+		trayMenu->addAction(blockController->createAction(trayMenu));
 		trayMenu->addSeparator();
 		trayMenu->addAction(Global::tr("Settings"), settingsDiag, SLOT(showSettings()));
 		trayMenu->addAction(Global::tr("About"), settingsDiag, SLOT(showAboutDialog()));
@@ -90,13 +75,22 @@ int main(int argc, char *argv[])
 		trayMenu->addSeparator();
 		trayMenu->addAction(Global::tr("Quit"), qApp, SLOT(quit()));
 
+		QObject::connect(codeController->getDialog(), SIGNAL(showBlock(int)),
+						 blockController->getDialog(), SLOT(showBlock(int)));
+		QObject::connect(symbController->getDialog(), SIGNAL(showInfo(uint,bool)),
+						 codeController->getDialog(), SLOT(showSymbolInfo(uint,bool)));
+		QObject::connect(emojiController->getDialog(), SIGNAL(showInfo(uint,bool)),
+						 codeController->getDialog(), SLOT(showSymbolInfo(uint,bool)));
+		QObject::connect(blockController->getDialog(), SIGNAL(showInfo(uint,bool)),
+						 codeController->getDialog(), SLOT(showSymbolInfo(uint,bool)));
+
 		QObject::connect(qApp, &QApplication::aboutToQuit, [&](){
 			trayIco->hide();
+			symbController->deleteLater();
+			codeController->deleteLater();
+			emojiController->deleteLater();
+			blockController->deleteLater();
 			settingsDiag->deleteLater();
-			symbDiag->deleteLater();
-			codeDiag->deleteLater();
-			emojiDialog->deleteLater();
-			blockDiag->deleteLater();
 			trayIco->deleteLater();
 		});
 

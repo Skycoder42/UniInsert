@@ -20,8 +20,8 @@ const QRegularExpression SymbolSelectDialog::unicodeRegex(QStringLiteral(R"__(^(
 														  QRegularExpression::CaseInsensitiveOption |
 														  QRegularExpression::OptimizeOnFirstUsageOption);
 
-SymbolSelectDialog::SymbolSelectDialog() :
-	PopupDialog(false),
+SymbolSelectDialog::SymbolSelectDialog(PopupController *controller) :
+	PopupDialog(controller, false),
 	ui(new Ui::SymbolSelectDialog),
 	currentCode(UINT_MAX),
 	doInsert(true),
@@ -111,10 +111,10 @@ SymbolSelectDialog::~SymbolSelectDialog()
 
 uint SymbolSelectDialog::getSymbol(QWidget *parent)
 {
-	SymbolSelectDialog selectDialog;
+	SymbolSelectDialog selectDialog(Q_NULLPTR);
 	selectDialog.setAutoHide(false);
 	selectDialog.setParent(parent);
-	DialogMaster::masterDialog(&selectDialog, true);
+	DialogMaster::masterDialog(&selectDialog);
 	selectDialog.doInsert = false;
 	if(selectDialog.exec())
 		return Unicoder::symbolToCode32(selectDialog.ui->previewLabel->text());
@@ -177,7 +177,7 @@ void SymbolSelectDialog::on_actionCopy_Symbol_triggered()
 
 void SymbolSelectDialog::on_actionShow_Symbol_Info_triggered()
 {
-	Q_UNIMPLEMENTED();
+	emit showInfo(this->currentCode, true);
 }
 
 void SymbolSelectDialog::on_actionCopy_Symbol_Name_triggered()
@@ -314,6 +314,23 @@ void SymbolSelectDialog::updateSymbol()
 		this->ui->actionCopy_symbol_HTML_code->setEnabled(false);
 		this->ui->actionShow_Symbol_Info->setEnabled(false);
 	}
+}
+
+
+
+QString SymbolSelectController::actionName() const
+{
+	return SymbolSelectDialog::tr("Insert Symbol");
+}
+
+QKeySequence SymbolSelectController::defaultKeySequence() const
+{
+	return QKeySequence(Qt::CTRL | Qt::META | Qt::Key_NumberSign);
+}
+
+PopupDialog *SymbolSelectController::createDialog()
+{
+	return new SymbolSelectDialog(this);
 }
 
 

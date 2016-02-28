@@ -11,12 +11,10 @@ class AliasAction;
 class GetCodeDialog : public PopupDialog
 {
 	Q_OBJECT
+	friend class GetCodeController;
 
-public:
-	explicit GetCodeDialog();
-	~GetCodeDialog();
-
-	static void showCodeInfo(uint code, QWidget *parent, bool allowGroups = true);
+public slots:
+	void showSymbolInfo(uint code, bool allowGroups);
 
 signals:
 	void showBlock(int blockID);
@@ -31,9 +29,21 @@ private slots:
 	void on_addRecentButton_clicked();
 
 private:
+	explicit GetCodeDialog(PopupController *controller);
+	~GetCodeDialog();
+
 	Ui::GetCodeDialog *ui;
 	AliasAction *aliasAction;
 	bool infoShow;
+};
+
+class GetCodeController : public PopupController
+{
+protected:
+	// PopupController interface
+	QString actionName() const Q_DECL_OVERRIDE;
+	QKeySequence defaultKeySequence() const Q_DECL_OVERRIDE;
+	PopupDialog *createDialog() Q_DECL_OVERRIDE;
 };
 
 #endif // GETCODEDIALOG_H

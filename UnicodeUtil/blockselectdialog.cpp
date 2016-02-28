@@ -9,8 +9,8 @@
 #include "unicodermodels.h"
 #include "settingsdialog.h"
 
-BlockSelectDialog::BlockSelectDialog() :
-	PopupDialog(false),
+BlockSelectDialog::BlockSelectDialog(PopupController *controller) :
+	PopupDialog(controller, false),
 	ui(new Ui::BlockSelectDialog),
 	blockModel(Unicoder::databaseLoader()->createBlockModel(this)),
 	displayModel(new SymbolListModel(this)),
@@ -97,4 +97,21 @@ void BlockSelectDialog::on_actionRemove_from_list_triggered()
 {
 	if(this->ui->comboBox->currentIndex() == 0)
 		this->displayModel->removeRecentItem(this->ui->listView->currentIndex());
+}
+
+
+
+QString BlockSelectController::actionName() const
+{
+	return BlockSelectDialog::tr("Blocklist/Recently used");
+}
+
+QKeySequence BlockSelectController::defaultKeySequence() const
+{
+	return QKeySequence(Qt::CTRL | Qt::META | Qt::Key_Delete);
+}
+
+PopupDialog *BlockSelectController::createDialog()
+{
+	return new BlockSelectDialog(this);
 }

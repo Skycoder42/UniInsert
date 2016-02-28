@@ -12,10 +12,7 @@ namespace Ui {
 class BlockSelectDialog : public PopupDialog
 {
 	Q_OBJECT
-
-public:
-	explicit BlockSelectDialog();
-	~BlockSelectDialog();
+	friend class BlockSelectController;
 
 public slots:
 	void showBlock(int blockID);
@@ -30,10 +27,22 @@ private slots:
 	void on_actionRemove_from_list_triggered();
 
 private:
+	explicit BlockSelectDialog(PopupController *controller);
+	~BlockSelectDialog();
+
 	Ui::BlockSelectDialog *ui;
 	QAbstractItemModel *blockModel;
 	SymbolListModel *displayModel;
 	bool indexSet;
+};
+
+class BlockSelectController : public PopupController
+{
+protected:
+	// PopupController interface
+	QString actionName() const Q_DECL_OVERRIDE;
+	QKeySequence defaultKeySequence() const Q_DECL_OVERRIDE;
+	PopupDialog *createDialog() Q_DECL_OVERRIDE;
 };
 
 #endif // BLOCKSELECT࣫DIALOG_H
