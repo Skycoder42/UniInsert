@@ -73,25 +73,12 @@
        </item>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="findAliasCheckBox">
-       <property name="text">
-        <string>Find &amp;Aliases</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
     <widget class="QTreeView" name="treeView">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="showDropIndicator" stdset="0">
-      <bool>false</bool>
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
