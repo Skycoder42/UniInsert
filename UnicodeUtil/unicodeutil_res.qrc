@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/icons">
         <file alias="copy.ico">icons/Fatcow-Farm-Fresh-Page-white-copy.ico</file>
-        <file alias="main.ico">icons/UNI.Logo.ico</file>
         <file alias="detailedSearch.ico">icons/Fatcow-Farm-Fresh-Advanced-data-grid.ico</file>
         <file alias="search.ico">icons/Fatcow-Farm-Fresh-Search-field.ico</file>
         <file alias="details.ico">icons/Fatcow-Farm-Fresh-Application-view-detail.ico</file>
@@ -11,6 +10,7 @@
         <file alias="deleteTab.ico">icons/Fatcow-Farm-Fresh-Tab-delete.ico</file>
         <file alias="loading.gif">icons/ajax-loader.gif</file>
         <file alias="help.ico">icons/Fatcow-Farm-Fresh-Ask-and-answer.ico</file>
-        <file alias="mainBlack.ico">icons/UNI.Logo.Black.ico</file>
+        <file alias="mainBlack.ico">icons/logo_black.ico</file>
+        <file alias="main.ico">icons/logo_white.ico</file>
     </qresource>
 </RCC>

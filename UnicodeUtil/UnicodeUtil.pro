@@ -23,7 +23,7 @@ DEFINES += "VERSION=\\\"$$VERSION\\\""
 DEFINES += QT_USE_STRINGBUILDER
 
 win32 {
-	RC_ICONS += ./icons/UNI.Logo.Black.ico
+	RC_ICONS += ./icons/logo_black.ico
 	QMAKE_TARGET_COMPANY = "Skycoder42"
 	QMAKE_TARGET_PRODUCT = "Unicode Utility"
 	QMAKE_TARGET_DESCRIPTION = $$QMAKE_TARGET_PRODUCT
