@@ -31,10 +31,20 @@ SymbolSelectDialog::SymbolSelectDialog() :
 {
 	this->ui->setupUi(this);
 	SettingsDialog::loadSize(this);
+	connect(this->ui->actionCopy_Symbol_2, &QAction::triggered,
+			this, &SymbolSelectDialog::on_actionCopy_Symbol_triggered);
+
+	QAction *seperator1 = new QAction(this);
+	seperator1->setSeparator(true);
+	QAction *seperator2 = new QAction(this);
+	seperator2->setSeparator(true);
 
 	this->ui->unicodeLineEdit->addActions({
 											  this->ui->actionEnter_unicode_codepoint,
-											  this->ui->actionEnter_HTML_code
+											  this->ui->actionEnter_HTML_code,
+											  seperator1,
+											  this->ui->actionCopy_Symbol_2,
+											  this->ui->actionShow_Symbol_Info
 										  });
 
 	QFont font = this->ui->previewLabel->font();
@@ -43,32 +53,18 @@ SymbolSelectDialog::SymbolSelectDialog() :
 	this->ui->previewLabel->setFixedHeight(this->ui->previewLayout->sizeHint().height());
 	this->ui->previewLabel->setFixedWidth(this->ui->previewLayout->sizeHint().height());
 
-	QAction *seperator1 = new QAction(this);
-	seperator1->setSeparator(true);
-	QAction *seperator2 = new QAction(this);
-	seperator2->setSeparator(true);
-
-	this->ui->actionCopy_Symbol->setShortcut(QKeySequence::Copy);
+	this->ui->actionCopy_Symbol->setShortcuts({QKeySequence::Copy, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C)});
 	this->ui->copyButton->setDefaultAction(this->ui->actionCopy_Symbol);
-	this->ui->copyButton->addActions({
-										 seperator1,
-										 this->ui->actionCopy_Symbol_Name,
-										 this->ui->actionCopy_symbol_unicode_codepoint,
-										 this->ui->actionCopy_symbol_HTML_code
-									 });
+	QMenu *copyMenu = new QMenu(this->ui->copyButton);
+	copyMenu->addActions({
+							 this->ui->actionCopy_Symbol_Name,
+							 this->ui->actionCopy_symbol_unicode_codepoint,
+							 this->ui->actionCopy_symbol_HTML_code
+						 });
+	this->ui->copyButton->setMenu(copyMenu);
 
 	this->ui->actionShow_Symbol_Info->setShortcut(QKeySequence::HelpContents);
 	this->ui->symbolInfoButton->setDefaultAction(this->ui->actionShow_Symbol_Info);
-
-	this->ui->previewLabel->addActions({
-										   this->ui->actionCopy_Symbol,
-										   seperator1,
-										   this->ui->actionCopy_Symbol_Name,
-										   this->ui->actionCopy_symbol_unicode_codepoint,
-										   this->ui->actionCopy_symbol_HTML_code,
-										   seperator2,
-										   this->ui->actionShow_Symbol_Info
-									   });
 
 	this->proxyModel->setSourceModel(this->symbolModel);
 	this->proxyModel->setSortLocaleAware(true);
@@ -81,6 +77,11 @@ SymbolSelectDialog::SymbolSelectDialog() :
 	this->ui->searchTreeView->setItemDelegateForColumn(1, new UnicodeDelegate(false, this->ui->searchTreeView));
 	this->ui->searchTreeView->addActions({
 											 this->ui->actionCopy_Symbol,
+											 seperator1,
+											 this->ui->actionCopy_Symbol_Name,
+											 this->ui->actionCopy_symbol_unicode_codepoint,
+											 this->ui->actionCopy_symbol_HTML_code,
+											 seperator2,
 											 this->ui->actionShow_Symbol_Info
 										 });
 
@@ -266,6 +267,10 @@ void SymbolSelectDialog::updateSearch(const QString &text, bool force)
 	} else {
 		this->currentCode = this->calcUnicode(text);
 		this->updateSymbol();
+		if(force && this->currentCode != UINT_MAX) {
+			Unicoder::sendSymbolInput(Unicoder::code32ToSymbol(this->currentCode));
+			this->accept();
+		}
 	}
 }
 
@@ -278,6 +283,7 @@ void SymbolSelectDialog::updateSymbol()
 		this->ui->previewLabel->setToolTip(name);
 		this->ui->previewLabel->setCursor(Qt::OpenHandCursor);
 		this->ui->actionCopy_Symbol->setEnabled(true);
+		this->ui->actionCopy_Symbol_2->setEnabled(true);
 		this->ui->actionCopy_Symbol_Name->setEnabled(!name.isEmpty());
 		this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(true);
 		this->ui->actionCopy_symbol_HTML_code->setEnabled(true);
@@ -287,6 +293,7 @@ void SymbolSelectDialog::updateSymbol()
 		this->ui->previewLabel->setToolTip(QString());
 		this->ui->previewLabel->setCursor(Qt::ForbiddenCursor);
 		this->ui->actionCopy_Symbol->setEnabled(false);
+		this->ui->actionCopy_Symbol_2->setEnabled(false);
 		this->ui->actionCopy_Symbol_Name->setEnabled(false);
 		this->ui->actionCopy_symbol_unicode_codepoint->setEnabled(false);
 		this->ui->actionCopy_symbol_HTML_code->setEnabled(false);
