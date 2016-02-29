@@ -19,6 +19,9 @@ BlockSelectDialog::BlockSelectDialog(PopupController *controller) :
 	ui->setupUi(this);
 	SettingsDialog::loadSize(this);
 
+	this->ui->actionDetailed_Search->setShortcut(QKeySequence::Find);
+	this->ui->searchButton->setDefaultAction(this->ui->actionDetailed_Search);
+
 	this->displayModel->createCopyAction(this->ui->listView);
 	this->displayModel->createHelpAction(this->ui->listView, this);
 	QAction *seperator = new QAction(this);
@@ -85,7 +88,7 @@ void BlockSelectDialog::on_comboBox_currentIndexChanged(int index)
 	}
 }
 
-void BlockSelectDialog::on_toolButton_clicked()
+void BlockSelectDialog::on_actionDetailed_Search_triggered()
 {
 	this->setAutoHide(false);
 	QModelIndex index = AdvancedSearchDialog::searchBlock(this, this->blockModel);

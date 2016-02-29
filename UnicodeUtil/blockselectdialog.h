@@ -22,8 +22,7 @@ protected:
 
 private slots:
 	void on_comboBox_currentIndexChanged(int index);
-	void on_toolButton_clicked();
-
+	void on_actionDetailed_Search_triggered();
 	void on_actionRemove_from_list_triggered();
 
 private:

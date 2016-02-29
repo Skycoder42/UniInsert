@@ -33,15 +33,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton">
-       <property name="toolTip">
-        <string>Show advanced search dialog</string>
-       </property>
-       <property name="icon">
-        <iconset resource="unicodeutil_res.qrc">
-         <normaloff>:/icons/detailedSearch.ico</normaloff>:/icons/detailedSearch.ico</iconset>
-       </property>
-      </widget>
+      <widget class="QToolButton" name="searchButton"/>
      </item>
     </layout>
    </item>
@@ -101,6 +93,18 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::WidgetWithChildrenShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDetailed_Search">
+   <property name="icon">
+    <iconset resource="unicodeutil_res.qrc">
+     <normaloff>:/icons/detailedSearch.ico</normaloff>:/icons/detailedSearch.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Detailed Search</string>
+   </property>
+   <property name="toolTip">
+    <string>Show advanced search dialog</string>
    </property>
   </action>
  </widget>
