@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
 		instance.closeInstance();
 		if(res == 0 && w.startUtil()) {
-			if(!QProcess::startDetached(QApplication::applicationDirPath() + QStringLiteral("/UnicodeUtil.exe"))) {
+			if(!QProcess::startDetached(QApplication::applicationDirPath() + QStringLiteral("/UnicodeUtil.exe"), QStringList())) {
 				DialogMaster::critical(&w,
 									   QCoreApplication::translate("GLOBAL",
 																   "Failed to start the Unicode Utility!"));
