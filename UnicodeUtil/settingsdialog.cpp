@@ -130,7 +130,7 @@ void SettingsDialog::on_buttonBox_clicked(QAbstractButton *button)
 		   == QMessageBox::Yes) {
 			QSettings().setValue(SettingsDialog::reset, true);
 			Unicoder::singleInstance()->closeInstance();
-			QProcess::startDetached(QApplication::applicationFilePath());
+			QProcess::startDetached(QApplication::applicationFilePath(), QStringList());
 			qApp->quit();
 		}
 		break;

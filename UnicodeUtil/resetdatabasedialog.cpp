@@ -119,7 +119,7 @@ void ResetDatabaseDialog::accept()
 	} else {
 		QSettings().setValue(SettingsDialog::resetDatabase, true);
 		Unicoder::singleInstance()->closeInstance();
-		QProcess::startDetached(QApplication::applicationFilePath());
+		QProcess::startDetached(QApplication::applicationFilePath(), QStringList());
 		this->done(Accepted);
 	}
 }
