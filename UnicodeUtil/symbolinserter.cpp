@@ -19,9 +19,8 @@ void SymbolInserter::insertSymbol(const QString &symbol)
 		method = "sendClipInput";
 	else
 		method = "sendInput";
-	bool ok = QMetaObject::invokeMethod(this, method, Qt::QueuedConnection,
-										Q_ARG(QString, symbol));
-	Q_ASSERT(ok);
+	QMetaObject::invokeMethod(this, method, Qt::QueuedConnection,
+							  Q_ARG(QString, symbol));
 }
 
 void SymbolInserter::sendInput(const QString &symbol)
