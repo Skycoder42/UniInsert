@@ -12,4 +12,5 @@
 	<Dependencies>com.microsoft.vcredist.x64</Dependencies><!-- Windows only...-->
 	<ForcedInstallation>true</ForcedInstallation>
 	<Default>true</Default>
+	<SortingPriority>10</SortingPriority>
 </Package>

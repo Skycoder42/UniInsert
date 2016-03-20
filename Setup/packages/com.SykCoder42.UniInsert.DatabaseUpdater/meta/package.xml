@@ -8,4 +8,5 @@
 	<ReleaseDate>2016-03-20</ReleaseDate>
 	<Dependencies>com.SykCoder42.UniInsert.UnicodeUtil, com.microsoft.vcredist.x64</Dependencies>
 	<Default>true</Default>
+	<SortingPriority>9</SortingPriority>
 </Package>

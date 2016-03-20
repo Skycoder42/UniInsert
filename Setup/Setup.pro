@@ -16,4 +16,5 @@ DISTFILES += \
 	packages/com.SykCoder42.UniInsert.UnicodeUtil/meta/LICENSE.txt \
     packages/com.SykCoder42.UniInsert.DatabaseUpdater/meta/package.xml \
 	packages/com.SykCoder42.UniInsert.DefaultDatabase/meta/package.xml \
-    setup.bat
+    setup.bat \
+    redirect_package/unicodeutil/meta/package.xml

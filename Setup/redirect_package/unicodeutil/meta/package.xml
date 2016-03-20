@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+	<DisplayName>Unicode Utility Version Chooser</DisplayName>
+	<Description>Determines the right repository for each installer</Description>
+	<Version>1.1.0</Version>
+	<ReleaseDate>2016-03-20</ReleaseDate>
+	<Virtual>true</Virtual>
+</Package>
