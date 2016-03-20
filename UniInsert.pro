@@ -1,13 +1,16 @@
 TEMPLATE = subdirs
 
 SUBDIRS += UnicodeUtil \
-    DatabaseUpdater
+	DatabaseUpdater \
+	Setup
 
 DISTFILES += \
 	LICENSE \
 	README.md \
 	localDB/unicodeutil_defaultdb.qrc \
-	build_deploy/win/deploy.bat
+	build_deploy/win/deploy.bat \
+	build_deploy/win/setup.bat
+
 
 #custom target to generate the rcc-file
 localDB.target = localDB
