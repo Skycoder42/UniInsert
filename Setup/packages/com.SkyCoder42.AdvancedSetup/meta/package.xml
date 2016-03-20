@@ -9,9 +9,9 @@
 		<UserInterface>ShortcutPage.ui</UserInterface>
 		<UserInterface>UserPage.ui</UserInterface>
 	</UserInterfaces>
-	<Translations>
+<!--	<Translations>
 		<Translation>de.qm</Translation>
-	</Translations>
+	</Translations>-->
 	<ForcedInstallation>true</ForcedInstallation>
 	<Virtual>true</Virtual>
 </Package>

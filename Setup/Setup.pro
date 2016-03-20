@@ -12,7 +12,8 @@ DISTFILES += \
 	packages/com.microsoft.vcredist.x64/meta/package.xml \
 	packages/com.microsoft.vcredist.x64/meta/install.js \
 	packages/com.microsoft.vcredist.x64/data/vcredist_x64.exe \
-	packages/com.SykCoder42.UniInsert.UniInsert/meta/package.xml \
-	packages/com.SykCoder42.UniInsert.UniInsert/meta/LICENSE.txt \
+	packages/com.SykCoder42.UniInsert.UnicodeUtil/meta/package.xml \
+	packages/com.SykCoder42.UniInsert.UnicodeUtil/meta/LICENSE.txt \
     packages/com.SykCoder42.UniInsert.DatabaseUpdater/meta/package.xml \
-	packages/com.SykCoder42.UniInsert.DefaultDatabase/meta/package.xml
+	packages/com.SykCoder42.UniInsert.DefaultDatabase/meta/package.xml \
+    setup.bat

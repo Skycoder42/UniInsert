@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
 	<DisplayName>Unicode Utility default Unicode database</DisplayName>
-	<DisplayName xml:lang="de_de">Unicode Utility standard Unicode-Datenbank</DisplayName>
+<!--	<DisplayName xml:lang="de_de">Unicode Utility standard Unicode-Datenbank</DisplayName>-->
 	<Description>A premade unicode database. Without this component, you will have to download and generated one on first start.</Description>
-	<Description xml:lang="de_de">Eine vorbereitete Unicode-Datenbank. Ohne diese müssen Sie beim ersten Start eine herunterladen und generieren.</Description>
+<!--	<Description xml:lang="de_de">Eine vorbereitete Unicode-Datenbank. Ohne diese müssen Sie beim ersten Start eine herunterladen und generieren.</Description>-->
 	<Version>6.2.0</Version>
 	<ReleaseDate>2016-03-20</ReleaseDate>
-	<Dependencies>com.SykCoder42.UniInsert.UniInsert</Dependencies>
+	<Dependencies>com.SykCoder42.UniInsert.UnicodeUtil</Dependencies>
 	<Default>true</Default>
 </Package>

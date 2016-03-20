@@ -32,3 +32,7 @@ Makefile*
 #QtCtreator Qml
 *.qmlproject.user
 *.qmlproject.user.*
+
+Setup/packages/com.SykCoder42.UniInsert.DatabaseUpdater/data/DatabaseUpdater.exe
+Setup/packages/com.SykCoder42.UniInsert.DefaultDatabase/data/defaultDatabase.rcc
+Setup/packages/com.SykCoder42.UniInsert.UnicodeUtil/data/UnicodeUtil.exe
