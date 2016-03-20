@@ -61,10 +61,7 @@ Controller.prototype.IntroductionPageCallback = function()
 
 		var widget = gui.currentPageWidget();
 		if (widget !== null) {
-			// check if the installer has online components
-			var isOnline = !installer.isOfflineOnly();
-
-            if(!isOnline) {
+			if(installer.isOfflineOnly()) {
                 //offline only -> only allow uninstall
                 widget.findChild("PackageManagerRadioButton").visible = false;
                 widget.findChild("UpdaterRadioButton").visible = false;
