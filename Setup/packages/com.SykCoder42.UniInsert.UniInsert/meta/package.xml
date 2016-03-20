@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+	<DisplayName>Unicode Utility</DisplayName>
+	<DisplayName xml:lang="de_de">Unicode Utility</DisplayName>
+	<Description>The Unicode Utility Program.</Description>
+	<Description xml:lang="de_de">Das Unicode Utility Programm.</Description>
+	<Version>1.1.0</Version>
+	<ReleaseDate>2016-03-20</ReleaseDate>
+    <Licenses>
+		<License name="BSD License" file="LICENSE.txt" />
+	</Licenses>
+	<Dependencies>com.microsoft.vcredist.x64</Dependencies><!-- Windows only...-->
+	<ForcedInstallation>true</ForcedInstallation>
+	<Default>true</Default>
+</Package>

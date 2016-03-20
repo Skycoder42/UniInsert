@@ -10,7 +10,7 @@ CONFIG += C++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = DatabaseUpdater
-VERSION = 1.1.0
+VERSION = 1.0.0
 TEMPLATE = app
 
 translate.target = translate

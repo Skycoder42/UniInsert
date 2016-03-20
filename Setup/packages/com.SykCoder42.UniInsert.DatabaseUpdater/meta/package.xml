@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-	<DisplayName>QtIFW-Advanced Example User Files</DisplayName>
-	<DisplayName xml:lang="de_de">QtIFW-Advanced Beispiel Benutzer-Dateien</DisplayName>
-	<Description>An example for a component you can add.</Description>
-	<Description xml:lang="de_de">Ein Beispiel für eine Komponente, die Sie hinzufügen können.</Description>
+	<DisplayName>Database Updater</DisplayName>
+	<DisplayName xml:lang="de_de">Datenbank-Updater</DisplayName>
+	<Description>A tool to download an generated custom unicode databases.</Description>
+	<Description xml:lang="de_de">Ein Tool zum Herunterladen und Generieren von benutzerdefinierten Unicode-Datenbanken.</Description>
 	<Version>1.0.0</Version>
-	<ReleaseDate>2016-01-01</ReleaseDate>
-    <Licenses>
-		<License name="BSD License" file="LICENSE.txt" />
-	</Licenses>
-	<Dependencies>com.microsoft.vcredist.x64</Dependencies><!-- Windows only...-->
-	<ForcedInstallation>true</ForcedInstallation>
+	<ReleaseDate>2016-03-20</ReleaseDate>
+	<Dependencies>com.SykCoder42.UniInsert.UniInsert</Dependencies>
 	<Default>true</Default>
 </Package>
