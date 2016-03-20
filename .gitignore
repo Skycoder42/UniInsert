@@ -36,3 +36,4 @@ Makefile*
 Setup/packages/com.SykCoder42.UniInsert.DatabaseUpdater/data/DatabaseUpdater.exe
 Setup/packages/com.SykCoder42.UniInsert.DefaultDatabase/data/defaultDatabase.rcc
 Setup/packages/com.SykCoder42.UniInsert.UnicodeUtil/data/UnicodeUtil.exe
+Setup/build/Unicode_Utility_1.1.0_setup_win_x64.exe

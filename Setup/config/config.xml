@@ -12,7 +12,7 @@
 	<AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
 	<RemoteRepositories>
 		<Repository>
-			<Url>https://skynet.is-an-engineer.com/repositories/UnicodeUtil</Url>
+			<Url>http://skynet.is-an-engineer.com/repositories/UnicodeUtil</Url>
 			<Enabled>1</Enabled>
 			<DisplayName>Unicode Utility Online Repository</DisplayName>
 		</Repository>
