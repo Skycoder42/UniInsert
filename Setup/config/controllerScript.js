@@ -59,15 +59,10 @@ Controller.prototype.IntroductionPageCallback = function()
             return;
         }
 
-        var widget = gui.currentPageWidget();
-        if (widget !== null) {
-            // check if the installer has online components
-            var comps = installer.components();
-            var isOnline = false;
-            for (i = 0; i < comps.length; ++i) {
-                if(comps[i].isFromOnlineRepository())
-                    isOnline = true;
-            }
+		var widget = gui.currentPageWidget();
+		if (widget !== null) {
+			// check if the installer has online components
+			var isOnline = !installer.isOfflineOnly();
 
             if(!isOnline) {
                 //offline only -> only allow uninstall
@@ -95,7 +90,7 @@ Controller.prototype.IntroductionPageCallback = function()
                 } //else -> normal start
             }
         }
-    }
+	}
 }
 
 Controller.prototype.DynamicUserPageCallback = function()
