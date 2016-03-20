@@ -1,8 +1,9 @@
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QMenu>
-#include <QHotkey>
 #include <QResource>
+#include <QHotkey>
+#include <QtAutoUpdater>
 #include <qsingleinstance.h>
 
 #include "settingsdialog.h"
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
 	QSingleInstance instance;
 
 	QSystemTrayIcon *trayIco = Q_NULLPTR;
+	QtAutoUpdater::UpdateController *controller = Q_NULLPTR;
 
 	SymbolSelectController *symbController = Q_NULLPTR;
 	GetCodeController *codeController = Q_NULLPTR;
@@ -51,6 +53,9 @@ int main(int argc, char *argv[])
 
 		trayIco = new QSystemTrayIcon(QApplication::windowIcon());
 		trayIco->setToolTip(QApplication::applicationDisplayName());
+
+		controller = new QtAutoUpdater::UpdateController(qApp);
+		controller->start();
 
 		symbController = new SymbolSelectController();
 		codeController = new GetCodeController();
@@ -75,6 +80,7 @@ int main(int argc, char *argv[])
 		trayMenu->addAction(blockController->createAction());
 		trayMenu->addSeparator();
 		trayMenu->addAction(Global::tr("Settings"), settingsDiag, SLOT(showSettings()));
+		trayMenu->addAction(controller->createUpdateAction(trayIco));
 		trayMenu->addAction(Global::tr("About"), settingsDiag, SLOT(showAboutDialog()));
 		trayMenu->addAction(Global::tr("About Qt"), qApp, SLOT(aboutQt()));
 		trayMenu->addSeparator();

@@ -37,6 +37,7 @@ win32 {
 include(C:/C++Libraries/Qt/QHotkey/qhotkey.pri)
 include(C:/C++Libraries/Qt/QSingleInstance/qsingleinstance.pri)
 include(C:/C++Libraries/Qt/DialogMaster/dialogmaster.pri)
+include(C:/C++Libraries/Qt/QtAutoUpdater/qtautoupdater.pri)
 
 SOURCES += main.cpp\
 		symbolselectdialog.cpp \
